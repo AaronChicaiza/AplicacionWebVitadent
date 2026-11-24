@@ -1,0 +1,62 @@
+.dashboard-title{margin-bottom:18px}
+.dashboard-summary{grid-template-columns:repeat(4,minmax(0,1fr))}
+.dashboard-summary .summary-item strong{font-size:24px;font-variant-numeric:tabular-nums}
+.dashboard-summary .summary-item>span{color:#354e4b;font-size:12px}
+.dashboard-summary .summary-item small{color:#526663;font-size:11px}
+.dashboard-title .admin-primary{background:#075d63!important;color:#fff!important;box-shadow:none!important}
+.dashboard-title .admin-primary:hover,.dashboard-title .admin-primary:focus-visible{background:#064b50!important;color:#fff!important}
+.dashboard-empty-note{margin:0 0 16px;padding:11px 14px;border:1px solid #d8e5df;background:#f0f6f2;color:#3d5b54;font-size:12px;line-height:1.55}
+.income-charts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;align-items:stretch}
+.income-panel{min-width:0;margin-bottom:16px}
+.income-panel .panel-header{min-height:65px;padding:14px 15px}
+.income-panel .panel-header h2{font-size:15px}
+.income-panel .panel-header p{font-size:11px;color:#526663}
+.treatment-panel .panel-header p,.dashboard-recent .panel-header p{color:#526663;font-size:12px}
+.dashboard-recent .schedule-empty{min-height:0;padding:16px 18px}
+.dashboard-recent .schedule-empty h2{margin:0 0 5px}
+.dashboard-recent .schedule-empty p{color:#354e4b;font-size:12px}
+.dashboard-summary .summary-item small{color:#354e4b}
+.dashboard-summary .admin-count{color:#354e4b}
+.treatment-panel .admin-count{color:#354e4b}
+.income-bars{position:relative;display:grid;grid-template-columns:repeat(7,minmax(0,1fr));align-items:end;gap:7px;padding:17px 14px 0;min-height:168px}
+.income-bars-week{grid-template-columns:repeat(8,minmax(0,1fr));gap:5px;padding-right:10px;padding-left:10px}
+.income-bar-item{display:flex;min-width:0;flex-direction:column;align-items:center;justify-content:flex-end;gap:7px}
+.income-bar-stage{display:flex;width:100%;height:122px;align-items:flex-end;border-bottom:1px solid #cddbd5;background:repeating-linear-gradient(to top,transparent 0,transparent 39px,#edf1ef 40px,#edf1ef 41px)}
+.income-panel-empty .income-bars{min-height:58px;padding-top:8px}
+.income-panel-empty .income-bar-stage{height:24px;background:none}
+.income-bar{display:block;width:min(28px,72%);min-height:0;margin:0 auto;background:#00aebc;transition:height .25s ease}
+.income-bar[style*="height:0%"]{height:1px!important;background:#d6e0db}
+.income-bar-label{display:block;width:100%;overflow:hidden;color:#526663;font-size:11px;text-align:center;text-overflow:ellipsis;white-space:nowrap;font-variant-numeric:tabular-nums}
+.income-bars-week .income-bar-label{font-size:11px}
+.income-total{margin:0;padding:11px 15px 13px;border-top:1px solid #edf1ef;color:#526663;font-size:11px}
+.income-total strong{color:#18363a;font-variant-numeric:tabular-nums}
+.income-empty-label{position:absolute;top:48%;left:50%;z-index:1;transform:translate(-50%,-50%);margin:0;color:#526663;font-size:11px;text-align:center;white-space:nowrap}
+.treatment-panel{margin-bottom:16px}
+.treatment-chart-content{display:grid;grid-template-columns:minmax(190px,.75fr) minmax(0,1.25fr);align-items:center;gap:22px;padding:19px 24px}
+.treatment-pie-wrap{display:grid;place-items:center;min-height:190px}
+.treatment-pie{width:170px;max-width:100%;aspect-ratio:1;border:1px solid #dfe8e3;border-radius:50%;overflow:hidden}
+.treatment-pie svg{display:block;width:100%;height:100%}
+.treatment-pie-empty{background:#f0f4f2}
+.treatment-pie-wrap-empty{min-height:112px}
+.treatment-pie-empty{width:100px}
+.treatment-legend{display:grid;gap:0;margin:0;padding:0;list-style:none}
+.treatment-legend li{display:grid;grid-template-columns:10px minmax(0,1fr) 40px 54px;align-items:center;gap:10px;min-height:43px;border-bottom:1px solid #edf1ef;color:#354e4b;font-size:12px}
+.treatment-legend li:last-child{border-bottom:0}
+.treatment-key{width:9px;height:9px;background:var(--treatment-color);border-radius:50%}
+.treatment-name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.treatment-count,.treatment-legend strong{text-align:right;font-variant-numeric:tabular-nums}
+.treatment-count{color:#526663}
+.treatment-legend strong{color:#18363a}
+.treatment-empty{padding:15px 0;color:#526663}
+.treatment-empty h3{margin:0 0 5px;color:#18363a;font-size:15px}
+.treatment-empty p{margin:0;font-size:12px;line-height:1.55}
+.dashboard-recent{margin-top:16px}
+.attendance-form{display:flex;align-items:center;gap:4px;margin:4px 0}
+.attendance-form>span{color:#526663;font-size:12px}
+.attendance-form input{width:88px;min-width:0;height:29px;padding:4px 6px;border:1px solid #cbd8d2;border-radius:2px;color:#18363a;font-size:12px;font-variant-numeric:tabular-nums}
+.attendance-form button{min-height:29px;padding:5px 8px;border:1px solid #12656b;background:#fff;color:#115c61;font-size:11px;cursor:pointer}
+.attendance-form button:hover{background:#eaf4f1}
+.attendance-form input:focus-visible,.attendance-form button:focus-visible{outline:2px solid #008f9a;outline-offset:2px}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+@media(max-width:1100px){.income-charts{grid-template-columns:repeat(2,minmax(0,1fr))}.income-panel:last-child{grid-column:1/-1}.dashboard-summary{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:700px){.income-charts{grid-template-columns:1fr;gap:8px}.income-panel:last-child{grid-column:auto}.dashboard-summary{grid-template-columns:repeat(2,minmax(0,1fr))}.dashboard-summary .summary-item{min-width:0;padding:12px 10px}.dashboard-summary .summary-item strong{font-size:20px}.income-bars{min-height:150px;padding-top:13px}.income-bar-stage{height:104px}.treatment-chart-content{grid-template-columns:1fr;gap:10px;padding:15px}.treatment-pie-wrap{min-height:150px}.treatment-pie{width:142px}.treatment-legend li{grid-template-columns:10px minmax(0,1fr) 30px 48px}.attendance-form{flex-wrap:wrap}.attendance-form button{white-space:nowrap}}

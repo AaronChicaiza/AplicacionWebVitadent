@@ -1,0 +1,41 @@
+{% extends 'web/plantilla_publica.html' %}
+{% block titulo %}Agenda tu cita por WhatsApp · VitaDent{% endblock %}
+{% block contenido %}
+<section class="page-hero booking-page-hero">
+  <div class="container"><p class="crumbs"><a href="{% url 'inicio' %}">Inicio</a> › Agendamiento</p><h1>Agenda por WhatsApp.</h1><p>El asistente de VitaDent te guía paso a paso. No necesitas crear una cuenta; la clínica revisará la disponibilidad antes de confirmar.</p></div>
+</section>
+<section class="section section-tint booking-section">
+  <div class="container chat-layout">
+    <section class="chat-window whatsapp-booking-card" aria-labelledby="whatsapp-booking-title">
+      <header class="chat-head">
+        <span class="chat-avatar" aria-hidden="true">VD</span>
+        <div><h2 id="whatsapp-booking-title">Asistente VitaDent</h2><p><span class="chat-dot"></span>Atención automatizada por WhatsApp</p></div>
+        <span class="chat-head-tag">CITAS</span>
+      </header>
+      <div class="chat-demo-note">El bot ayuda con solicitudes de cita e información administrativa. No realiza diagnósticos ni confirma horarios sin revisión de la clínica.</div>
+      <div class="whatsapp-booking-content">
+        <span class="whatsapp-mark" aria-hidden="true">W</span>
+        <h3>Empieza la conversación</h3>
+        <p>Cuéntale al asistente qué necesitas. Te pedirá los datos necesarios, te mostrará un resumen para confirmar y enviará la solicitud al equipo VitaDent.</p>
+        {% if whatsapp_url %}
+          <a class="btn btn-primary btn-lg whatsapp-cta" href="{{ whatsapp_url }}" target="_blank" rel="noopener noreferrer">Abrir WhatsApp <span aria-hidden="true">↗</span></a>
+        {% else %}
+          <div class="whatsapp-pending" role="status"><strong>WhatsApp pendiente de configuración</strong><span>La clínica debe registrar el número oficial en el archivo local de configuración antes de recibir solicitudes.</span></div>
+        {% endif %}
+        <p class="whatsapp-privacy">Al continuar, compartirás tu número de WhatsApp y los datos que el bot solicite para gestionar la cita. Evita enviar información médica o de pago.</p>
+      </div>
+    </section>
+    <aside class="chat-side">
+      <h2>Así funciona el agendamiento.</h2>
+      <p>Rasa interpreta el mensaje y conserva el contexto. Django valida el catálogo y registra la solicitud después de que confirmes el resumen.</p>
+      <div class="chat-steps">
+        <div><span>1</span><p>Escribe a VitaDent por WhatsApp; no creas una cuenta.</p></div>
+        <div><span>2</span><p>El bot pregunta solo los datos que falten y permite corregirlos.</p></div>
+        <div><span>3</span><p>Revisa el resumen y autoriza el envío de la solicitud.</p></div>
+        <div><span>4</span><p>Recepción revisa agenda y disponibilidad; te confirma por WhatsApp.</p></div>
+      </div>
+      <div class="chat-human"><strong>¿Necesitas hablar con recepción?</strong><p>Pide atención humana durante la conversación y el equipo podrá continuar por el mismo canal cuando se habilite la línea oficial.</p></div>
+    </aside>
+  </div>
+</section>
+{% endblock %}

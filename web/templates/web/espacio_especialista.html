@@ -1,0 +1,41 @@
+{% extends 'web/doctor/plantilla_especialista.html' %}
+{% block titulo %}{% if seccion_especialista == 'pacientes' %}Mis pacientes{% elif seccion_especialista == 'agenda' %}Mi agenda{% else %}Resumen profesional{% endif %} · VitaDent{% endblock %}
+{% block contenido_especialista %}
+{% if seccion_especialista == 'resumen' %}
+<div class="doctor-page-heading"><div><h1>Resumen profesional</h1><p>{{ perfil.nombre_completo }} · {{ perfil.especialidad }}</p></div><a class="doctor-heading-link" href="{% url 'especialista_agenda' %}">Ver mi agenda <span aria-hidden="true">→</span></a></div>
+<section class="doctor-summary" aria-label="Resumen profesional">
+  <div class="doctor-stat"><span>Pacientes asignados</span><strong>{{ total_pacientes }}</strong><small>Vinculados a tu perfil</small></div>
+  <div class="doctor-stat"><span>Citas por revisar</span><strong>{{ citas_solicitadas }}</strong><small>Solicitudes pendientes</small></div>
+  <div class="doctor-stat"><span>Atenciones realizadas</span><strong>{{ citas_atendidas }}</strong><small>Registradas en VitaDent</small></div>
+</section>
+<section class="doctor-section" aria-labelledby="proximas-heading">
+  <div class="doctor-section-heading"><div><h2 id="proximas-heading">Próximas citas confirmadas</h2><p>Solo aparecen las citas asignadas a tu perfil.</p></div><a href="{% url 'especialista_pacientes' %}">Ver pacientes <span aria-hidden="true">→</span></a></div>
+  <div class="doctor-table-wrap"><table class="doctor-table"><thead><tr><th>Paciente</th><th>Tratamiento</th><th>Fecha y hora</th></tr></thead><tbody>
+    {% for cita in citas_proximas %}<tr><td data-label="Paciente"><strong>{{ cita.paciente.nombre_completo }}</strong></td><td data-label="Tratamiento">{{ cita.tratamiento.nombre }}</td><td data-label="Fecha y hora">{{ cita.fecha_hora_solicitada|date:'d/m/Y H:i' }}</td></tr>
+    {% empty %}<tr class="doctor-empty-row"><td colspan="3"><div class="doctor-empty"><h3>No tienes próximas citas confirmadas</h3><p>Las solicitudes pendientes se muestran en “Mis pacientes” para que puedas consultarlas.</p></div></td></tr>{% endfor %}
+  </tbody></table></div>
+</section>
+{% elif seccion_especialista == 'pacientes' %}
+<div class="doctor-page-heading"><div><h1>Mis pacientes</h1><p>Pacientes con citas asociadas a {{ perfil.especialidad }}.</p></div><span class="doctor-total">{{ total_pacientes }} pacientes</span></div>
+<section class="doctor-section" aria-labelledby="patients-heading">
+  <div class="doctor-section-heading"><div><h2 id="patients-heading">Pacientes asignados</h2><p>La lista se limita a pacientes relacionados con tus citas.</p></div></div>
+  <div class="doctor-table-wrap"><table class="doctor-table"><thead><tr><th>Paciente</th><th>Teléfono</th><th>Citas</th><th>Última cita</th></tr></thead><tbody>
+    {% for paciente in pacientes %}<tr><td data-label="Paciente"><strong>{{ paciente.nombre_completo }}</strong></td><td data-label="Teléfono">{{ paciente.telefono }}</td><td data-label="Citas">{{ paciente.total_citas }}</td><td data-label="Última cita">{% if paciente.ultima_cita %}{{ paciente.ultima_cita|date:'d/m/Y H:i' }}{% else %}—{% endif %}</td></tr>
+    {% empty %}<tr class="doctor-empty-row"><td colspan="4"><div class="doctor-empty"><h3>Aún no tienes pacientes asignados</h3><p>Cuando recepción vincule una cita con tu perfil, el paciente aparecerá aquí.</p></div></td></tr>{% endfor %}
+  </tbody></table></div>
+</section>
+{% else %}
+<div class="doctor-page-heading"><div><h1>Mi agenda</h1><p>Disponibilidad y citas vinculadas a tu perfil profesional.</p></div><span class="doctor-total">{{ citas_proximas|length }} próximas</span></div>
+<section class="doctor-section doctor-hours-section" aria-labelledby="horarios-heading">
+  <div class="doctor-section-heading"><div><h2 id="horarios-heading">Disponibilidad registrada</h2><p>Bloques habilitados para tu atención.</p></div></div>
+  <div class="doctor-hours-list">{% for horario in horarios %}<div><strong>{{ horario.get_dia_semana_display }}</strong><span>{{ horario.hora_inicio|time:'H:i' }}–{{ horario.hora_fin|time:'H:i' }}</span></div>{% empty %}<div class="doctor-empty"><h3>No hay horarios individuales configurados</h3><p>Solicita a administración que registre tu disponibilidad.</p></div>{% endfor %}</div>
+</section>
+<section class="doctor-section" aria-labelledby="agenda-citas-heading">
+  <div class="doctor-section-heading"><div><h2 id="agenda-citas-heading">Citas de mi agenda</h2><p>Solicitadas, confirmadas y atendidas asociadas a tu perfil.</p></div></div>
+  <div class="doctor-table-wrap"><table class="doctor-table"><thead><tr><th>Fecha y hora</th><th>Paciente</th><th>Motivo</th><th>Estado</th></tr></thead><tbody>
+    {% for cita in citas %}<tr><td data-label="Fecha y hora">{{ cita.fecha_hora_solicitada|date:'d/m/Y H:i' }}</td><td data-label="Paciente"><strong>{{ cita.paciente.nombre_completo }}</strong></td><td data-label="Motivo">{{ cita.tratamiento.nombre }}</td><td data-label="Estado"><span class="doctor-status">{{ cita.get_estado_display }}</span></td></tr>
+    {% empty %}<tr class="doctor-empty-row"><td colspan="4"><div class="doctor-empty"><h3>Tu agenda todavía está vacía</h3><p>Las citas aparecerán cuando recepción las asigne a tu perfil.</p></div></td></tr>{% endfor %}
+  </tbody></table></div>
+</section>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,11 @@
+action_endpoint:
+  url: "http://actions:5055/webhook"
+
+tracker_store:
+  type: redis
+  url: ${REDIS_HOST}
+  port: ${REDIS_PORT}
+  password: ${REDIS_PASSWORD}
+  db: 0
+  use_ssl: false
+  record_exp: 2592000

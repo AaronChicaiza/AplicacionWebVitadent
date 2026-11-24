@@ -1,0 +1,77 @@
+version: "3.1"
+nlu:
+  - intent: saludo
+    examples: |
+      - hola
+      - buenos días
+      - buenas tardes, VitaDent
+      - qué tal
+  - intent: despedida
+    examples: |
+      - gracias, hasta luego
+      - eso es todo
+      - chao
+  - intent: reservar_cita
+    examples: |
+      - quiero reservar una cita
+      - necesito agendar una consulta
+      - quisiera sacar turno para odontología
+      - me pueden ayudar con una cita dental
+      - quiero una cita para [profilaxis](tratamiento)
+      - agenda para [Ortodoncia](tratamiento)
+      - necesito una cita de [endodoncia](tratamiento) con [Dra. Odalis Monar](especialista) el [25/12/2026 10:30](fecha_hora)
+  - intent: consultar_disponibilidad
+    examples: |
+      - qué horarios tienen disponibles
+      - hay citas para esta semana
+      - quiero saber si hay espacio mañana
+  - intent: cancelar_cita
+    examples: |
+      - quiero cancelar mi cita
+      - anula mi turno
+      - ya no puedo asistir a mi reserva
+  - intent: reprogramar_cita
+    examples: |
+      - necesito cambiar la fecha de mi cita
+      - puedo mover el turno para otro día
+      - quiero reprogramar mi cita
+  - intent: consultar_tratamientos
+    examples: |
+      - qué tratamientos ofrecen
+      - cuáles son los servicios de la clínica
+      - quiero consultar el catálogo
+  - intent: consultar_especialistas
+    examples: |
+      - qué especialistas trabajan ahí
+      - quién atiende ortodoncia
+      - quiero conocer a los odontólogos
+  - intent: confirmar_cita
+    examples: |
+      - quiero confirmar mi cita
+      - confirma mi asistencia
+      - mi código de cita es [AB12CD34](codigo_cita)
+  - intent: solicitar_asesor_humano
+    examples: |
+      - quiero hablar con recepción
+      - necesito que me atienda una persona
+      - pásame con un asesor
+  - intent: mensaje_fuera_de_alcance
+    examples: |
+      - tengo dolor, dime qué medicamento tomar
+      - diagnostica qué problema tengo
+      - quiero saber qué enfermedad dental tengo
+  - intent: afirmar
+    examples: |
+      - sí
+      - correcto
+      - confirmo
+      - envíala
+  - intent: negar
+    examples: |
+      - no
+      - cancela
+      - esos datos están mal
+  - intent: nlu_fallback
+    examples: |
+      - asdf qwer
+      - no sé cómo explicarlo

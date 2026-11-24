@@ -1,0 +1,90 @@
+
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Panel de gestión de la clínica VitaDent">
+  <title>WhatsApp · VitaDent</title>
+  <link rel="stylesheet" href="/static/vendor/srtdash/assets/css/bootstrap.min.css">
+  <link rel="stylesheet" href="/static/vendor/srtdash/assets/css/fontawesome.min.css">
+  <link rel="stylesheet" href="/static/vendor/srtdash/assets/css/themify-icons.css">
+  <link rel="stylesheet" href="/static/vendor/srtdash/assets/css/metismenujs.min.css">
+  <link rel="stylesheet" href="/static/vendor/srtdash/assets/css/typography.css">
+  <link rel="stylesheet" href="/static/vendor/srtdash/assets/css/default-css.css">
+  <link rel="stylesheet" href="/static/vendor/srtdash/assets/css/styles.css">
+  <link rel="stylesheet" href="/static/vendor/srtdash/assets/css/responsive.css">
+  <link rel="stylesheet" href="/static/web/css/site.css">
+  <link rel="stylesheet" href="/static/web/css/admin.css">
+  <link rel="stylesheet" href="/static/web/css/responsive.css">
+  <link rel="stylesheet" href="/static/web/css/admin-extras.css">
+  <link rel="stylesheet" href="/static/web/css/vitadent-srtdash.css">
+  <link rel="stylesheet" href="/static/web/css/admin-polish.css">
+</head>
+<body class="admin-body">
+  <a class="skip-link" href="#main-content">Saltar al contenido</a>
+  <div class="demo-banner">Panel interno · acceso autenticado · información guardada en el sistema</div>
+  <div class="page-container">
+    <aside class="sidebar-menu" aria-label="Navegación de gestión">
+      <div class="sidebar-header">
+        <div class="logo"><a href="/gestion/" aria-label="VitaDent, ir al resumen"><img src="/static/web/img/vitadent-logo.png" alt="VitaDent · Inteligencia odontológica"></a></div>
+        <p class="clinic-label">GESTIÓN DE CLÍNICA</p>
+      </div>
+      <div class="main-menu"><div class="menu-inner"><nav>
+        <p class="sidebar-section-label">Agenda</p>
+        <ul class="metismenu" id="menu">
+          <li class=""><a href="/gestion/" ><i class="ti-dashboard" aria-hidden="true"></i><span>Resumen</span></a></li>
+          <li class=""><a href="/gestion/citas/" ><i class="ti-notepad" aria-hidden="true"></i><span>Solicitudes de cita</span></a></li>
+          <li class=""><a href="/gestion/agenda/" ><i class="ti-calendar" aria-hidden="true"></i><span>Agenda y horarios</span></a></li>
+        </ul>
+        <p class="sidebar-section-label">Clínica</p>
+        <ul class="metismenu">
+          <li class=""><a href="/gestion/pacientes/" ><i class="ti-user" aria-hidden="true"></i><span>Pacientes</span></a></li>
+          <li class=""><a href="/gestion/especialistas/" ><i class="ti-id-badge" aria-hidden="true"></i><span>Especialistas</span></a></li>
+          <li class=""><a href="/gestion/tratamientos/" ><i class="ti-heart" aria-hidden="true"></i><span>Tratamientos</span></a></li>
+        </ul>
+        <p class="sidebar-section-label">Sistema</p>
+        <ul class="metismenu">
+          <li class=""><a href="/gestion/notificaciones/" ><i class="ti-bell" aria-hidden="true"></i><span>Notificaciones</span></a></li>
+          <li class="active"><a href="/gestion/conversaciones/" aria-current="page"><i class="ti-comments" aria-hidden="true"></i><span>WhatsApp</span></a></li>
+          <li class=""><a href="/gestion/auditoria/" ><i class="ti-clipboard" aria-hidden="true"></i><span>Auditoría</span></a></li>
+        </ul>
+      </nav></div></div>
+      <div class="sidebar-footer"><span class="profile-mark">VD</span><div><strong>preview-admin</strong><small>Administración</small></div></div>
+    </aside>
+    <div class="main-content">
+      <header class="header-area">
+        <div class="header-inner">
+          <button class="nav-btn" type="button" aria-label="Contraer o mostrar el menú"><span></span><span></span><span></span></button>
+          <div class="header-context"><span class="context-dot"></span><span>Gestión VitaDent</span></div>
+          <a class="public-site-link" href="/">Ver sitio público <i class="ti-arrow-top-right" aria-hidden="true"></i></a>
+          <form method="post" action="/acceso/salir/"><input type="hidden" name="csrfmiddlewaretoken" value="ybhxndxtTsRcXjRIqcMcc90FxWJyFowtDmkyv9QBxiPO7tkFWdiEtA0h3k4U5L3a"><button class="public-site-link" type="submit">Salir</button></form>
+        </div>
+      </header>
+      <div class="page-title-area"><div class="breadcrumbs-area"><p>VitaDent <span>/</span> Administración</p></div></div>
+      <main class="main-content-inner" id="main-content">
+        
+        
+<div class="admin-title-row"><div><h1>Conversaciones de WhatsApp</h1><p>1 conversación espera respuesta de recepción.</p></div></div>
+<nav class="conversation-filters" aria-label="Filtrar conversaciones por estado">
+  <a href="/gestion/conversaciones/" aria-current="page"><span>Todas</span><strong>1</strong></a>
+  <a href="?estado=activa" ><span>Asistente</span><strong>0</strong></a>
+  <a href="?estado=humana" ><span>Recepción</span><strong>1</strong></a>
+  <a href="?estado=cerrada" ><span>Cerradas</span><strong>0</strong></a>
+</nav>
+<section class="admin-panel">
+  <div class="table-responsive"><table class="admin-table"><thead><tr><th>Contacto</th><th>Atención</th><th>Último mensaje</th><th>Actividad</th><th></th></tr></thead><tbody>
+  <tr><td>+593999000111</td><td><span class="status-pill">Requiere atención humana</span></td><td>Claro. ¿Qué día te conviene?</td><td>23/11/2026 01:47</td><td><a class="admin-button" href="/gestion/conversaciones/1/">Abrir conversación</a></td></tr>
+  </tbody></table></div>
+  
+</section>
+
+      </main>
+      <footer class="footer-area"><span>VitaDent · Panel de gestión</span><span>Interfaz de demostración · Colorlib SRTdash</span></footer>
+    </div>
+  </div>
+  <script src="/static/vendor/srtdash/assets/js/bootstrap.bundle.min.js" defer></script>
+  <script src="/static/vendor/srtdash/assets/js/metismenujs.min.js" defer></script>
+  <script src="/static/vendor/srtdash/assets/js/scripts.js" defer></script>
+</body>
+</html>

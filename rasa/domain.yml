@@ -1,0 +1,198 @@
+version: "3.1"
+
+intents:
+  - saludo
+  - despedida
+  - reservar_cita
+  - consultar_disponibilidad
+  - cancelar_cita
+  - reprogramar_cita
+  - consultar_tratamientos
+  - consultar_especialistas
+  - confirmar_cita
+  - solicitar_asesor_humano
+  - afirmar
+  - negar
+  - mensaje_fuera_de_alcance
+  - nlu_fallback
+
+entities:
+  - nombre
+  - identificacion
+  - telefono
+  - tratamiento
+  - especialista
+  - fecha_hora
+  - codigo_cita
+  - correo
+  - sucursal
+  - nueva_fecha_hora
+
+slots:
+  nombre:
+    type: text
+    influence_conversation: false
+    mappings:
+      - type: from_text
+        conditions: [{active_loop: reserva_form, requested_slot: nombre}]
+  identificacion:
+    type: text
+    influence_conversation: false
+    mappings:
+      - type: from_text
+        conditions: [{active_loop: reserva_form, requested_slot: identificacion}]
+      - type: from_text
+        conditions: [{active_loop: cancelar_form, requested_slot: identificacion}]
+      - type: from_text
+        conditions: [{active_loop: reprogramar_form, requested_slot: identificacion}]
+      - type: from_text
+        conditions: [{active_loop: consulta_cita_form, requested_slot: identificacion}]
+  tratamiento:
+    type: text
+    influence_conversation: false
+    mappings:
+      - type: from_text
+        conditions: [{active_loop: reserva_form, requested_slot: tratamiento}]
+      - type: from_text
+        conditions: [{active_loop: disponibilidad_form, requested_slot: tratamiento}]
+  especialista:
+    type: text
+    influence_conversation: false
+    mappings:
+      - type: from_text
+        conditions: [{active_loop: reserva_form, requested_slot: especialista}]
+      - type: from_text
+        conditions: [{active_loop: disponibilidad_form, requested_slot: especialista}]
+  fecha_hora:
+    type: text
+    influence_conversation: false
+    mappings:
+      - type: from_text
+        conditions: [{active_loop: reserva_form, requested_slot: fecha_hora}]
+      - type: from_text
+        conditions: [{active_loop: disponibilidad_form, requested_slot: fecha_hora}]
+  codigo_cita:
+    type: text
+    influence_conversation: false
+    mappings:
+      - type: from_entity
+        entity: codigo_cita
+      - type: from_text
+        conditions: [{active_loop: cancelar_form, requested_slot: codigo_cita}]
+      - type: from_text
+        conditions: [{active_loop: reprogramar_form, requested_slot: codigo_cita}]
+      - type: from_text
+        conditions: [{active_loop: consulta_cita_form, requested_slot: codigo_cita}]
+  accion_pendiente:
+    type: text
+    influence_conversation: true
+    mappings: [{type: custom}]
+  nueva_fecha_hora:
+    type: text
+    influence_conversation: false
+    mappings:
+      - type: from_entity
+        entity: nueva_fecha_hora
+      - type: from_text
+        conditions: [{active_loop: reprogramar_form, requested_slot: nueva_fecha_hora}]
+  correo:
+    type: text
+    influence_conversation: false
+    mappings: [{type: from_entity, entity: correo}]
+  sucursal:
+    type: text
+    influence_conversation: false
+    mappings: [{type: from_entity, entity: sucursal}]
+  esperando_confirmacion:
+    type: bool
+    influence_conversation: true
+    mappings: [{type: custom}]
+
+forms:
+  reserva_form:
+    required_slots:
+      - nombre
+      - identificacion
+      - tratamiento
+      - especialista
+      - fecha_hora
+  cancelar_form:
+    required_slots:
+      - codigo_cita
+      - identificacion
+  reprogramar_form:
+    required_slots:
+      - codigo_cita
+      - identificacion
+      - nueva_fecha_hora
+  disponibilidad_form:
+    required_slots:
+      - tratamiento
+      - especialista
+      - fecha_hora
+  consulta_cita_form:
+    required_slots:
+      - codigo_cita
+      - identificacion
+
+responses:
+  utter_saludo:
+    - text: "Hola. Puedo orientarte con información administrativa y solicitudes de cita; no realizo diagnósticos. ¿Qué necesitas?"
+  utter_despedida:
+    - text: "Gracias por escribir a VitaDent. Si necesitas otra gestión, puedes volver a enviarme un mensaje."
+  utter_ask_consulta_cita_form_codigo_cita:
+    - text: "Escribe el código de la cita que quieres consultar."
+  utter_ask_consulta_cita_form_identificacion:
+    - text: "Escribe el número de identificación asociado a esa cita."
+  utter_ask_reserva_form_nombre:
+    - text: "¿Cuál es tu nombre y apellido?"
+  utter_ask_reserva_form_identificacion:
+    - text: "¿Cuál es tu número de identificación?"
+  utter_ask_reserva_form_tratamiento:
+    - text: "¿Qué tratamiento deseas consultar o agendar? Usa el nombre del catálogo de VitaDent."
+  utter_ask_reserva_form_especialista:
+    - text: "¿Tienes preferencia de especialista? Escribe el nombre o «cualquiera»."
+  utter_ask_reserva_form_fecha_hora:
+    - text: "Indica fecha y hora preferidas como DD/MM/AAAA HH:MM. Recepción verificará disponibilidad."
+  utter_ask_cancelar_form_codigo_cita:
+    - text: "Escribe el código de la cita que aparece en el mensaje de confirmación."
+  utter_ask_cancelar_form_identificacion:
+    - text: "Para proteger tus datos, escribe el número de identificación asociado a la cita."
+  utter_ask_reprogramar_form_codigo_cita:
+    - text: "Escribe el código de la cita que deseas reprogramar."
+  utter_ask_reprogramar_form_identificacion:
+    - text: "Escribe el número de identificación asociado a esa cita."
+  utter_ask_reprogramar_form_nueva_fecha_hora:
+    - text: "¿Qué nueva fecha y hora prefieres? Usa DD/MM/AAAA HH:MM."
+  utter_ask_disponibilidad_form_tratamiento:
+    - text: "¿Para qué tratamiento deseas consultar un horario?"
+  utter_ask_disponibilidad_form_especialista:
+    - text: "¿Con qué especialista? Escribe su nombre como aparece en el equipo VitaDent."
+  utter_ask_disponibilidad_form_fecha_hora:
+    - text: "Indica la fecha que deseas consultar como DD/MM/AAAA HH:MM."
+  utter_fuera_alcance:
+    - text: "Puedo ayudar con gestiones administrativas de citas. No puedo diagnosticar ni indicar tratamientos médicos."
+  utter_derivar:
+    - text: "Dejaré la conversación pendiente para que recepción te atienda por este mismo WhatsApp."
+      custom:
+        handoff: true
+  utter_fallback:
+    - text: "No entendí la solicitud. Puedes pedir una cita, consultar tratamientos o solicitar atención de recepción."
+  utter_preguntar_confirmacion:
+    - text: "{resumen_solicitud} Si los datos son correctos, responde sí para enviar la solicitud a recepción; todavía no es una cita confirmada."
+  utter_no_enviada:
+    - text: "No envié la solicitud. Puedes iniciar otra conversación cuando quieras."
+
+actions:
+  - action_revisar_reserva
+  - action_cancelar_solicitud
+  - action_revisar_cancelacion
+  - action_revisar_reprogramacion
+  - action_confirmar_operacion
+  - action_consultar_cita
+  - action_consultar_catalogo
+  - action_consultar_disponibilidad
+
+session_config:
+  session_expiration_time: 60
+  carry_over_slots_to_new_session: false

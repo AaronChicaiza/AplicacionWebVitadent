@@ -1,0 +1,53 @@
+.admin-body{font-family:Arial,sans-serif;font-size:14px}
+.admin-body :not(i):not(svg):not(path){font-family:Arial,sans-serif!important}
+.admin-body :is(h1,h2,h3,h4,h5,h6){font-family:Arial,sans-serif;letter-spacing:-.02em}
+.demo-banner{font-size:12px;letter-spacing:0}
+.clinic-label,.sidebar-section-label{font-size:12px;letter-spacing:0;text-transform:none}
+.sidebar-section-label{color:#b2d0cc}
+.sidebar-footer strong{font-size:12px}.sidebar-footer small{font-size:11px;color:#d7e6e3}
+.header-inner form{margin:0}.header-inner form .public-site-link{border:0;background:transparent;padding:0;font:inherit;cursor:pointer}
+.header-context,.public-site-link,.breadcrumbs-area p,.footer-area{font-size:12px}
+.header-context{color:#354e4b}
+.footer-area{color:#526663}
+.breadcrumbs-area p{letter-spacing:0;text-transform:none;color:#526663}
+.admin-title-row h1{font-family:Arial,sans-serif;font-size:26px;letter-spacing:-.025em}
+.admin-title-row>div>p:last-child{font-size:13px;color:#526663}
+.admin-table th{font-size:12px;font-weight:600;letter-spacing:0;text-transform:none;color:#526663}
+.admin-table td{font-size:12px;line-height:1.45}
+.admin-table td small{font-size:11px}
+.filter-bar label,.conversation-controls label{font-size:12px;color:#354e4b}
+.admin-button{background:#075d63;border-radius:3px;padding:10px 14px;font-size:12px;line-height:1.3}
+.admin-button:hover{background:#064b50}
+.admin-table .status-pill{font-size:11px;padding:5px 9px}
+.pagination{font-size:12px}
+.conversation-filters{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin:0 0 18px}
+.conversation-filters a{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:62px;padding:12px 15px;border:1px solid #dce7e3;border-radius:4px;background:#fff;color:#354e4b}
+.conversation-filters a span{font-size:13px}.conversation-filters a strong{font-size:16px;font-variant-numeric:tabular-nums;color:#18363a}
+.conversation-filters a[aria-current=page]{border-color:#08777e;border-bottom:2px solid #08777e;background:#eaf4f1}
+.conversation-thread{gap:14px;min-height:500px}.conversation-message span{font-size:11px;color:#526663}.conversation-message p{font-size:13px}
+.conversation-controls h2{font-size:18px}.conversation-controls p{font-size:12px;color:#526663}
+.conversation-controls textarea,.conversation-controls select{font-size:13px}
+@media(max-width:900px){.conversation-filters{grid-template-columns:repeat(2,minmax(0,1fr))}.table-responsive{overflow-x:visible}.table-responsive .admin-table{min-width:0;width:100%;table-layout:fixed}.table-responsive .admin-table th,.table-responsive .admin-table td{padding-right:8px;padding-left:8px}.table-responsive .admin-table th:nth-child(1){width:16%}.table-responsive .admin-table th:nth-child(2){width:19%}.table-responsive .admin-table th:nth-child(3){width:25%}.table-responsive .admin-table th:nth-child(4){width:19%}.table-responsive .admin-table th:nth-child(5){width:21%}}
+@media(max-width:650px){
+  .header-context{font-size:12px!important;white-space:nowrap}
+  .header-inner form .public-site-link{font-size:12px!important;white-space:nowrap;margin-left:0}
+  .header-inner .public-site-link{white-space:nowrap}
+  .admin-title-row h1{font-size:24px}
+  .conversation-filters{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+  .conversation-filters a{min-height:56px;padding:10px 12px}
+  .conversation-filters a span{font-size:12px}
+  .table-responsive{overflow:visible}
+  .table-responsive .admin-table{min-width:0;display:block;white-space:normal}
+  .table-responsive .admin-table thead{display:none}
+  .table-responsive .admin-table tbody,.table-responsive .admin-table tr{display:grid;width:100%}
+  .table-responsive .admin-table tr{grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"identity action" "preview action" "status status";gap:3px 12px;padding:12px 0;border-bottom:1px solid #e3ebe7}
+  .table-responsive .admin-table td{display:block;padding:0;border:0;white-space:normal}
+  .table-responsive .admin-table td:nth-child(1){grid-area:identity;font-weight:700;color:#18363a}
+  .table-responsive .admin-table td:nth-child(2){grid-area:status;justify-self:start;margin-top:4px}
+  .table-responsive .admin-table td:nth-child(3){grid-area:preview;min-width:0;color:#526663}
+  .table-responsive .admin-table td:nth-child(4){display:none}
+  .table-responsive .admin-table td:nth-child(5){grid-area:action;align-self:center}
+  .table-responsive .admin-table td:nth-child(5) .admin-button{white-space:nowrap}
+  .conversation-layout{grid-template-columns:1fr}
+  .conversation-thread{min-height:0}
+}

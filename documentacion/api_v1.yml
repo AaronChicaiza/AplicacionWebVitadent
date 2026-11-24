@@ -1,0 +1,519 @@
+openapi: 3.0.3
+info:
+  title: API VitaDent
+  version: 1.0.0
+  description: API de catálogo, disponibilidad, citas y operación del personal.
+paths:
+  /api/v1/citas/:
+    get:
+      operationId: v1_citas_list
+      summary: Listar citas permitidas para el rol autenticado
+      tags:
+      - v1
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CitaLectura'
+          description: ''
+  /api/v1/citas/{id}/:
+    get:
+      operationId: v1_citas_retrieve
+      summary: Consultar una cita dentro del alcance del rol
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CitaLectura'
+          description: ''
+    patch:
+      operationId: v1_citas_partial_update
+      summary: Cambiar el estado de una cita (administración)
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedCambioEstadoCita'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedCambioEstadoCita'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedCambioEstadoCita'
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CitaLectura'
+          description: ''
+  /api/v1/conversaciones/:
+    get:
+      operationId: v1_conversaciones_list
+      summary: Listar conversaciones de WhatsApp para administración
+      tags:
+      - v1
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ConversacionResumen'
+          description: ''
+  /api/v1/conversaciones/{id}/:
+    get:
+      operationId: v1_conversaciones_list_2
+      summary: Consultar mensajes de una conversación de WhatsApp
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/MensajeConversacion'
+          description: ''
+    patch:
+      operationId: v1_conversaciones_partial_update
+      summary: Poner o quitar una conversación en atención humana
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedEstadoConversacion'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedEstadoConversacion'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedEstadoConversacion'
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConversacionResumen'
+          description: ''
+  /api/v1/disponibilidad/:
+    get:
+      operationId: v1_disponibilidad_retrieve
+      summary: Consultar bloques disponibles de un especialista
+      parameters:
+      - in: query
+        name: especialista
+        schema:
+          type: integer
+        description: ID del especialista activo
+        required: true
+      - in: query
+        name: fecha
+        schema:
+          type: string
+        description: Fecha local YYYY-MM-DD
+        required: true
+      - in: query
+        name: tratamiento
+        schema:
+          type: integer
+        description: ID de tratamiento activo
+      tags:
+      - v1
+      security:
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DisponibilidadRespuesta'
+          description: ''
+  /api/v1/especialistas/:
+    get:
+      operationId: v1_especialistas_list
+      summary: Listar especialistas activos
+      tags:
+      - v1
+      security:
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/EspecialistaPublico'
+          description: ''
+  /api/v1/pacientes/:
+    get:
+      operationId: v1_pacientes_list
+      summary: Listar pacientes (solo administración)
+      tags:
+      - v1
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PacienteLectura'
+          description: ''
+  /api/v1/sucursales/:
+    get:
+      operationId: v1_sucursales_list
+      summary: Listar sucursales activas
+      tags:
+      - v1
+      security:
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Sucursal'
+          description: ''
+  /api/v1/tratamientos/:
+    get:
+      operationId: v1_tratamientos_list
+      summary: Listar tratamientos activos
+      tags:
+      - v1
+      security:
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Tratamiento'
+          description: ''
+components:
+  schemas:
+    BloqueDisponible:
+      type: object
+      properties:
+        inicio:
+          type: string
+          format: date-time
+        fin:
+          type: string
+          format: date-time
+      required:
+      - fin
+      - inicio
+    CitaLectura:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        codigo:
+          type: string
+          readOnly: true
+        paciente:
+          type: string
+          readOnly: true
+        tratamiento:
+          type: string
+          readOnly: true
+        especialista:
+          type: string
+          readOnly: true
+          nullable: true
+        sucursal:
+          type: string
+          readOnly: true
+          nullable: true
+        fecha_hora_solicitada:
+          type: string
+          format: date-time
+          readOnly: true
+        estado:
+          allOf:
+          - $ref: '#/components/schemas/EstadoDfcEnum'
+          readOnly: true
+        creado_en:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - codigo
+      - creado_en
+      - especialista
+      - estado
+      - fecha_hora_solicitada
+      - id
+      - paciente
+      - sucursal
+      - tratamiento
+    ConversacionResumen:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        canal:
+          type: string
+          readOnly: true
+        whatsapp_id:
+          type: string
+          readOnly: true
+        estado:
+          allOf:
+          - $ref: '#/components/schemas/Estado0dbEnum'
+          readOnly: true
+        iniciada_en:
+          type: string
+          format: date-time
+          readOnly: true
+        ultima_actividad:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - canal
+      - estado
+      - id
+      - iniciada_en
+      - ultima_actividad
+      - whatsapp_id
+    DireccionEnum:
+      enum:
+      - entrante
+      - saliente
+      type: string
+      description: |-
+        * `entrante` - Entrante
+        * `saliente` - Saliente
+    DisponibilidadRespuesta:
+      type: object
+      properties:
+        fecha:
+          type: string
+          format: date
+        especialista:
+          type: integer
+        duracion_minutos:
+          type: integer
+        bloques:
+          type: array
+          items:
+            $ref: '#/components/schemas/BloqueDisponible'
+      required:
+      - bloques
+      - duracion_minutos
+      - especialista
+      - fecha
+    EspecialistaPublico:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        nombre_completo:
+          type: string
+          maxLength: 120
+        especialidad:
+          type: string
+          maxLength: 100
+      required:
+      - especialidad
+      - id
+    Estado0dbEnum:
+      enum:
+      - activa
+      - humana
+      - cerrada
+      type: string
+      description: |-
+        * `activa` - Activa
+        * `humana` - Requiere atención humana
+        * `cerrada` - Cerrada
+    EstadoDfcEnum:
+      enum:
+      - solicitada
+      - confirmada
+      - reprogramada
+      - cancelada
+      - atendida
+      type: string
+      description: |-
+        * `solicitada` - Solicitada
+        * `confirmada` - Confirmada
+        * `reprogramada` - Reprogramada
+        * `cancelada` - Cancelada
+        * `atendida` - Atendida
+    MensajeConversacion:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        direccion:
+          allOf:
+          - $ref: '#/components/schemas/DireccionEnum'
+          readOnly: true
+        tipo:
+          type: string
+          readOnly: true
+        contenido:
+          type: string
+          readOnly: true
+        creado_en:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - contenido
+      - creado_en
+      - direccion
+      - id
+      - tipo
+    PacienteLectura:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        nombre_completo:
+          type: string
+          readOnly: true
+        identificacion:
+          type: string
+          readOnly: true
+          nullable: true
+        telefono:
+          type: string
+          readOnly: true
+        correo:
+          type: string
+          format: email
+          readOnly: true
+        creado_en:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - correo
+      - creado_en
+      - id
+      - identificacion
+      - nombre_completo
+      - telefono
+    PatchedCambioEstadoCita:
+      type: object
+      properties:
+        estado:
+          $ref: '#/components/schemas/EstadoDfcEnum'
+        motivo:
+          type: string
+          maxLength: 300
+    PatchedEstadoConversacion:
+      type: object
+      properties:
+        estado:
+          $ref: '#/components/schemas/Estado0dbEnum'
+    Sucursal:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        nombre:
+          type: string
+          maxLength: 100
+        direccion:
+          type: string
+          maxLength: 240
+      required:
+      - id
+      - nombre
+    Tratamiento:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        nombre:
+          type: string
+          maxLength: 140
+        area:
+          type: string
+          maxLength: 100
+        duracion_minutos:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+          nullable: true
+      required:
+      - area
+      - id
+      - nombre
+  securitySchemes:
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: sessionid

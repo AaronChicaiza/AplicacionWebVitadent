@@ -1,0 +1,101 @@
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-vitadent}
+      POSTGRES_USER: ${POSTGRES_USER:-vitadent}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-cambiar-solo-desarrollo}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+    networks: [privada]
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    command: ["redis-server", "--appendonly", "yes", "--save", "60", "1000"]
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 12
+    networks: [privada]
+
+  web:
+    build: .
+    restart: unless-stopped
+    environment:
+      DJANGO_DEBUG: ${DJANGO_DEBUG:-True}
+      DJANGO_SECRET_KEY: ${DJANGO_SECRET_KEY:-}
+      DJANGO_ALLOWED_HOSTS: ${DJANGO_ALLOWED_HOSTS:-127.0.0.1,localhost}
+      POSTGRES_DB: ${POSTGRES_DB:-vitadent}
+      POSTGRES_USER: ${POSTGRES_USER:-vitadent}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-cambiar-solo-desarrollo}
+      POSTGRES_HOST: db
+      POSTGRES_PORT: 5432
+      REDIS_URL: redis://redis:6379/1
+      VITADENT_RASA_URL: http://rasa:5005
+      VITADENT_RASA_TOKEN: ${VITADENT_RASA_TOKEN:-}
+      VITADENT_DJANGO_INTERNAL_URL: http://web:8000
+      VITADENT_WHATSAPP_NUMBER: ${VITADENT_WHATSAPP_NUMBER:-}
+      WHATSAPP_VERIFY_TOKEN: ${WHATSAPP_VERIFY_TOKEN:-}
+      WHATSAPP_APP_SECRET: ${WHATSAPP_APP_SECRET:-}
+      WHATSAPP_ACCESS_TOKEN: ${WHATSAPP_ACCESS_TOKEN:-}
+      WHATSAPP_PHONE_NUMBER_ID: ${WHATSAPP_PHONE_NUMBER_ID:-}
+      WHATSAPP_GRAPH_API_VERSION: ${WHATSAPP_GRAPH_API_VERSION:-v25.0}
+    command: ["sh", "-c", "python manage.py migrate --noinput && gunicorn vitadent.wsgi:application --bind 0.0.0.0:8000 --workers 3 --timeout 60"]
+    ports:
+      - "127.0.0.1:8000:8000"
+    depends_on:
+      db: {condition: service_healthy}
+      redis: {condition: service_healthy}
+      rasa: {condition: service_started}
+    healthcheck:
+      test: ["CMD", "python", "-c", "from urllib.request import urlopen; urlopen('http://127.0.0.1:8000/healthz/', timeout=3)"]
+      interval: 20s
+      timeout: 5s
+      retries: 5
+    networks: [privada]
+
+  rasa:
+    build:
+      context: .
+      dockerfile: rasa/Dockerfile
+    restart: unless-stopped
+    command: ["sh", "-c", "rasa train --fixed-model-name vitadent && rasa run --enable-api --credentials credentials.yml --endpoints endpoints.yml --model models/vitadent.tar.gz --port 5005 --host 0.0.0.0"]
+    environment:
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: ${REDIS_PASSWORD:-}
+      VITADENT_RASA_TOKEN: ${VITADENT_RASA_TOKEN:-}
+      VITADENT_DJANGO_INTERNAL_URL: http://web:8000
+    depends_on:
+      redis: {condition: service_healthy}
+      actions: {condition: service_started}
+    networks: [privada]
+
+  actions:
+    build:
+      context: .
+      dockerfile: rasa/Dockerfile
+    restart: unless-stopped
+    command: ["python", "-m", "rasa_sdk", "--actions", "actions", "--port", "5055"]
+    environment:
+      VITADENT_RASA_TOKEN: ${VITADENT_RASA_TOKEN:-}
+      VITADENT_DJANGO_INTERNAL_URL: http://web:8000
+    networks: [privada]
+
+volumes:
+  postgres_data:
+  redis_data:
+
+networks:
+  privada:
+    driver: bridge

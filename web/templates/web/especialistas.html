@@ -1,0 +1,9 @@
+{% extends 'web/plantilla_publica.html' %}
+{% block titulo %}Especialistas · VitaDent{% endblock %}
+{% block contenido %}
+<section class="page-hero"><div class="container"><p class="crumbs"><a href="{% url 'inicio' %}">Inicio</a> › Especialistas</p><h1>Conoce al equipo de VitaDent</h1><p>Especialistas y áreas de atención según la información proporcionada por la clínica. La agenda de cada profesional se confirmará al coordinar la cita.</p></div></section>
+<section class="section section-tint"><div class="container"><div class="section-head center"><span class="eyebrow">Equipo odontológico</span><h2>Profesionales para distintas necesidades.</h2><p>Las fotografías institucionales están pendientes; las iniciales identifican cada perfil en esta maqueta.</p></div>
+  <div class="team-grid team-directory">{% for especialista in especialistas %}<article class="team-card"><div class="team-photo team-initials tone-{{ especialista.tono }}"><span>{{ especialista.iniciales }}</span><small>Foto institucional pendiente</small></div><div class="team-body"><span class="team-role">{{ especialista.especialidad }}</span><h3>{{ especialista.nombre }}</h3><a class="svc-link" href="{% url 'asistente_citas' %}">Consultar una cita <span aria-hidden="true">→</span></a></div></article>{% endfor %}</div>
+</div></section>
+<section class="section"><div class="container cta-card"><div><span class="eyebrow">Atención con cita</span><h2>Te ayudamos a encontrar la especialidad.</h2><p>Inicia una conversación con el asistente para indicar el motivo de consulta.</p></div><a class="btn btn-white btn-lg" href="{% url 'asistente_citas' %}">Abrir asistente <span aria-hidden="true">↗</span></a></div></section>
+{% endblock %}

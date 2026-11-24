@@ -1,0 +1,60 @@
+{% load static %}
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Espacio profesional de VitaDent para especialistas">
+  <title>{% block titulo %}Mi espacio · VitaDent{% endblock %}</title>
+  <link rel="stylesheet" href="{% static 'vendor/srtdash/assets/css/bootstrap.min.css' %}">
+  <link rel="stylesheet" href="{% static 'vendor/srtdash/assets/css/fontawesome.min.css' %}">
+  <link rel="stylesheet" href="{% static 'vendor/srtdash/assets/css/themify-icons.css' %}">
+  <link rel="stylesheet" href="{% static 'vendor/srtdash/assets/css/metismenujs.min.css' %}">
+  <link rel="stylesheet" href="{% static 'vendor/srtdash/assets/css/typography.css' %}">
+  <link rel="stylesheet" href="{% static 'vendor/srtdash/assets/css/default-css.css' %}">
+  <link rel="stylesheet" href="{% static 'vendor/srtdash/assets/css/styles.css' %}">
+  <link rel="stylesheet" href="{% static 'vendor/srtdash/assets/css/responsive.css' %}">
+  <link rel="stylesheet" href="{% static 'web/css/site.css' %}">
+  <link rel="stylesheet" href="{% static 'web/css/admin.css' %}">
+  <link rel="stylesheet" href="{% static 'web/css/responsive.css' %}">
+  <link rel="stylesheet" href="{% static 'web/css/admin-extras.css' %}">
+  <link rel="stylesheet" href="{% static 'web/css/admin-polish.css' %}">
+  <link rel="stylesheet" href="{% static 'web/css/vitadent-srtdash.css' %}">
+  <link rel="stylesheet" href="{% static 'web/css/doctor-panel.css' %}">
+</head>
+<body class="admin-body doctor-body">
+  <a class="skip-link" href="#doctor-content">Saltar al contenido</a>
+  <div class="demo-banner doctor-demo-banner">Espacio profesional · pacientes y citas asignados a tu perfil</div>
+  <div class="page-container">
+    <aside class="sidebar-menu" aria-label="Navegación del espacio profesional">
+      <div class="sidebar-header">
+        <div class="logo"><a href="{% url 'espacio_especialista' %}" aria-label="VitaDent, ir a mi espacio"><img src="{% static 'web/img/vitadent-logo.png' %}" alt="VitaDent · Inteligencia odontológica"></a></div>
+        <p class="clinic-label">ESPACIO PROFESIONAL</p>
+      </div>
+      <div class="main-menu"><div class="menu-inner"><nav>
+        <p class="sidebar-section-label">MI ATENCIÓN</p>
+        <ul class="metismenu" id="doctor-menu">
+          <li class="{% if seccion_especialista == 'resumen' %}active{% endif %}"><a href="{% url 'espacio_especialista' %}" {% if seccion_especialista == 'resumen' %}aria-current="page"{% endif %}><i class="ti-dashboard" aria-hidden="true"></i><span>Resumen</span></a></li>
+          <li class="{% if seccion_especialista == 'pacientes' %}active{% endif %}"><a href="{% url 'especialista_pacientes' %}" {% if seccion_especialista == 'pacientes' %}aria-current="page"{% endif %}><i class="ti-user" aria-hidden="true"></i><span>Mis pacientes</span></a></li>
+          <li class="{% if seccion_especialista == 'agenda' %}active{% endif %}"><a href="{% url 'especialista_agenda' %}" {% if seccion_especialista == 'agenda' %}aria-current="page"{% endif %}><i class="ti-calendar" aria-hidden="true"></i><span>Mi agenda</span></a></li>
+        </ul>
+      </nav></div></div>
+      <div class="sidebar-footer"><span class="profile-mark">VD</span><div><strong>{{ perfil.nombre_completo }}</strong><small>{{ perfil.especialidad }}</small></div></div>
+    </aside>
+    <div class="main-content">
+      <header class="header-area"><div class="header-inner">
+        <button class="nav-btn" type="button" aria-label="Contraer o mostrar el menú"><span></span><span></span><span></span></button>
+        <div class="header-context"><span class="context-dot"></span><span>VitaDent</span><span class="context-divider">/</span><span>Espacio profesional</span></div>
+        <a class="public-site-link" href="{% url 'acceso_personal' %}">Portal del personal <i class="ti-arrow-top-right" aria-hidden="true"></i></a>
+        <form method="post" action="{% url 'salir_personal' %}">{% csrf_token %}<button class="public-site-link" type="submit">Cerrar sesión</button></form>
+      </div></header>
+      <div class="page-title-area"><div class="breadcrumbs-area"><p>VITADENT <span>/</span> PERFIL DE ESPECIALISTA</p></div></div>
+      <main class="main-content-inner" id="doctor-content">{% block contenido_especialista %}{% endblock %}</main>
+      <footer class="footer-area"><span>VitaDent · Espacio profesional</span><span>Datos limitados al perfil autenticado</span></footer>
+    </div>
+  </div>
+  <script src="{% static 'vendor/srtdash/assets/js/bootstrap.bundle.min.js' %}" defer></script>
+  <script src="{% static 'vendor/srtdash/assets/js/metismenujs.min.js' %}" defer></script>
+  <script src="{% static 'vendor/srtdash/assets/js/scripts.js' %}" defer></script>
+</body>
+</html>

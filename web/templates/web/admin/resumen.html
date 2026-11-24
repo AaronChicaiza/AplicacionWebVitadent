@@ -1,0 +1,36 @@
+{% extends 'web/admin/plantilla_gestion.html' %}
+{% block titulo %}Dashboard · Gestión VitaDent{% endblock %}
+{% block contenido_gestion %}
+<div class="admin-title-row dashboard-title"><div><h1>Dashboard</h1><p>Ingresos registrados y tratamientos atendidos en VitaDent.</p></div><a class="admin-primary" href="{% url 'gestion_citas' %}">Revisar citas <span aria-hidden="true">→</span></a></div>
+
+<section class="admin-summary dashboard-summary" aria-label="Resumen de la clínica">
+  <div class="summary-item"><span>Ingresos de hoy</span><strong>${{ ingreso_hoy|floatformat:2 }}</strong><small>Por atenciones registradas hoy</small></div>
+  <div class="summary-item"><span>Esta semana</span><strong>${{ ingreso_semana|floatformat:2 }}</strong><small>Ingresos desde el lunes</small></div>
+  <div class="summary-item"><span>Este mes</span><strong>${{ ingreso_mes|floatformat:2 }}</strong><small>Acumulado del mes actual</small></div>
+  <div class="summary-item"><span>Citas pendientes</span><strong>{{ pendientes }}</strong><small>Esperan revisión de recepción</small></div>
+</section>
+
+{% if not ingresos_registrados %}<p class="dashboard-empty-note" role="status">Todavía no hay ingresos registrados. Los gráficos se completarán cuando administración marque una cita como atendida e ingrese el valor cobrado.</p>{% endif %}
+
+<section class="income-charts" aria-label="Ingresos registrados por periodo">
+  <article class="admin-panel income-panel {% if not ingresos_registrados %}income-panel-empty{% endif %}"><div class="panel-header"><div><h2>Ingresos diarios</h2><p>Últimos siete días · USD</p></div></div><div class="income-bars" role="list" aria-label="Ingresos por día">
+    {% for punto in barras_diarias %}<div class="income-bar-item" role="listitem" title="{{ punto.etiqueta }}: {{ punto.valor }}"><div class="income-bar-stage"><span class="income-bar" style="height:{{ punto.altura }}%" aria-hidden="true"></span></div><span class="income-bar-label">{{ punto.etiqueta }}</span></div>{% endfor %}
+  </div><p class="income-total">Hoy: <strong>${{ ingreso_hoy|floatformat:2 }}</strong></p></article>
+  <article class="admin-panel income-panel {% if not ingresos_registrados %}income-panel-empty{% endif %}"><div class="panel-header"><div><h2>Ingresos semanales</h2><p>Últimas ocho semanas · USD</p></div></div><div class="income-bars income-bars-week" role="list" aria-label="Ingresos por semana">
+    {% for punto in barras_semanales %}<div class="income-bar-item" role="listitem" title="Semana del {{ punto.etiqueta }}: {{ punto.valor }}"><div class="income-bar-stage"><span class="income-bar" style="height:{{ punto.altura }}%" aria-hidden="true"></span></div><span class="income-bar-label">{{ punto.etiqueta }}</span></div>{% endfor %}
+  </div><p class="income-total">Esta semana: <strong>${{ ingreso_semana|floatformat:2 }}</strong></p></article>
+  <article class="admin-panel income-panel {% if not ingresos_registrados %}income-panel-empty{% endif %}"><div class="panel-header"><div><h2>Ingresos mensuales</h2><p>Últimos seis meses · USD</p></div></div><div class="income-bars" role="list" aria-label="Ingresos por mes">
+    {% for punto in barras_mensuales %}<div class="income-bar-item" role="listitem" title="{{ punto.etiqueta }}: {{ punto.valor }}"><div class="income-bar-stage"><span class="income-bar" style="height:{{ punto.altura }}%" aria-hidden="true"></span></div><span class="income-bar-label">{{ punto.etiqueta }}</span></div>{% endfor %}
+  </div><p class="income-total">Este mes: <strong>${{ ingreso_mes|floatformat:2 }}</strong></p></article>
+</section>
+
+<section class="admin-panel treatment-panel" aria-labelledby="treatment-chart-heading">
+  <div class="panel-header"><div><h2 id="treatment-chart-heading">Tratamientos más realizados</h2><p>Distribución de citas marcadas como atendidas</p></div><span class="admin-count">{{ atenciones_realizadas }} atenciones</span></div>
+  <div class="treatment-chart-content">
+    <div class="treatment-pie-wrap {% if not tratamientos_mas_realizados %}treatment-pie-wrap-empty{% endif %}"><div class="treatment-pie {% if not tratamientos_mas_realizados %}treatment-pie-empty{% endif %}" role="img" aria-label="Porcentaje de tratamientos atendidos"><svg viewBox="0 0 200 200" aria-hidden="true" focusable="false">{% for item in tratamientos_mas_realizados %}<path d="{{ item.ruta_svg }}" fill="{{ item.color }}"></path>{% endfor %}</svg></div></div>
+    {% if tratamientos_mas_realizados %}<ul class="treatment-legend" aria-label="Tratamientos y porcentaje de atenciones">{% for item in tratamientos_mas_realizados %}<li><span class="treatment-key" style="--treatment-color:{{ item.color }}" aria-hidden="true"></span><span class="treatment-name">{{ item.nombre }}</span><span class="treatment-count">{{ item.cantidad }}</span><strong>{{ item.porcentaje }}%</strong></li>{% endfor %}</ul>{% else %}<div class="treatment-empty"><h3>Aún no hay tratamientos atendidos</h3><p>El gráfico aparecerá cuando se registren las primeras atenciones.</p></div>{% endif %}
+  </div>
+</section>
+
+<section class="admin-panel dashboard-recent"><div class="panel-header"><div><h2>Solicitudes recientes</h2><p>Registros actuales de la agenda</p></div><a href="{% url 'gestion_citas' %}">Ver todas <span aria-hidden="true">→</span></a></div><div class="table-scroll"><table class="admin-table"><thead><tr><th>Paciente</th><th>Tratamiento</th><th>Preferencia</th><th>Estado</th><th></th></tr></thead><tbody>{% for cita in citas_recientes %}<tr><td><strong>{{ cita.paciente.nombre_completo }}</strong><small>{{ cita.codigo }}</small></td><td>{{ cita.tratamiento.nombre }}</td><td>{{ cita.fecha_hora_solicitada|date:'d/m/Y H:i' }}</td><td><span class="status status-pending">{{ cita.get_estado_display }}</span></td><td><a class="table-action" href="{% url 'gestion_citas' %}">Revisar</a></td></tr>{% empty %}<tr><td colspan="5"><div class="schedule-empty"><h2>Aún no hay solicitudes</h2><p>Las solicitudes recibidas se mostrarán aquí cuando existan.</p></div></td></tr>{% endfor %}</tbody></table></div></section>
+{% endblock %}

@@ -1,0 +1,30 @@
+/* Shared final breakpoint corrections for the public site and reception panel. */
+.eyebrow,.admin-eyebrow{display:none!important}
+@media(max-width:760px){
+  .menu-toggle{display:block;z-index:2}
+  .main-nav{display:none;position:absolute;left:0;right:0;top:69px;padding:18px var(--gutter) 24px;background:var(--paper);border-bottom:1px solid var(--line);align-items:stretch;gap:0;flex-direction:column}
+  .main-nav.open{display:flex}
+  .main-nav>a:not(.button){padding:13px 0;border-bottom:1px solid var(--line)}
+  .main-nav .button{margin-top:15px}
+  .hero-grid{display:flex;flex-direction:column;align-items:stretch;gap:0}
+  .hero-copy{padding:58px 0 20px}
+  .hero h1{font-size:clamp(45px,10vw,62px)}
+  .hero-art{height:370px;transform:none;margin:0 -5px}
+  .smile-panel{height:305px;width:calc(100% - 38px)}
+  .smile-panel:before{width:260px;height:260px}
+  .smile-illustration{width:88%}
+  .floating-note{right:0;top:15px;padding:10px 12px}
+  .hero-orbit.orbit-one{width:390px;height:390px;right:-23px;top:-10px}
+  .hero-orbit.orbit-two{width:440px;height:440px;right:-49px;top:-35px}
+  .admin-shell{display:block}
+  .admin-sidebar{position:fixed;top:33px;bottom:0;left:0;width:250px;z-index:30;transform:translateX(-105%);transition:transform .22s ease;box-shadow:12px 0 35px rgba(20,45,42,.1);min-height:0}
+  .admin-sidebar.is-open{transform:translateX(0)}
+  .admin-topbar{padding-inline:16px}
+  .admin-menu-toggle{display:block}
+}
+@media(max-width:540px){
+  .hero h1{font-size:clamp(42px,11vw,56px)}
+  .hero-art{height:330px}
+  .smile-panel{height:280px}
+}
+@media(prefers-reduced-motion:reduce){.admin-sidebar{transition:none}}

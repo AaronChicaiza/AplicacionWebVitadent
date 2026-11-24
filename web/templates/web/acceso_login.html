@@ -1,0 +1,60 @@
+{% extends 'web/plantilla_publica.html' %}
+{% load static %}
+{% block fuentes_tipograficas %}{% endblock %}
+{% block titulo %}Acceso del personal · VitaDent{% endblock %}
+{% block css_extra %}<link rel="stylesheet" href="{% static 'web/css/acceso-personal.css' %}">{% endblock %}
+{% block contenido %}
+<section class="access-page">
+  <div class="access-wrap">
+    <section class="access-panel" aria-labelledby="access-title">
+      <div class="access-brand-row">
+        <img src="{% static 'web/img/vitadent-logo.png' %}" alt="VitaDent, Inteligencia odontológica">
+        <span class="access-secure"><span aria-hidden="true">●</span> Portal privado</span>
+      </div>
+      <p class="access-kicker">Acceso del personal</p>
+      <h1 id="access-title">Iniciar sesión</h1>
+      <p class="access-intro">Ingresa con las credenciales que te asignó la clínica. Tu acceso se limita a las funciones de tu perfil.</p>
+
+      {% if form.errors %}<div class="access-alert" role="alert"><span aria-hidden="true">!</span><p>Usuario o contraseña incorrectos. Verifica los datos e inténtalo otra vez.</p></div>{% endif %}
+      {% if error_acceso %}<div class="access-alert" role="alert"><span aria-hidden="true">!</span><p>{{ error_acceso }}</p></div>{% endif %}
+      {% if messages %}{% for message in messages %}<div class="access-success" role="status">{{ message }}</div>{% endfor %}{% endif %}
+
+      <form class="staff-login-form" id="formulario-acceso" method="post" action="{% url 'ingresar_personal' %}">
+        {% csrf_token %}
+        <div class="access-field">
+          <label for="id_username">Usuario</label>
+          <input id="id_username" name="username" type="text" autocomplete="username" autocapitalize="none" spellcheck="false" maxlength="150" required aria-describedby="username-error" value="{{ form.username.value|default:'' }}" placeholder="Tu usuario">
+          <span class="field-error" id="username-error"></span>
+        </div>
+        <div class="access-field">
+          <div class="access-label-row"><label for="id_password">Contraseña</label><span>Distinguimos mayúsculas</span></div>
+          <div class="password-control">
+            <input id="id_password" name="password" type="password" autocomplete="current-password" required aria-describedby="password-error" placeholder="Tu contraseña">
+            <button class="password-toggle" type="button" data-toggle-password="id_password" aria-label="Mostrar contraseña" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2.2 12s3.4-6 9.8-6 9.8 6 9.8 6-3.4 6-9.8 6-9.8-6-9.8-6Z"/><circle cx="12" cy="12" r="2.6"/></svg></button>
+          </div>
+          <span class="field-error" id="password-error"></span>
+        </div>
+        <button class="access-submit" id="login-submit" type="submit"><span>Iniciar sesión</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
+        <p class="access-form-note">Los pacientes pueden solicitar citas sin crear una cuenta.</p>
+      </form>
+      <a class="access-back" href="{% url 'inicio' %}"><span aria-hidden="true">←</span> Volver al sitio VitaDent</a>
+    </section>
+
+    <aside class="access-aside" aria-label="Información sobre permisos del personal">
+      <p class="access-aside-kicker">Privacidad del equipo</p>
+      <h2>Acceso según tu función</h2>
+      <p class="access-aside-copy">La información de la clínica está protegida por perfiles individuales.</p>
+      <div class="access-role-list">
+        <div class="access-role"><strong>Administración</strong><small>Gestiona agenda, pacientes y catálogo.</small></div>
+        <div class="access-role"><strong>Especialistas</strong><small>Consulta únicamente sus citas y pacientes asignados.</small></div>
+      </div>
+      <div class="access-aside-foot"><span aria-hidden="true">◈</span><p>¿Aún no tienes acceso? Solicítalo a la persona administradora de VitaDent.</p></div>
+    </aside>
+  </div>
+</section>
+{% endblock %}
+{% block scripts_extra %}
+<script src="{% static 'vendor/jquery/jquery-4.1.0.min.js' %}" defer></script>
+<script src="{% static 'vendor/jquery/jquery.validate-1.22.1.min.js' %}" defer></script>
+<script src="{% static 'web/js/acceso-personal.js' %}" defer></script>
+{% endblock %}

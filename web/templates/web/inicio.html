@@ -1,0 +1,49 @@
+{% extends 'web/plantilla_publica.html' %}
+{% load static %}
+{% block titulo %}VitaDent · Atención odontológica{% endblock %}
+{% block contenido %}
+<section class="hero" id="home">
+  <span class="hero-blob b1" aria-hidden="true"></span><span class="hero-blob b2" aria-hidden="true"></span>
+  <div class="container hero-grid">
+    <div class="hero-copy">
+      <span class="hero-pill"><span class="dot" aria-hidden="true">✳</span> VitaDent · Inteligencia odontológica</span>
+      <h1>Un equipo para <span class="underline-brush">cuidar tu sonrisa.</span></h1>
+      <p class="hero-sub">Conoce las áreas de atención y el equipo VitaDent. Agenda tu cita por WhatsApp con ayuda del asistente virtual.</p>
+      <div class="hero-actions"><a class="btn btn-primary btn-lg" href="{% url 'asistente_citas' %}">Agendar por WhatsApp <span aria-hidden="true">↗</span></a><a class="btn btn-outline btn-lg" href="{% url 'tratamientos' %}">Ver tratamientos</a></div>
+      <div class="trust-row vitadent-facts" aria-label="Información de la clínica">
+        <div class="trust"><div class="num">09</div><div class="lbl">Profesionales</div></div>
+        <div class="trust"><div class="num">09</div><div class="lbl">Áreas de atención</div></div>
+        <div class="trust"><div class="num">L–S</div><div class="lbl">Atención con cita</div></div>
+        <div class="trust"><div class="num">VD</div><div class="lbl">Asistente virtual</div></div>
+      </div>
+    </div>
+    <div class="hero-form">
+      <div class="hero-photo-card"><img src="{% static 'vendor/pearl/img/treat-emergency.jpg' %}" alt="Imagen ilustrativa de un consultorio odontológico"><div class="hero-photo-shade"></div><div class="hero-photo-caption"><span class="hero-photo-mark">✳</span><div><strong>Atención odontológica</strong><span>Conoce las áreas y el equipo de VitaDent</span></div></div><span class="hero-photo-note">Imagen ilustrativa</span></div>
+    </div>
+  </div>
+</section>
+<section class="section section-tint" id="services"><div class="container">
+  <div class="section-head center"><span class="eyebrow">Áreas de atención</span><h2>El cuidado adecuado para cada necesidad.</h2><p>Explora los servicios que constan en la información de VitaDent. La indicación de tratamiento se define con un profesional.</p></div>
+  <div class="svc-grid mt-tight">
+    <article class="svc-card"><div class="svc-ico" aria-hidden="true">✳</div><h3>Odontología general</h3><p>Diagnóstico, prevención y procedimientos de cuidado cotidiano.</p><a class="svc-link" href="{% url 'tratamientos' %}#general">Explorar área <span aria-hidden="true">→</span></a></article>
+    <article class="svc-card"><div class="svc-ico" aria-hidden="true">⌁</div><h3>Ortodoncia</h3><p>Atención especializada para la alineación y controles ortodónticos.</p><a class="svc-link" href="{% url 'tratamientos' %}#ortodoncia">Explorar área <span aria-hidden="true">→</span></a></article>
+    <article class="svc-card"><div class="svc-ico" aria-hidden="true">◇</div><h3>Rehabilitación oral</h3><p>Alternativas para recuperar función oral según valoración clínica.</p><a class="svc-link" href="{% url 'tratamientos' %}#rehabilitacion">Explorar área <span aria-hidden="true">→</span></a></article>
+    <article class="svc-card"><div class="svc-ico" aria-hidden="true">＋</div><h3>Odontología infantil</h3><p>Procedimientos de cuidado y prevención para pacientes infantiles.</p><a class="svc-link" href="{% url 'tratamientos' %}#infantil">Explorar área <span aria-hidden="true">→</span></a></article>
+    <article class="svc-card"><div class="svc-ico" aria-hidden="true">⌕</div><h3>Endodoncia y cirugía</h3><p>Especialidades para atención de necesidades específicas.</p><a class="svc-link" href="{% url 'tratamientos' %}#especialidades">Ver procedimientos <span aria-hidden="true">→</span></a></article>
+    <article class="svc-card"><div class="svc-ico" aria-hidden="true">◎</div><h3>Implantología</h3><p>Consulta las opciones registradas en el catálogo de atención.</p><a class="svc-link" href="{% url 'tratamientos' %}#especialidades">Ver procedimientos <span aria-hidden="true">→</span></a></article>
+  </div>
+  <div class="section-action"><a class="btn btn-ghost" href="{% url 'tratamientos' %}">Ver todas las áreas de atención <span aria-hidden="true">↗</span></a></div>
+</div></section>
+<section class="section"><div class="container why-grid">
+  <div class="why-media"><img src="{% static 'vendor/pearl/img/why-clinic.jpg' %}" alt="Imagen ilustrativa de un espacio de atención odontológica"><div class="float-card"><span class="fc-ico">✳</span><div><strong>Atención con cita</strong><span>Horario general de VitaDent</span></div></div><span class="image-disclaimer">Imagen ilustrativa</span></div>
+  <div><span class="eyebrow">Cómo empezar</span><h2>Un primer paso sencillo para coordinar tu atención.</h2><p class="lead">Escribe por WhatsApp al asistente. Te orientará y recopilará los datos necesarios para enviar una solicitud.</p>
+    <ul class="why-list"><li class="why-item"><span class="wi-ico">01</span><div><h4>Inicia por WhatsApp</h4><p>No necesitas crear una cuenta para solicitar una cita.</p></div></li><li class="why-item"><span class="wi-ico">02</span><div><h4>Indica tu motivo de consulta</h4><p>El asistente te orientará con las áreas y especialistas registrados.</p></div></li><li class="why-item"><span class="wi-ico">03</span><div><h4>La clínica confirma disponibilidad</h4><p>La agenda se coordina según los horarios reales del profesional.</p></div></li></ul>
+    <a class="svc-link" href="{% url 'asistente_citas' %}">Agendar cita por WhatsApp <span aria-hidden="true">→</span></a>
+  </div>
+</div></section>
+<section class="section section-tint" id="team"><div class="container"><div class="section-head center"><span class="eyebrow">Equipo VitaDent</span><h2>Profesionales de distintas especialidades.</h2><p>Los datos corresponden al equipo indicado en el manual de la clínica. Las fotografías institucionales están pendientes.</p></div>
+  <div class="team-grid team-preview-grid">{% for especialista in especialistas|slice:":3" %}<article class="team-card"><div class="team-photo team-initials tone-{{ especialista.tono }}"><span>{{ especialista.iniciales }}</span><small>Foto institucional pendiente</small></div><div class="team-body"><span class="team-role">{{ especialista.especialidad }}</span><h3>{{ especialista.nombre }}</h3></div></article>{% endfor %}</div>
+  <div class="section-action"><a class="btn btn-ghost" href="{% url 'especialistas' %}">Conocer a los 9 especialistas <span aria-hidden="true">↗</span></a></div>
+</div></section>
+<section class="section cta-band"><div class="container cta-card"><div><span class="eyebrow">Tu próximo paso</span><h2>Conversemos sobre tu cita.</h2><p>El asistente virtual te atenderá por WhatsApp.</p></div><a class="btn btn-white btn-lg" href="{% url 'asistente_citas' %}">Abrir WhatsApp <span aria-hidden="true">↗</span></a></div></section>
+{% endblock %}

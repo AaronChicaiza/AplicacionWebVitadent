@@ -1,0 +1,15 @@
+{% extends 'web/admin/plantilla_gestion.html' %}
+{% block titulo %}Conversación WhatsApp · VitaDent{% endblock %}
+{% block contenido_gestion %}
+<div class="admin-title-row"><div><p><a href="{% url 'gestion_conversaciones' %}">← Volver a WhatsApp</a></p><h1>Conversación de +{{ conversacion.whatsapp_id }}</h1><p>Estado actual: {{ conversacion.get_estado_display }} · Última actividad {{ conversacion.ultima_actividad|date:'d/m/Y H:i' }}</p></div></div>
+<div class="conversation-layout">
+  <section class="admin-panel conversation-thread" aria-label="Historial de mensajes">
+    {% for mensaje in mensajes_conversacion %}<article class="conversation-message {% if mensaje.direccion == 'saliente' %}is-outgoing{% endif %}"><span>{% if mensaje.direccion == 'saliente' %}VitaDent{% else %}Paciente{% endif %} · {{ mensaje.creado_en|date:'d/m/Y H:i' }}</span><p>{{ mensaje.contenido|default:'Mensaje multimedia recibido' }}</p></article>{% empty %}<p>Aún no hay mensajes guardados.</p>{% endfor %}
+  </section>
+  <aside class="admin-panel conversation-controls">
+    <h2>Responder por WhatsApp</h2><p>Requiere token y número de WhatsApp Cloud API configurados. Las reglas de ventana de mensajería de Meta aplican.</p>
+    <form method="post">{% csrf_token %}<input type="hidden" name="accion" value="responder"><label for="mensaje">Mensaje</label><textarea id="mensaje" name="mensaje" maxlength="1000" required rows="5"></textarea><button class="admin-button" type="submit">Enviar mensaje</button></form>
+    <hr><h2>Estado de atención</h2><form method="post">{% csrf_token %}<input type="hidden" name="accion" value="estado"><label for="estado">Estado</label><select id="estado" name="estado">{% for valor, etiqueta in estados_conversacion %}<option value="{{ valor }}" {% if conversacion.estado == valor %}selected{% endif %}>{{ etiqueta }}</option>{% endfor %}</select><button class="admin-button" type="submit">Guardar estado</button></form>
+  </aside>
+</div>
+{% endblock %}

@@ -1,0 +1,54 @@
+{% extends 'web/plantilla_publica.html' %}
+{% load static %}
+{% block titulo %}Actualiza tu contraseña · VitaDent{% endblock %}
+{% block css_extra %}<link rel="stylesheet" href="{% static 'web/css/acceso-personal.css' %}">{% endblock %}
+{% block contenido %}
+<section class="access-page">
+  <div class="access-wrap change-password-wrap">
+    <section class="access-panel" aria-labelledby="change-title">
+      <div class="access-brand-row">
+        <img src="{% static 'web/img/vitadent-logo.png' %}" alt="VitaDent, Inteligencia odontológica">
+        <span class="access-secure"><span aria-hidden="true">●</span> Configuración segura</span>
+      </div>
+      <p class="access-kicker">PRIMER INGRESO</p>
+      <h1 id="change-title">Protege tu cuenta.</h1>
+      <p class="access-intro">Crea una contraseña personal antes de entrar al sistema. Esta clave temporal dejará de funcionar al guardar el cambio.</p>
+      {% if messages %}{% for message in messages %}<div class="access-success" role="status">{{ message }}</div>{% endfor %}{% endif %}
+      <form class="staff-login-form" id="formulario-cambio-clave" method="post" novalidate>
+        {% csrf_token %}
+        {% if formulario_clave.non_field_errors %}<div class="access-alert" role="alert">{{ formulario_clave.non_field_errors }}</div>{% endif %}
+        {% for field in formulario_clave %}
+          <div class="access-field">
+            <label for="{{ field.id_for_label }}">{% if field.name == 'old_password' %}Contraseña temporal{% elif field.name == 'new_password1' %}Nueva contraseña{% else %}Confirma la nueva contraseña{% endif %}</label>
+            <div class="password-control">
+              <input id="{{ field.id_for_label }}" name="{{ field.html_name }}" type="password" autocomplete="{% if field.name == 'old_password' %}current-password{% else %}new-password{% endif %}" required aria-describedby="{{ field.name }}-error" {% if field.name == 'old_password' %}autofocus{% endif %}>
+              <button class="password-toggle" type="button" data-toggle-password="{{ field.id_for_label }}" aria-label="Mostrar contraseña" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2.2 12s3.4-6 9.8-6 9.8 6 9.8 6-3.4 6-9.8 6-9.8-6-9.8-6Z"/><circle cx="12" cy="12" r="2.6"/></svg></button>
+            </div>
+            <span class="field-error" id="{{ field.name }}-error">{{ field.errors|striptags }}</span>
+            {% if field.help_text %}<span class="password-help">{{ field.help_text|safe }}</span>{% endif %}
+          </div>
+        {% endfor %}
+        <button class="access-submit" id="change-password-submit" type="submit"><span>Guardar nueva contraseña</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
+        <p class="access-form-note">Usa una clave única que no compartas con otras personas.</p>
+      </form>
+      <a class="access-back" href="{% url 'salir_personal' %}"><span aria-hidden="true">←</span> Cerrar sesión</a>
+    </section>
+    <aside class="access-aside" aria-label="Recomendaciones para una contraseña segura">
+      <div class="access-aside-mark" aria-hidden="true"><span>VD</span><i></i></div>
+      <p class="access-aside-kicker">SEGURIDAD DE TU PERFIL</p>
+      <h2>Solo tú debes<br>conocer tu clave.</h2>
+      <p class="access-aside-copy">El acceso profesional protege información de pacientes y de la clínica.</p>
+      <div class="access-role-list">
+        <div class="access-role"><span class="role-icon" aria-hidden="true">✓</span><div><strong>Al menos 12 caracteres</strong><small>Combina palabras, números y símbolos.</small></div></div>
+        <div class="access-role"><span class="role-icon" aria-hidden="true">◈</span><div><strong>Una clave personal</strong><small>Evita compartirla o reutilizarla en otros sitios.</small></div></div>
+      </div>
+      <div class="access-aside-foot"><span aria-hidden="true">◈</span><p>El formulario valida la contraseña en el navegador y el servidor.</p></div>
+    </aside>
+  </div>
+</section>
+{% endblock %}
+{% block scripts_extra %}
+<script src="{% static 'vendor/jquery/jquery-4.1.0.min.js' %}" defer></script>
+<script src="{% static 'vendor/jquery/jquery.validate-1.22.1.min.js' %}" defer></script>
+<script src="{% static 'web/js/cambiar-clave.js' %}" defer></script>
+{% endblock %}

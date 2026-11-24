@@ -1,0 +1,50 @@
+{% load static %}
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#ffffff">
+  <title>{% block titulo %}VitaDent · Inteligencia odontológica{% endblock %}</title>
+  <meta name="description" content="Conoce VitaDent, sus áreas de atención y especialistas. Solicita tu cita conversando con el asistente virtual.">
+  {% block fuentes_tipograficas %}<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Mulish:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">{% endblock %}
+  <link rel="stylesheet" href="{% static 'vendor/pearl/css/vendor/bootstrap.min.css' %}">
+  <link rel="stylesheet" href="{% static 'vendor/pearl/css/style.css' %}">
+  <link rel="stylesheet" href="{% static 'web/css/vitadent-pearl.css' %}">
+  <link rel="stylesheet" href="{% static 'web/css/roles-chat.css' %}">
+  {% block css_extra %}{% endblock %}
+</head>
+<body>
+  <a class="skip-link" href="#contenido">Saltar al contenido</a>
+  <header class="site-nav" data-site-nav>
+    <div class="container">
+      <a class="brand vitadent-brand" href="{% url 'inicio' %}" aria-label="VitaDent, inicio"><img src="{% static 'web/img/vitadent-logo.png' %}" alt="VitaDent · Inteligencia odontológica"></a>
+      <nav aria-label="Navegación principal"><ul class="nav-links">
+        <li><a href="{% url 'inicio' %}" {% if request.path == '/' %}aria-current="page"{% endif %}>Inicio</a></li>
+        <li><a href="{% url 'tratamientos' %}" {% if request.path == '/tratamientos/' %}aria-current="page"{% endif %}>Tratamientos</a></li>
+        <li><a href="{% url 'especialistas' %}" {% if request.path == '/equipo/' %}aria-current="page"{% endif %}>Especialistas</a></li>
+        <li><a href="{% url 'acceso_personal' %}">Personal</a></li>
+      </ul></nav>
+      <div class="nav-cta"><a class="btn btn-primary" href="{% url 'asistente_citas' %}">Agendar una cita <span aria-hidden="true">↗</span></a>
+        <button class="nav-toggle" type="button" data-nav-toggle aria-expanded="false" aria-controls="mobile-menu" aria-label="Abrir menú"><span></span></button>
+      </div>
+    </div>
+  </header>
+  <div class="mobile-menu" id="mobile-menu" data-mobile-menu><div class="mobile-panel">
+    <div class="mobile-head"><a class="brand vitadent-brand" href="{% url 'inicio' %}" aria-label="VitaDent, inicio"><img src="{% static 'web/img/vitadent-logo.png' %}" alt="VitaDent"></a><button class="mobile-close" type="button" data-nav-close aria-label="Cerrar menú">&times;</button></div>
+    <a class="m-link" href="{% url 'inicio' %}">Inicio</a><a class="m-link" href="{% url 'tratamientos' %}">Tratamientos</a><a class="m-link" href="{% url 'especialistas' %}">Especialistas</a><a class="m-link" href="{% url 'acceso_personal' %}">Acceso del personal</a>
+    <a class="btn btn-primary" href="{% url 'asistente_citas' %}">Agendar una cita <span aria-hidden="true">↗</span></a>
+    <div class="mobile-contact"><p><strong>Horario general</strong></p><p>Lun–vie 09h00–19h30<br>Sáb 08h00–15h30</p><p>La atención dominical se confirma según fecha.</p></div>
+  </div></div>
+  <main id="contenido">{% block contenido %}{% endblock %}</main>
+  <footer class="footer"><div class="container footer-grid">
+    <div class="footer-about"><a class="brand vitadent-brand footer-brand" href="{% url 'inicio' %}"><img src="{% static 'web/img/vitadent-logo.png' %}" alt="VitaDent · Inteligencia odontológica"></a><p>Atención odontológica y acompañamiento profesional para cada etapa de tu salud oral.</p></div>
+    <div><h5>Explora</h5><ul class="footer-links"><li><a href="{% url 'tratamientos' %}">Tratamientos</a></li><li><a href="{% url 'especialistas' %}">Especialistas</a></li><li><a href="{% url 'asistente_citas' %}">Asistente de citas</a></li></ul></div>
+    <div><h5>Horario general</h5><ul class="footer-links"><li>Lun–vie · 09h00–19h30</li><li>Sábados · 08h00–15h30</li><li>Domingo · confirmar fecha</li></ul></div>
+    <div><h5>Atención</h5><p>Para solicitar una cita, inicia una conversación con el asistente virtual. La disponibilidad se confirma con la clínica.</p><a class="footer-chat-link" href="{% url 'asistente_citas' %}">Abrir asistente <span aria-hidden="true">↗</span></a></div>
+  </div><div class="container footer-bottom"><span>© {% now "Y" %} VitaDent</span><a href="{% url 'acceso_personal' %}">Acceso del personal</a><span>Información basada en los datos proporcionados por la clínica.</span></div></footer>
+  <script src="{% static 'vendor/pearl/js/main.js' %}" defer></script>
+  <script src="{% static 'web/js/site.js' %}" defer></script>
+  {% block scripts_extra %}{% endblock %}
+</body>
+</html>

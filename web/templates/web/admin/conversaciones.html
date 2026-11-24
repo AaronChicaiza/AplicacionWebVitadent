@@ -1,0 +1,17 @@
+{% extends 'web/admin/plantilla_gestion.html' %}
+{% block titulo %}WhatsApp · VitaDent{% endblock %}
+{% block contenido_gestion %}
+<div class="admin-title-row"><div><h1>Conversaciones de WhatsApp</h1><p>{{ conversaciones_humanas }} {% if conversaciones_humanas == 1 %}conversación espera{% else %}conversaciones esperan{% endif %} respuesta de recepción.</p></div></div>
+<nav class="conversation-filters" aria-label="Filtrar conversaciones por estado">
+  <a href="{% url 'gestion_conversaciones' %}" {% if not estado_filtro %}aria-current="page"{% endif %}><span>Todas</span><strong>{{ total_conversaciones }}</strong></a>
+  <a href="?estado=activa" {% if estado_filtro == 'activa' %}aria-current="page"{% endif %}><span>Asistente</span><strong>{{ conversaciones_activas }}</strong></a>
+  <a href="?estado=humana" {% if estado_filtro == 'humana' %}aria-current="page"{% endif %}><span>Recepción</span><strong>{{ conversaciones_humanas }}</strong></a>
+  <a href="?estado=cerrada" {% if estado_filtro == 'cerrada' %}aria-current="page"{% endif %}><span>Cerradas</span><strong>{{ conversaciones_cerradas }}</strong></a>
+</nav>
+<section class="admin-panel">
+  <div class="table-responsive"><table class="admin-table"><thead><tr><th>Contacto</th><th>Atención</th><th>Último mensaje</th><th>Actividad</th><th></th></tr></thead><tbody>
+  {% for conversacion in conversaciones %}<tr><td>+{{ conversacion.whatsapp_id }}</td><td><span class="status-pill">{{ conversacion.get_estado_display }}</span></td><td>{{ conversacion.ultimo_mensaje|default:'Sin mensajes'|truncatechars:90 }}</td><td>{{ conversacion.ultima_actividad|date:'d/m/Y H:i' }}</td><td><a class="admin-button" href="{% url 'gestion_conversacion_detalle' conversacion.pk %}">Abrir conversación</a></td></tr>{% empty %}<tr><td colspan="5">Todavía no hay conversaciones recibidas por el webhook.</td></tr>{% endfor %}
+  </tbody></table></div>
+  {% if conversaciones.has_other_pages %}<nav class="pagination" aria-label="Páginas de conversaciones">{% if conversaciones.has_previous %}<a href="?pagina={{ conversaciones.previous_page_number }}&estado={{ estado_filtro|urlencode }}">Anterior</a>{% endif %}<span>Página {{ conversaciones.number }} de {{ conversaciones.paginator.num_pages }}</span>{% if conversaciones.has_next %}<a href="?pagina={{ conversaciones.next_page_number }}&estado={{ estado_filtro|urlencode }}">Siguiente</a>{% endif %}</nav>{% endif %}
+</section>
+{% endblock %}

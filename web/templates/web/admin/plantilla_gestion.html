@@ -1,0 +1,77 @@
+{% load static %}
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Panel de gestión de la clínica VitaDent">
+  <title>{% block titulo %}Gestión · VitaDent{% endblock %}</title>
+  <link rel="stylesheet" href="{% static 'vendor/srtdash/assets/css/bootstrap.min.css' %}">
+  <link rel="stylesheet" href="{% static 'vendor/srtdash/assets/css/fontawesome.min.css' %}">
+  <link rel="stylesheet" href="{% static 'vendor/srtdash/assets/css/themify-icons.css' %}">
+  <link rel="stylesheet" href="{% static 'vendor/srtdash/assets/css/metismenujs.min.css' %}">
+  <link rel="stylesheet" href="{% static 'vendor/srtdash/assets/css/typography.css' %}">
+  <link rel="stylesheet" href="{% static 'vendor/srtdash/assets/css/default-css.css' %}">
+  <link rel="stylesheet" href="{% static 'vendor/srtdash/assets/css/styles.css' %}">
+  <link rel="stylesheet" href="{% static 'vendor/srtdash/assets/css/responsive.css' %}">
+  <link rel="stylesheet" href="{% static 'web/css/site.css' %}">
+  <link rel="stylesheet" href="{% static 'web/css/admin.css' %}">
+  <link rel="stylesheet" href="{% static 'web/css/responsive.css' %}">
+  <link rel="stylesheet" href="{% static 'web/css/admin-extras.css' %}">
+  <link rel="stylesheet" href="{% static 'web/css/vitadent-srtdash.css' %}">
+  <link rel="stylesheet" href="{% static 'web/css/admin-polish.css' %}">
+  <link rel="stylesheet" href="{% static 'web/css/admin-dashboard.css' %}">
+</head>
+<body class="admin-body">
+  <a class="skip-link" href="#main-content">Saltar al contenido</a>
+  <div class="demo-banner">Panel interno · acceso autenticado · información guardada en el sistema</div>
+  <div class="page-container">
+    <aside class="sidebar-menu" aria-label="Navegación de gestión">
+      <div class="sidebar-header">
+        <div class="logo"><a href="{% url 'gestion_inicio' %}" aria-label="VitaDent, ir al resumen"><img src="{% static 'web/img/vitadent-logo.png' %}" alt="VitaDent · Inteligencia odontológica"></a></div>
+        <p class="clinic-label">GESTIÓN DE CLÍNICA</p>
+      </div>
+      <div class="main-menu"><div class="menu-inner"><nav>
+        <p class="sidebar-section-label">Agenda</p>
+        <ul class="metismenu" id="menu">
+          <li class="{% if seccion_activa == 'resumen' %}active{% endif %}"><a href="{% url 'gestion_inicio' %}" {% if seccion_activa == 'resumen' %}aria-current="page"{% endif %}><i class="ti-dashboard" aria-hidden="true"></i><span>Resumen</span></a></li>
+          <li class="{% if seccion_activa == 'citas' %}active{% endif %}"><a href="{% url 'gestion_citas' %}" {% if seccion_activa == 'citas' %}aria-current="page"{% endif %}><i class="ti-notepad" aria-hidden="true"></i><span>Solicitudes de cita</span></a></li>
+          <li class="{% if seccion_activa == 'agenda' %}active{% endif %}"><a href="{% url 'gestion_agenda' %}" {% if seccion_activa == 'agenda' %}aria-current="page"{% endif %}><i class="ti-calendar" aria-hidden="true"></i><span>Agenda y horarios</span></a></li>
+        </ul>
+        <p class="sidebar-section-label">Clínica</p>
+        <ul class="metismenu">
+          <li class="{% if seccion_activa == 'pacientes' %}active{% endif %}"><a href="{% url 'gestion_pacientes' %}" {% if seccion_activa == 'pacientes' %}aria-current="page"{% endif %}><i class="ti-user" aria-hidden="true"></i><span>Pacientes</span></a></li>
+          <li class="{% if seccion_activa == 'especialistas' %}active{% endif %}"><a href="{% url 'gestion_especialistas' %}" {% if seccion_activa == 'especialistas' %}aria-current="page"{% endif %}><i class="ti-id-badge" aria-hidden="true"></i><span>Especialistas</span></a></li>
+          <li class="{% if seccion_activa == 'tratamientos' %}active{% endif %}"><a href="{% url 'gestion_tratamientos' %}" {% if seccion_activa == 'tratamientos' %}aria-current="page"{% endif %}><i class="ti-heart" aria-hidden="true"></i><span>Tratamientos</span></a></li>
+        </ul>
+        <p class="sidebar-section-label">Sistema</p>
+        <ul class="metismenu">
+          <li class="{% if seccion_activa == 'notificaciones' %}active{% endif %}"><a href="{% url 'gestion_notificaciones' %}" {% if seccion_activa == 'notificaciones' %}aria-current="page"{% endif %}><i class="ti-bell" aria-hidden="true"></i><span>Notificaciones</span></a></li>
+          <li class="{% if seccion_activa == 'conversaciones' %}active{% endif %}"><a href="{% url 'gestion_conversaciones' %}" {% if seccion_activa == 'conversaciones' %}aria-current="page"{% endif %}><i class="ti-comments" aria-hidden="true"></i><span>WhatsApp</span></a></li>
+          <li class="{% if seccion_activa == 'auditoria' %}active{% endif %}"><a href="{% url 'gestion_auditoria' %}" {% if seccion_activa == 'auditoria' %}aria-current="page"{% endif %}><i class="ti-clipboard" aria-hidden="true"></i><span>Auditoría</span></a></li>
+        </ul>
+      </nav></div></div>
+      <div class="sidebar-footer"><span class="profile-mark">VD</span><div><strong>{{ request.user.get_full_name|default:request.user.username }}</strong><small>Administración</small></div></div>
+    </aside>
+    <div class="main-content">
+      <header class="header-area">
+        <div class="header-inner">
+          <button class="nav-btn" type="button" aria-label="Contraer o mostrar el menú"><span></span><span></span><span></span></button>
+          <div class="header-context"><span class="context-dot"></span><span>Gestión VitaDent</span></div>
+          <a class="public-site-link" href="{% url 'inicio' %}">Ver sitio público <i class="ti-arrow-top-right" aria-hidden="true"></i></a>
+          <form method="post" action="{% url 'salir_personal' %}">{% csrf_token %}<button class="public-site-link" type="submit">Salir</button></form>
+        </div>
+      </header>
+      <div class="page-title-area"><div class="breadcrumbs-area"><p>VitaDent <span>/</span> Administración</p></div></div>
+      <main class="main-content-inner" id="main-content">
+        {% if messages %}<div class="container-fluid" role="status">{% for message in messages %}<p class="admin-disclaimer">{{ message }}</p>{% endfor %}</div>{% endif %}
+        {% block contenido_gestion %}{% endblock %}
+      </main>
+      <footer class="footer-area"><span>VitaDent · Panel de gestión</span><span>Interfaz de demostración · Colorlib SRTdash</span></footer>
+    </div>
+  </div>
+  <script src="{% static 'vendor/srtdash/assets/js/bootstrap.bundle.min.js' %}" defer></script>
+  <script src="{% static 'vendor/srtdash/assets/js/metismenujs.min.js' %}" defer></script>
+  <script src="{% static 'vendor/srtdash/assets/js/scripts.js' %}" defer></script>
+</body>
+</html>
