@@ -21,6 +21,11 @@
   <link rel="stylesheet" href="{% static 'web/css/vitadent-srtdash.css' %}">
   <link rel="stylesheet" href="{% static 'web/css/admin-polish.css' %}">
   <link rel="stylesheet" href="{% static 'web/css/admin-dashboard.css' %}">
+  <link rel="stylesheet" href="{% static 'vendor/datatables/dataTables.dataTables.min.css' %}">
+  <link rel="stylesheet" href="{% static 'vendor/datatables/buttons.dataTables.min.css' %}">
+  <link rel="stylesheet" href="{% static 'vendor/datatables/sweetalert2.min.css' %}">
+  <link rel="stylesheet" href="{% static 'web/css/admin-datatables.css' %}">
+  {% block estilos_gestion %}{% endblock %}
 </head>
 <body class="admin-body">
   <a class="skip-link" href="#main-content">Saltar al contenido</a>
@@ -43,6 +48,7 @@
           <li class="{% if seccion_activa == 'pacientes' %}active{% endif %}"><a href="{% url 'gestion_pacientes' %}" {% if seccion_activa == 'pacientes' %}aria-current="page"{% endif %}><i class="ti-user" aria-hidden="true"></i><span>Pacientes</span></a></li>
           <li class="{% if seccion_activa == 'especialistas' %}active{% endif %}"><a href="{% url 'gestion_especialistas' %}" {% if seccion_activa == 'especialistas' %}aria-current="page"{% endif %}><i class="ti-id-badge" aria-hidden="true"></i><span>Especialistas</span></a></li>
           <li class="{% if seccion_activa == 'tratamientos' %}active{% endif %}"><a href="{% url 'gestion_tratamientos' %}" {% if seccion_activa == 'tratamientos' %}aria-current="page"{% endif %}><i class="ti-heart" aria-hidden="true"></i><span>Tratamientos</span></a></li>
+          <li class="{% if seccion_activa == 'sucursales' %}active{% endif %}"><a href="{% url 'gestion_sucursales' %}" {% if seccion_activa == 'sucursales' %}aria-current="page"{% endif %}><i class="ti-location-pin" aria-hidden="true"></i><span>Sucursales</span></a></li>
         </ul>
         <p class="sidebar-section-label">Sistema</p>
         <ul class="metismenu">
@@ -73,5 +79,15 @@
   <script src="{% static 'vendor/srtdash/assets/js/bootstrap.bundle.min.js' %}" defer></script>
   <script src="{% static 'vendor/srtdash/assets/js/metismenujs.min.js' %}" defer></script>
   <script src="{% static 'vendor/srtdash/assets/js/scripts.js' %}" defer></script>
+  <script src="{% static 'vendor/datatables/jquery.min.js' %}"></script>
+  <script src="{% static 'vendor/datatables/dataTables.min.js' %}"></script>
+  <script src="{% static 'vendor/datatables/dataTables.buttons.min.js' %}"></script>
+  <script src="{% static 'vendor/datatables/jszip.min.js' %}"></script>
+  <script src="{% static 'vendor/datatables/pdfmake.min.js' %}"></script>
+  <script src="{% static 'vendor/datatables/vfs_fonts.js' %}"></script>
+  <script src="{% static 'vendor/datatables/buttons.html5.min.js' %}"></script>
+  <script src="{% static 'vendor/datatables/sweetalert2.all.min.js' %}"></script>
+  <script src="{% static 'web/js/admin-datatables.js' %}" defer></script>
+  {% block scripts_gestion %}{% endblock %}
 </body>
 </html>

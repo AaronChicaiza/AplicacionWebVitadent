@@ -37,6 +37,7 @@ urlpatterns = [
     path("gestion/agenda/", views.gestion_agenda, name="gestion_agenda"),
     path("gestion/especialistas/", views.gestion_especialistas, name="gestion_especialistas"),
     path("gestion/tratamientos/", views.gestion_tratamientos, name="gestion_tratamientos"),
+    path("gestion/sucursales/", views.gestion_sucursales, name="gestion_sucursales"),
     path("gestion/notificaciones/", views.gestion_notificaciones, name="gestion_notificaciones"),
     path("gestion/conversaciones/", views.gestion_conversaciones, name="gestion_conversaciones"),
     path("gestion/conversaciones/<int:pk>/", views.gestion_conversaciones, name="gestion_conversacion_detalle"),

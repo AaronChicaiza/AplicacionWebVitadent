@@ -30,6 +30,14 @@ from .models import AccesoPersonal, Cita, CitaEvento, Conversacion, Especialista
 from .serializers import OperacionCitaWhatsAppSerializer, SolicitudWhatsAppSerializer
 from .servicios_whatsapp import enviar_mensaje_whatsapp, firma_meta_valida, procesar_evento_whatsapp
 from .validaciones import especialidad_admite_tratamiento
+from .forms_gestion import (
+    CitaGestionForm,
+    EspecialistaGestionForm,
+    HorarioGestionForm,
+    PacienteGestionForm,
+    SucursalGestionForm,
+    TratamientoGestionForm,
+)
 
 
 def contexto_base(**adicionales):
@@ -459,15 +467,109 @@ def gestion_inicio(request):
     )
 
 
+def _auditar_gestion(request, accion, objeto):
+    """Registra la operación del panel sin copiar datos personales al log."""
+    EventoAuditoria.objects.create(
+        actor=request.user,
+        accion=accion,
+        tipo_objeto=objeto.__class__.__name__,
+        identificador_objeto=str(objeto.pk),
+        detalles={"origen": "panel_gestion"},
+    )
+
+
+def _resumen_errores_formulario(form):
+    errores = [str(error) for grupo in form.errors.values() for error in grupo]
+    return "No se guardaron los cambios. " + " ".join(errores or ["Revisa los campos e inténtalo de nuevo."])
+
+
+def _validar_bloque_cita(cita):
+    """Comprueba agenda y solapamientos antes de mover una cita ya confirmada."""
+    if not cita.especialista or not cita.especialista.activo:
+        return "Asigna un especialista activo antes de reprogramar esta cita."
+    if not especialidad_admite_tratamiento(cita.tratamiento.area, cita.especialista.especialidad):
+        return "El especialista seleccionado no corresponde al tratamiento."
+    if cita.fecha_hora_solicitada <= timezone.now():
+        return "La nueva fecha debe ser futura."
+
+    inicio_local = timezone.localtime(cita.fecha_hora_solicitada)
+    duracion = cita.tratamiento.duracion_minutos or 30
+    fin = cita.fecha_hora_solicitada + timedelta(minutes=duracion)
+    fin_local = timezone.localtime(fin)
+    horario = HorarioAtencion.objects.filter(
+        especialista=cita.especialista,
+        dia_semana=inicio_local.weekday(),
+        activo=True,
+        hora_inicio__lte=inicio_local.time(),
+        hora_fin__gt=inicio_local.time(),
+    ).first()
+    if not horario or fin_local.date() != inicio_local.date() or fin_local.time() > horario.hora_fin:
+        return "La nueva fecha no cabe dentro de un horario activo del especialista."
+
+    otras = Cita.objects.filter(
+        especialista=cita.especialista,
+        estado__in=[Cita.Estado.CONFIRMADA, Cita.Estado.REPROGRAMADA],
+        fecha_hora_solicitada__lt=fin,
+    ).exclude(pk=cita.pk).select_related("tratamiento")
+    for otra in otras:
+        fin_otra = otra.fecha_hora_solicitada + timedelta(minutes=otra.tratamiento.duracion_minutos or 30)
+        if fin_otra > cita.fecha_hora_solicitada:
+            return "Ese bloque se cruza con otra cita confirmada. Selecciona otro horario."
+    return ""
+
+
 @staff_member_required(login_url="acceso_personal")
 def gestion_citas(request):
     if request.method == "POST":
+        accion = request.POST.get("accion", "")
+        if accion in {"crear", "editar"}:
+            pk = request.POST.get("cita_id") or request.POST.get("registro_id")
+            cita_existente = get_object_or_404(Cita, pk=pk) if accion == "editar" else None
+            if cita_existente and cita_existente.estado in {Cita.Estado.CANCELADA, Cita.Estado.ATENDIDA}:
+                messages.error(request, "Las citas canceladas o atendidas no se pueden editar; el historial se conserva.")
+                return redirect("gestion_citas")
+            form = CitaGestionForm(request.POST, instance=cita_existente)
+            if form.is_valid():
+                fecha_previa = cita_existente.fecha_hora_solicitada if cita_existente else None
+                cita = form.save(commit=False)
+                cita_previa = cita_existente
+                with transaction.atomic():
+                    if cita_previa and cita_previa.estado in {Cita.Estado.CONFIRMADA, Cita.Estado.REPROGRAMADA}:
+                        if not cita.especialista_id:
+                            messages.error(request, "Asigna un especialista activo antes de reprogramar esta cita.")
+                            return redirect("gestion_citas")
+                        Especialista.objects.select_for_update().get(pk=cita.especialista_id)
+                        error_agenda = _validar_bloque_cita(cita)
+                        if error_agenda:
+                            messages.error(request, error_agenda)
+                            return redirect("gestion_citas")
+                        cita.estado = Cita.Estado.REPROGRAMADA
+                    cita.save()
+                    if cita_previa is None:
+                        CitaEvento.objects.create(cita=cita, accion=CitaEvento.Accion.SOLICITADA, actor=request.user)
+                        mensaje = f"Se registró la solicitud {cita.codigo}. Aún debe confirmarse desde el panel."
+                    else:
+                        CitaEvento.objects.create(
+                            cita=cita,
+                            accion=CitaEvento.Accion.REPROGRAMADA,
+                            fecha_anterior=fecha_previa,
+                            fecha_nueva=cita.fecha_hora_solicitada,
+                            motivo="Ajuste realizado desde el panel de administración.",
+                            actor=request.user,
+                        )
+                        mensaje = f"Se actualizaron los datos de la cita {cita.codigo}."
+                    _auditar_gestion(request, "crear_cita" if cita_previa is None else "editar_cita", cita)
+                messages.success(request, mensaje)
+            else:
+                messages.error(request, _resumen_errores_formulario(form))
+            return redirect("gestion_citas")
+
         cita = get_object_or_404(Cita.objects.select_related("especialista", "tratamiento"), pk=request.POST.get("cita_id"))
-        accion = request.POST.get("accion")
         if accion == "cancelar" and cita.estado in {Cita.Estado.SOLICITADA, Cita.Estado.CONFIRMADA, Cita.Estado.REPROGRAMADA}:
             cita.estado = Cita.Estado.CANCELADA
             cita.save(update_fields=["estado"])
             CitaEvento.objects.create(cita=cita, accion=CitaEvento.Accion.CANCELADA, actor=request.user)
+            _auditar_gestion(request, "cancelar_cita", cita)
             messages.success(request, f"La cita {cita.codigo} quedó cancelada.")
         elif accion == "confirmar" and cita.estado in {Cita.Estado.SOLICITADA, Cita.Estado.REPROGRAMADA}:
             horario = None
@@ -508,6 +610,7 @@ def gestion_citas(request):
                     cita.estado = Cita.Estado.CONFIRMADA
                     cita.save(update_fields=["estado"])
                     CitaEvento.objects.create(cita=cita, accion=CitaEvento.Accion.CONFIRMADA, actor=request.user)
+                    _auditar_gestion(request, "confirmar_cita", cita)
                 messages.success(request, f"La cita {cita.codigo} quedó confirmada.")
         elif accion == "atender" and cita.estado in {Cita.Estado.CONFIRMADA, Cita.Estado.REPROGRAMADA}:
             try:
@@ -530,11 +633,12 @@ def gestion_citas(request):
                         motivo=f"Ingreso registrado: USD {monto:.2f}",
                         actor=request.user,
                     )
+                    _auditar_gestion(request, "registrar_atencion", cita)
                     messages.success(request, f"Se registró la atención y el ingreso de la cita {cita.codigo}.")
         else:
             messages.warning(request, "La acción no corresponde al estado actual de la cita.")
         return redirect("gestion_citas")
-    citas = Cita.objects.select_related("paciente", "tratamiento", "especialista")
+    citas = Cita.objects.select_related("paciente", "tratamiento", "especialista", "sucursal")
     estado = request.GET.get("estado", "")
     busqueda = request.GET.get("q", "").strip()[:100]
     if estado in Cita.Estado.values:
@@ -544,47 +648,191 @@ def gestion_citas(request):
     return render(
         request,
         "web/admin/citas.html",
-        contexto_base(seccion_activa="citas", citas=citas, estado_filtro=estado, busqueda=busqueda, estados_cita=Cita.Estado.choices, ahora=timezone.now()),
+        contexto_base(
+            seccion_activa="citas", citas=citas, estado_filtro=estado, busqueda=busqueda,
+            estados_cita=Cita.Estado.choices, ahora=timezone.now(), cita_form=CitaGestionForm(),
+            pacientes_catalogo=Paciente.objects.order_by("nombre_completo"),
+            tratamientos_catalogo=Tratamiento.objects.filter(activo=True).order_by("area", "nombre"),
+            especialistas_catalogo=Especialista.objects.filter(activo=True).order_by("nombre_completo"),
+            sucursales_catalogo=Sucursal.objects.filter(activa=True).order_by("nombre"),
+        ),
     )
 
 
 @staff_member_required(login_url="acceso_personal")
 def gestion_pacientes(request):
-    pacientes = Paciente.objects.order_by("nombre_completo")
+    if request.method == "POST":
+        accion = request.POST.get("accion", "")
+        paciente = get_object_or_404(Paciente, pk=request.POST.get("registro_id")) if request.POST.get("registro_id") else None
+        if accion == "eliminar" and paciente:
+            if paciente.citas.exists():
+                messages.error(request, "No se puede eliminar este paciente porque tiene citas en el historial. Puedes corregir sus datos desde Editar.")
+            else:
+                pk = paciente.pk
+                paciente.delete()
+                EventoAuditoria.objects.create(actor=request.user, accion="eliminar_paciente", tipo_objeto="Paciente", identificador_objeto=str(pk), detalles={"accion_panel": "eliminar"})
+                messages.success(request, "Se eliminó el registro del paciente.")
+            return redirect("gestion_pacientes")
+        if accion in {"crear", "editar"}:
+            form = PacienteGestionForm(request.POST, instance=paciente if accion == "editar" else None)
+            if form.is_valid():
+                paciente = form.save()
+                _auditar_gestion(request, "crear_paciente" if accion == "crear" else "editar_paciente", paciente)
+                messages.success(request, "Se guardaron los datos del paciente.")
+            else:
+                messages.error(request, _resumen_errores_formulario(form))
+            return redirect("gestion_pacientes")
+
+    pacientes = Paciente.objects.annotate(total_citas=Count("citas")).order_by("nombre_completo")
     busqueda = request.GET.get("q", "").strip()[:100]
     if busqueda:
         pacientes = pacientes.filter(nombre_completo__icontains=busqueda) | pacientes.filter(telefono__icontains=busqueda) | pacientes.filter(identificacion__icontains=busqueda)
     return render(
         request,
         "web/admin/pacientes.html",
-        contexto_base(seccion_activa="pacientes", pacientes=pacientes, busqueda=busqueda),
+        contexto_base(seccion_activa="pacientes", pacientes=pacientes, busqueda=busqueda, paciente_form=PacienteGestionForm()),
     )
 
 
 @staff_member_required(login_url="acceso_personal")
 def gestion_agenda(request):
+    if request.method == "POST":
+        accion = request.POST.get("accion", "")
+        horario = get_object_or_404(HorarioAtencion, pk=request.POST.get("registro_id")) if request.POST.get("registro_id") else None
+        if accion == "eliminar" and horario:
+            pk = horario.pk
+            horario.delete()
+            EventoAuditoria.objects.create(actor=request.user, accion="eliminar_horario", tipo_objeto="HorarioAtencion", identificador_objeto=str(pk), detalles={"accion_panel": "eliminar"})
+            messages.success(request, "Se eliminó el horario.")
+            return redirect("gestion_agenda")
+        if accion in {"crear", "editar"}:
+            form = HorarioGestionForm(request.POST, instance=horario if accion == "editar" else None)
+            if form.is_valid():
+                horario = form.save()
+                _auditar_gestion(request, "crear_horario" if accion == "crear" else "editar_horario", horario)
+                messages.success(request, "Se guardó el horario de atención.")
+            else:
+                messages.error(request, _resumen_errores_formulario(form))
+            return redirect("gestion_agenda")
     return render(
         request,
         "web/admin/agenda.html",
-        contexto_base(seccion_activa="agenda", horarios=HorarioAtencion.objects.select_related("especialista").filter(activo=True)),
+        contexto_base(
+            seccion_activa="agenda",
+            horarios=HorarioAtencion.objects.select_related("especialista").all(),
+            horario_form=HorarioGestionForm(),
+        ),
     )
 
 
 @staff_member_required(login_url="acceso_personal")
 def gestion_especialistas(request):
+    if request.method == "POST":
+        accion = request.POST.get("accion", "")
+        especialista = get_object_or_404(Especialista, pk=request.POST.get("registro_id")) if request.POST.get("registro_id") else None
+        if accion == "eliminar" and especialista:
+            if especialista.usuario_id or especialista.citas.exists() or especialista.horarios.exists():
+                especialista.activo = False
+                especialista.save(update_fields=["activo"])
+                _auditar_gestion(request, "desactivar_especialista", especialista)
+                messages.warning(request, "El especialista tiene relaciones o historial. Se desactivó para conservar los registros asociados.")
+            else:
+                pk = especialista.pk
+                especialista.delete()
+                EventoAuditoria.objects.create(actor=request.user, accion="eliminar_especialista", tipo_objeto="Especialista", identificador_objeto=str(pk), detalles={"accion_panel": "eliminar"})
+                messages.success(request, "Se eliminó el especialista del catálogo.")
+            return redirect("gestion_especialistas")
+        if accion in {"crear", "editar"}:
+            form = EspecialistaGestionForm(request.POST, instance=especialista if accion == "editar" else None)
+            if form.is_valid():
+                especialista = form.save()
+                _auditar_gestion(request, "crear_especialista" if accion == "crear" else "editar_especialista", especialista)
+                messages.success(request, "Se guardaron los datos del especialista.")
+            else:
+                messages.error(request, _resumen_errores_formulario(form))
+            return redirect("gestion_especialistas")
     return render(
         request,
         "web/admin/especialistas.html",
-        contexto_base(seccion_activa="especialistas", catalogo_especialistas=Especialista.objects.all()),
+        contexto_base(
+            seccion_activa="especialistas",
+            catalogo_especialistas=Especialista.objects.annotate(total_citas=Count("citas", distinct=True), total_horarios=Count("horarios", distinct=True)).order_by("nombre_completo"),
+            especialista_form=EspecialistaGestionForm(),
+        ),
     )
 
 
 @staff_member_required(login_url="acceso_personal")
 def gestion_tratamientos(request):
+    if request.method == "POST":
+        accion = request.POST.get("accion", "")
+        tratamiento = get_object_or_404(Tratamiento, pk=request.POST.get("registro_id")) if request.POST.get("registro_id") else None
+        if accion == "eliminar" and tratamiento:
+            if tratamiento.citas.exists():
+                tratamiento.activo = False
+                tratamiento.save(update_fields=["activo"])
+                _auditar_gestion(request, "desactivar_tratamiento", tratamiento)
+                messages.warning(request, "El tratamiento tiene citas asociadas. Se desactivó para conservar el historial.")
+            else:
+                pk = tratamiento.pk
+                tratamiento.delete()
+                EventoAuditoria.objects.create(actor=request.user, accion="eliminar_tratamiento", tipo_objeto="Tratamiento", identificador_objeto=str(pk), detalles={"accion_panel": "eliminar"})
+                messages.success(request, "Se eliminó el tratamiento del catálogo.")
+            return redirect("gestion_tratamientos")
+        if accion in {"crear", "editar"}:
+            form = TratamientoGestionForm(request.POST, instance=tratamiento if accion == "editar" else None)
+            if form.is_valid():
+                tratamiento = form.save()
+                _auditar_gestion(request, "crear_tratamiento" if accion == "crear" else "editar_tratamiento", tratamiento)
+                messages.success(request, "Se guardaron los datos del tratamiento.")
+            else:
+                messages.error(request, _resumen_errores_formulario(form))
+            return redirect("gestion_tratamientos")
     return render(
         request,
         "web/admin/tratamientos.html",
-        contexto_base(seccion_activa="tratamientos", catalogo_tratamientos=Tratamiento.objects.all()),
+        contexto_base(
+            seccion_activa="tratamientos",
+            catalogo_tratamientos=Tratamiento.objects.annotate(total_citas=Count("citas")).order_by("area", "nombre"),
+            tratamiento_form=TratamientoGestionForm(),
+        ),
+    )
+
+
+@staff_member_required(login_url="acceso_personal")
+def gestion_sucursales(request):
+    if request.method == "POST":
+        accion = request.POST.get("accion", "")
+        sucursal = get_object_or_404(Sucursal, pk=request.POST.get("registro_id")) if request.POST.get("registro_id") else None
+        if accion == "eliminar" and sucursal:
+            if sucursal.citas.exists():
+                sucursal.activa = False
+                sucursal.save(update_fields=["activa"])
+                _auditar_gestion(request, "desactivar_sucursal", sucursal)
+                messages.warning(request, "La sucursal tiene citas asociadas. Se desactivó para conservar el historial.")
+            else:
+                pk = sucursal.pk
+                sucursal.delete()
+                EventoAuditoria.objects.create(actor=request.user, accion="eliminar_sucursal", tipo_objeto="Sucursal", identificador_objeto=str(pk), detalles={"accion_panel": "eliminar"})
+                messages.success(request, "Se eliminó la sucursal.")
+            return redirect("gestion_sucursales")
+        if accion in {"crear", "editar"}:
+            form = SucursalGestionForm(request.POST, instance=sucursal if accion == "editar" else None)
+            if form.is_valid():
+                sucursal = form.save()
+                _auditar_gestion(request, "crear_sucursal" if accion == "crear" else "editar_sucursal", sucursal)
+                messages.success(request, "Se guardaron los datos de la sucursal.")
+            else:
+                messages.error(request, _resumen_errores_formulario(form))
+            return redirect("gestion_sucursales")
+    return render(
+        request,
+        "web/admin/sucursales.html",
+        contexto_base(
+            seccion_activa="sucursales",
+            sucursales=Sucursal.objects.annotate(total_citas=Count("citas")).order_by("nombre"),
+            sucursal_form=SucursalGestionForm(),
+        ),
     )
 
 

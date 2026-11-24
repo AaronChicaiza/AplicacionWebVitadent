@@ -1,0 +1,20 @@
+<div class="modal fade admin-modal" id="{{ modal_id }}" tabindex="-1" aria-labelledby="{{ modal_id }}-title" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg"><div class="modal-content">
+    <form method="post" class="admin-crud-form">
+      {% csrf_token %}
+      <input type="hidden" name="accion" value="crear">
+      <input type="hidden" name="registro_id" value="">
+      <div class="modal-header"><h2 class="modal-title" id="{{ modal_id }}-title" data-modal-title>{{ titulo_modal }}</h2><button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button></div>
+      <div class="modal-body">
+        {% if nota_modal %}<p class="admin-table-note">{{ nota_modal }}</p>{% endif %}
+        {% for field in form %}
+          <div class="form-group{% if field.field.widget.input_type == 'checkbox' %} admin-crud-check{% endif %}">
+            {% if field.field.widget.input_type == 'checkbox' %}{{ field }}<label for="{{ field.id_for_label }}">{{ field.label }}</label>{% else %}<label for="{{ field.id_for_label }}">{{ field.label }}</label>{{ field }}{% endif %}
+            {% for error in field.errors %}<span class="admin-modal-error">{{ error }}</span>{% endfor %}
+          </div>
+        {% endfor %}
+      </div>
+      <div class="modal-footer"><button type="button" class="btn btn-cancel" data-bs-dismiss="modal">Cancelar</button><button type="submit" class="btn btn-save">Guardar cambios</button></div>
+    </form>
+  </div></div>
+</div>

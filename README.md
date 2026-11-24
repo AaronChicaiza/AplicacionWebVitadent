@@ -14,6 +14,8 @@ Aplicación web Django en español para el sitio público y la gestión odontol�
 ## Roles y seguridad
 
 - Administración gestiona solicitudes, catálogo, especialistas, horarios, pacientes, conversaciones y auditoría.
+- Las secciones de gestión usan DataTables en español para buscar, ordenar y paginar. Los catálogos incluyen exportación; pacientes y citas no se exportan para proteger datos personales. Crear, editar y eliminar se hace dentro del panel, con formularios modales y confirmación.
+- Los registros relacionados con citas o historial se desactivan o se conservan en vez de borrarse físicamente.
 - Cada especialista inicia sesión con su cuenta propia y ve solo las citas asignadas a su perfil.
 - Django valida campos y catálogos en servidor; usa ORM parametrizado, protección CSRF en formularios, Argon2 para contraseñas, limitación de solicitudes, permisos por rol y registros de auditoría.
 - El webhook comprueba la firma SHA-256 de Meta. Las rutas internas de Rasa exigen `VITADENT_RASA_TOKEN`.

@@ -1,0 +1,47 @@
+.admin-table-shell{padding:18px 20px 14px}
+.admin-table-toolbar{display:flex;align-items:center;justify-content:space-between;gap:16px;margin:0 0 16px}
+.admin-table-toolbar p{margin:0;color:#526663;font-size:13px;line-height:1.5}
+.admin-count{font-variant-numeric:tabular-nums}
+.admin-crud-actions{display:flex;align-items:center;justify-content:flex-end;gap:6px;white-space:nowrap}
+.admin-crud-actions form{display:inline-flex;margin:0}
+.admin-icon-action{display:inline-grid;width:34px;height:32px;place-items:center;border:1px solid #ccd8d3;border-radius:3px;background:#fff;color:#254b49;font:inherit;font-size:12px;text-decoration:none;cursor:pointer}
+.admin-icon-action:hover,.admin-icon-action:focus-visible{border-color:#087d83;background:#f1f8f5;color:#075d63;outline:2px solid transparent}
+.admin-icon-action-danger{border-color:#e2ceca;color:#933b33}
+.admin-crud-form{display:grid;gap:14px}
+.admin-crud-form .form-row{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.admin-crud-form .form-group{display:grid;gap:6px;min-width:0}
+.admin-crud-form label{color:#23413e;font-size:12px;font-weight:600}
+.admin-crud-form .form-control,.admin-crud-form .form-select{min-height:40px;border:1px solid #bdccc5;border-radius:3px;padding:8px 10px;color:#1d3735;background:#fff;font:inherit;font-size:13px}
+.admin-crud-form .form-control:focus,.admin-crud-form .form-select:focus{border-color:#07818a;outline:2px solid #07818a33;box-shadow:none}
+.admin-crud-form input[type=checkbox]{width:17px;height:17px;accent-color:#087d83}
+.admin-crud-check{display:flex!important;align-items:center;gap:9px!important;min-height:38px}
+.admin-crud-check label{margin:0}
+.admin-modal .modal-content{border:1px solid #cfdbd5;border-radius:5px;box-shadow:0 18px 50px #183b382b}
+.admin-modal .modal-header{padding:18px 22px;border-bottom:1px solid #dce6e0}
+.admin-modal .modal-title{margin:0;color:#183638;font-size:18px;font-weight:650}
+.admin-modal .modal-body{padding:20px 22px}
+.admin-modal .modal-footer{padding:14px 22px;border-top:1px solid #dce6e0}
+.admin-modal .btn{min-height:38px;border-radius:3px;padding:8px 14px;font-size:13px}
+.admin-modal .btn-save{border:1px solid #075d63;background:#075d63;color:#fff}
+.admin-modal .btn-cancel{border:1px solid #cbd7d1;background:#fff;color:#294441}
+.admin-table-note{margin:0 0 14px;color:#586f69;font-size:12px;line-height:1.55}
+.admin-panel .status-confirmed{display:inline-flex;align-items:center;padding:4px 7px;border:1px solid #c9ded3;border-radius:2px;background:#eff6f1;color:#285943;font-size:10px;font-weight:600}
+.admin-panel .status-pending{display:inline-flex;align-items:center;padding:4px 7px;border:1px solid #e5dfc4;border-radius:2px;background:#f8f5e9;color:#665c2e;font-size:10px;font-weight:600}
+.admin-table-empty{padding:27px 12px;color:#526663;text-align:center}
+.admin-table-empty strong{display:block;margin-bottom:5px;color:#183638;font-size:15px}
+.admin-table-empty p{margin:0;font-size:12px}
+.admin-panel .dt-container{color:#3a514d;font-size:12px}
+.admin-panel .dt-layout-row{margin:10px 0}
+.admin-panel .dt-search input,.admin-panel .dt-length select{min-height:34px;border:1px solid #cbd8d2;border-radius:3px;padding:5px 8px;background:#fff;color:#183638}
+.admin-panel .dt-search input:focus,.admin-panel .dt-length select:focus{border-color:#07818a;outline:2px solid #07818a33}
+.admin-panel .dt-buttons{display:flex;flex-wrap:wrap;gap:6px}
+.admin-panel .dt-button{min-height:32px!important;margin:0!important;border:1px solid #cbd8d2!important;border-radius:3px!important;padding:6px 10px!important;background:#fff!important;color:#294441!important;font:inherit!important;font-size:11px!important;box-shadow:none!important}
+.admin-panel .dt-button:hover,.admin-panel .dt-button:focus-visible{border-color:#087d83!important;background:#f1f8f5!important;color:#075d63!important}
+.admin-panel table.dataTable thead th{border-bottom:1px solid #cbd8d2;color:#38534e;font-size:11px;font-weight:650;white-space:nowrap}
+.admin-panel table.dataTable tbody td{vertical-align:middle}
+.admin-panel table.dataTable tbody tr:hover{background:#f7faf8}
+.admin-panel .dt-paging .dt-paging-button{min-width:30px;min-height:30px;margin:0 2px;border:1px solid transparent;border-radius:3px;padding:5px 8px;background:transparent;color:#294441!important;font-size:11px}
+.admin-panel .dt-paging .dt-paging-button.current{border-color:#cad8d1;background:#edf4ef;color:#183638!important}
+.admin-panel .dt-paging .dt-paging-button:hover{border-color:#cbd8d2;background:#f4f8f5;color:#075d63!important}
+.admin-modal-error{color:#a43f36;font-size:11px}
+@media(max-width:700px){.admin-table-shell{padding:14px 12px}.admin-table-toolbar{align-items:flex-start;flex-direction:column}.admin-crud-form .form-row{grid-template-columns:1fr}.admin-modal .modal-body{padding:16px}.admin-panel .dt-layout-row{gap:9px}.admin-panel .dt-layout-cell{width:100%}.admin-panel .dt-search{width:100%}.admin-panel .dt-search input{width:min(100%,220px)}}

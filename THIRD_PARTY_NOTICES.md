@@ -21,3 +21,7 @@ El sitio público utiliza recursos adaptados de Pearl, plantilla de uiCookies. E
 ## Otros recursos
 
 Bootstrap, jQuery, jQuery Validation, Font Awesome y otros recursos conservan sus propios avisos de copyright y licencias cuando están disponibles en sus archivos de distribución.
+
+## DataTables y exportación
+
+DataTables y su extensión Buttons se distribuyen bajo la licencia MIT; los archivos locales conservan sus avisos del titular SpryMedia. JSZip, pdfmake y SweetAlert2 se distribuyen con sus avisos de licencia incluidos en sus respectivas distribuciones. Se incorporan recursos locales siguiendo el patrón de DataTables del proyecto de Gestión de Flotas del propietario del repositorio.
