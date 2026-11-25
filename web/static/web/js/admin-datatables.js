@@ -1,4 +1,49 @@
 document.addEventListener('DOMContentLoaded', function () {
+  if (window.jQuery && window.Swal) {
+    window.jQuery(function ($) {
+      const notices = $('.admin-notification');
+      if (!notices.length) return;
+      const toast = window.Swal.mixin({
+        toast: true,
+        position: 'top-end',
+        showConfirmButton: false,
+        timer: 4200,
+        timerProgressBar: true,
+        didOpen: function (element) {
+          element.addEventListener('mouseenter', window.Swal.stopTimer);
+          element.addEventListener('mouseleave', window.Swal.resumeTimer);
+        }
+      });
+      notices.each(function () {
+        const notice = $(this);
+        const type = (notice.data('message-type') || 'info').split(' ')[0];
+        const message = $.trim(notice.text());
+        const lowerMessage = message.toLocaleLowerCase('es');
+        let title = 'Información';
+        let icon = 'info';
+        let iconColor;
+        if (type === 'success') {
+          icon = 'success';
+          iconColor = '#218838';
+          if (/actualiz|guardaron/.test(lowerMessage)) title = 'Actualizado exitosamente';
+          else if (/eliminó/.test(lowerMessage)) title = 'Eliminado exitosamente';
+          else if (/registr|cread|creó|guardó/.test(lowerMessage)) title = 'Registrado exitosamente';
+          else title = 'Operación realizada exitosamente';
+        } else if (type === 'error') {
+          title = 'No se pudo completar';
+          icon = 'error';
+          iconColor = '#c83e45';
+        } else if (type === 'warning') {
+          title = 'Revisa esta acción';
+          icon = 'warning';
+          iconColor = '#d08a18';
+        }
+        toast.fire({ icon: icon, iconColor: iconColor, title: title, text: message });
+        notice.attr('hidden', 'hidden');
+      });
+    });
+  }
+
   const language = {
     emptyTable: 'No hay registros para mostrar',
     info: 'Mostrando _START_ a _END_ de _TOTAL_ registros',

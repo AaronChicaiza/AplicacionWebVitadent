@@ -1,4 +1,9 @@
 .admin-table-shell{padding:18px 20px 14px}
+.admin-notifications{display:grid;gap:8px;margin:12px auto}
+.admin-notification{margin:0;padding:11px 14px;border:1px solid #cbd8d2;border-left:4px solid #71827b;border-radius:6px;background:#fff;color:#294441;font-size:13px;line-height:1.5}
+.admin-notification-success{border-color:#b9ddc3;border-left-color:#218838;background:#eff9f1;color:#205d32}
+.admin-notification-warning{border-color:#f0d89f;border-left-color:#d08a18;background:#fff8e7;color:#76540c}
+.admin-notification-error{border-color:#e9babe;border-left-color:#c83e45;background:#fff1f2;color:#842b32}
 .admin-table-toolbar{display:flex;align-items:center;justify-content:space-between;gap:16px;margin:0 0 16px}
 .admin-table-toolbar p{margin:0;color:#526663;font-size:13px;line-height:1.5}
 .admin-count{font-variant-numeric:tabular-nums}

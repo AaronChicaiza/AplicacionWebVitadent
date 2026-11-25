@@ -70,7 +70,7 @@
       </header>
       <div class="page-title-area"><div class="breadcrumbs-area"><p>VitaDent <span>/</span> Administración</p></div></div>
       <main class="main-content-inner" id="main-content">
-        {% if messages %}<div class="container-fluid" role="status">{% for message in messages %}<p class="admin-disclaimer">{{ message }}</p>{% endfor %}</div>{% endif %}
+        {% if messages %}<div class="container-fluid admin-notifications" aria-live="polite">{% for message in messages %}<div class="admin-notification admin-notification-{{ message.tags|default:'info' }}" data-message-type="{{ message.tags|default:'info' }}" role="status">{{ message }}</div>{% endfor %}</div>{% endif %}
         {% block contenido_gestion %}{% endblock %}
       </main>
       <footer class="footer-area"><span>VitaDent · Panel de gestión</span><span>Interfaz de demostración · Colorlib SRTdash</span></footer>

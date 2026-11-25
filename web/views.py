@@ -737,7 +737,7 @@ def gestion_pacientes(request):
             if form.is_valid():
                 paciente = form.save()
                 _auditar_gestion(request, "crear_paciente" if accion == "crear" else "editar_paciente", paciente)
-                messages.success(request, "Se guardaron los datos del paciente.")
+                messages.success(request, "Datos del paciente actualizados exitosamente." if accion == "editar" else "Paciente creado exitosamente.")
             else:
                 messages.error(request, _resumen_errores_formulario(form))
             return redirect("gestion_pacientes")
@@ -769,7 +769,7 @@ def gestion_agenda(request):
             if form.is_valid():
                 horario = form.save()
                 _auditar_gestion(request, "crear_horario" if accion == "crear" else "editar_horario", horario)
-                messages.success(request, "Se guardó el horario de atención.")
+                messages.success(request, "Horario de atención actualizado exitosamente." if accion == "editar" else "Horario de atención creado exitosamente.")
             else:
                 messages.error(request, _resumen_errores_formulario(form))
             return redirect("gestion_agenda")
@@ -820,7 +820,7 @@ def gestion_especialistas(request):
             if form.is_valid():
                 especialista = form.save()
                 _auditar_gestion(request, "crear_especialista" if accion == "crear" else "editar_especialista", especialista)
-                messages.success(request, "Se guardaron los datos del especialista.")
+                messages.success(request, "Datos del especialista actualizados exitosamente." if accion == "editar" else "Especialista creado exitosamente.")
             else:
                 messages.error(request, _resumen_errores_formulario(form))
             return redirect("gestion_especialistas")
@@ -857,7 +857,7 @@ def gestion_tratamientos(request):
             if form.is_valid():
                 tratamiento = form.save()
                 _auditar_gestion(request, "crear_tratamiento" if accion == "crear" else "editar_tratamiento", tratamiento)
-                messages.success(request, "Se guardaron los datos del tratamiento.")
+                messages.success(request, "Datos del tratamiento actualizados exitosamente." if accion == "editar" else "Tratamiento creado exitosamente.")
             else:
                 messages.error(request, _resumen_errores_formulario(form))
             return redirect("gestion_tratamientos")
@@ -894,7 +894,7 @@ def gestion_sucursales(request):
             if form.is_valid():
                 sucursal = form.save()
                 _auditar_gestion(request, "crear_sucursal" if accion == "crear" else "editar_sucursal", sucursal)
-                messages.success(request, "Se guardaron los datos de la sucursal.")
+                messages.success(request, "Datos de la sucursal actualizados exitosamente." if accion == "editar" else "Sucursal creada exitosamente.")
             else:
                 messages.error(request, _resumen_errores_formulario(form))
             return redirect("gestion_sucursales")
