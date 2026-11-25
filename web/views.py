@@ -832,12 +832,22 @@ def gestion_especialistas(request):
             else:
                 messages.error(request, _resumen_errores_formulario(form))
             return redirect("gestion_especialistas")
+    catalogo_especialistas = list(
+        Especialista.objects.annotate(
+            total_citas=Count("citas", distinct=True),
+            total_horarios=Count("horarios", distinct=True),
+        ).order_by("nombre_completo")
+    )
+    for especialista in catalogo_especialistas:
+        clave = _clave_color_especialista(especialista.nombre_completo)
+        especialista.color_agenda = COLORES_AGENDA_ESPECIALISTAS.get(clave, "#4475A9")
+        especialista.color_agenda_texto = COLORES_TEXTO_AGENDA_ESPECIALISTAS.get(clave, "#303030")
     return render(
         request,
         "web/admin/especialistas.html",
         contexto_base(
             seccion_activa="especialistas",
-            catalogo_especialistas=Especialista.objects.annotate(total_citas=Count("citas", distinct=True), total_horarios=Count("horarios", distinct=True)).order_by("nombre_completo"),
+            catalogo_especialistas=catalogo_especialistas,
             especialista_form=EspecialistaGestionForm(),
         ),
     )
