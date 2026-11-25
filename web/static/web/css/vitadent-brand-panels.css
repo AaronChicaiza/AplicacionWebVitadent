@@ -57,8 +57,8 @@ body.admin-body { background: var(--vd-paper); color: var(--vd-charcoal); font-f
 .specialist-schedule-column li:last-child { border-bottom: 0; }
 .specialist-schedule-column li strong { color: var(--vd-charcoal); font-size: 11px; font-variant-numeric: tabular-nums; }
 .specialist-schedule-column li.specialist-no-hours { color: #59635f; font-size: 11px; }
-.schedule-specialist-label { display: inline-flex; align-items: center; gap: 7px; color: var(--vd-charcoal); font-weight: 600; }
-.schedule-specialist-label::before { width: 9px; height: 9px; border: 1px solid rgba(48, 48, 48, .14); border-radius: 50%; background: var(--specialist-accent); content: ''; }
+.schedule-specialist-label { display: inline-flex; align-items: center; gap: 8px; max-width: 100%; padding: 5px 9px; border: 1px solid color-mix(in srgb, var(--specialist-accent, #4475a9) 32%, white); border-left: 3px solid var(--specialist-accent, #4475a9); border-radius: 5px; background: color-mix(in srgb, var(--specialist-accent, #4475a9) 11%, white); color: var(--vd-charcoal); font-weight: 600; }
+.schedule-specialist-label::before { flex: 0 0 9px; width: 9px; height: 9px; border: 1px solid rgba(48, 48, 48, .14); border-radius: 50%; background: var(--specialist-accent, #4475a9); content: ''; }
 .schedule-management-table { margin-top: 15px; }
 .admin-field-help { display: block; margin-top: 5px; color: #59635f; font-size: 11px; line-height: 1.45; }
 .doctor-body .doctor-demo-banner { background: #e8f7fb; color: #303030; }

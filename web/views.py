@@ -699,6 +699,11 @@ def gestion_citas(request):
         citas = citas.filter(estado=estado)
     if busqueda:
         citas = citas.filter(paciente__nombre_completo__icontains=busqueda) | citas.filter(codigo__icontains=busqueda)
+    citas = list(citas)
+    for cita in citas:
+        if cita.especialista_id:
+            clave = _clave_color_especialista(cita.especialista.nombre_completo)
+            cita.especialista.color_agenda = COLORES_AGENDA_ESPECIALISTAS.get(clave, "#4475A9")
     return render(
         request,
         "web/admin/citas.html",
