@@ -1,4 +1,24 @@
 document.addEventListener('DOMContentLoaded', function () {
+  const horariosSugeridos = document.getElementById('horarios-sugeridos');
+  if (horariosSugeridos) {
+    for (let minutoDelDia = 8 * 60; minutoDelDia <= 20 * 60; minutoDelDia += 15) {
+      const option = document.createElement('option');
+      option.value = String(Math.floor(minutoDelDia / 60)).padStart(2, '0') + ':' + String(minutoDelDia % 60).padStart(2, '0');
+      horariosSugeridos.appendChild(option);
+    }
+  }
+  document.querySelectorAll('.admin-time-input').forEach(function (field) {
+    field.addEventListener('input', function () {
+      const compacta = field.value.replace(/\D/g, '');
+      if (/^\d{4}$/.test(compacta)) field.value = compacta.slice(0, 2) + ':' + compacta.slice(2);
+      field.setCustomValidity('');
+    });
+    field.addEventListener('blur', function () {
+      const valida = /^(?:[01]\d|2[0-3]):[0-5]\d$/.test(field.value);
+      field.setCustomValidity(field.value && !valida ? 'Escribe la hora en formato de 24 horas, por ejemplo 09:15.' : '');
+    });
+  });
+
   if (window.jQuery && window.Swal) {
     window.jQuery(function ($) {
       const notices = $('.admin-notification');
@@ -120,14 +140,6 @@ document.addEventListener('DOMContentLoaded', function () {
       Object.keys(button.dataset).forEach(function (key) {
         if (!key.startsWith('record')) return;
         const fieldName = key.slice(6).replace(/^[A-Z]/, function (letter) { return letter.toLowerCase(); });
-        const hourPart = form.elements.namedItem(fieldName + '_0');
-        const minutePart = form.elements.namedItem(fieldName + '_1');
-        if (hourPart && minutePart) {
-          const timeParts = String(button.dataset[key] || '').slice(0, 5).split(':');
-          hourPart.value = timeParts[0] || '';
-          minutePart.value = timeParts[1] || '';
-          return;
-        }
         const field = form.elements.namedItem(fieldName);
         if (!field) return;
         if (field.type === 'checkbox') field.checked = button.dataset[key] === 'true';

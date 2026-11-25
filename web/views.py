@@ -378,6 +378,12 @@ COLORES_AGENDA_ESPECIALISTAS = {
     "wilson": "#77D1E9",
     "daysi": "#4475A9",
 }
+COLORES_TEXTO_AGENDA_ESPECIALISTAS = {
+    "daniela": "#FFFFFF",
+    "mishel": "#FFFFFF",
+    "adrian": "#FFFFFF",
+    "daysi": "#FFFFFF",
+}
 
 
 def _clave_color_especialista(nombre_completo):
@@ -704,6 +710,7 @@ def gestion_citas(request):
         if cita.especialista_id:
             clave = _clave_color_especialista(cita.especialista.nombre_completo)
             cita.especialista.color_agenda = COLORES_AGENDA_ESPECIALISTAS.get(clave, "#4475A9")
+            cita.especialista.color_agenda_texto = COLORES_TEXTO_AGENDA_ESPECIALISTAS.get(clave, "#303030")
     return render(
         request,
         "web/admin/citas.html",
@@ -786,6 +793,7 @@ def gestion_agenda(request):
     for horario in horarios:
         clave = _clave_color_especialista(horario.especialista.nombre_completo)
         horario.especialista.color_agenda = COLORES_AGENDA_ESPECIALISTAS.get(clave, "#4475A9")
+        horario.especialista.color_agenda_texto = COLORES_TEXTO_AGENDA_ESPECIALISTAS.get(clave, "#303030")
     return render(
         request,
         "web/admin/agenda.html",

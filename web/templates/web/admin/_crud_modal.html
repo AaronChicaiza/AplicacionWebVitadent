@@ -7,6 +7,7 @@
       <div class="modal-header"><h2 class="modal-title" id="{{ modal_id }}-title" data-modal-title>{{ titulo_modal }}</h2><button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button></div>
       <div class="modal-body">
         {% if nota_modal %}<p class="admin-table-note">{{ nota_modal }}</p>{% endif %}
+        {% if modal_id == 'horarioModal' %}<datalist id="horarios-sugeridos"></datalist>{% endif %}
         {% for field in form %}
           <div class="form-group{% if field.field.widget.input_type == 'checkbox' %} admin-crud-check{% endif %}">
             {% if field.field.widget.input_type == 'checkbox' %}{{ field }}<label for="{{ field.id_for_label }}">{{ field.label }}</label>{% else %}<label for="{{ field.id_for_label }}">{{ field.label }}</label>{{ field }}{% endif %}
