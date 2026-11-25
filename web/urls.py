@@ -47,4 +47,5 @@ urlpatterns = [
     path("doctor/", views.espacio_especialista, name="espacio_especialista"),
     path("doctor/pacientes/", views.espacio_especialista, name="especialista_pacientes"),
     path("doctor/agenda/", views.espacio_especialista, name="especialista_agenda"),
+    path("doctor/dashboard/", views.especialista_dashboard, name="especialista_dashboard"),
 ]

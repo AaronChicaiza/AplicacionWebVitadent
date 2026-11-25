@@ -6,6 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="Panel de gestión de la clínica VitaDent">
   <title>{% block titulo %}Gestión · VitaDent{% endblock %}</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Raleway:wght@400;500;600;700;800&display=swap">
   <link rel="stylesheet" href="{% static 'vendor/srtdash/assets/css/bootstrap.min.css' %}">
   <link rel="stylesheet" href="{% static 'vendor/srtdash/assets/css/fontawesome.min.css' %}">
   <link rel="stylesheet" href="{% static 'vendor/srtdash/assets/css/themify-icons.css' %}">
@@ -20,11 +21,11 @@
   <link rel="stylesheet" href="{% static 'web/css/admin-extras.css' %}">
   <link rel="stylesheet" href="{% static 'web/css/vitadent-srtdash.css' %}">
   <link rel="stylesheet" href="{% static 'web/css/admin-polish.css' %}">
-  <link rel="stylesheet" href="{% static 'web/css/admin-dashboard.css' %}">
   <link rel="stylesheet" href="{% static 'vendor/datatables/dataTables.dataTables.min.css' %}">
   <link rel="stylesheet" href="{% static 'vendor/datatables/buttons.dataTables.min.css' %}">
   <link rel="stylesheet" href="{% static 'vendor/datatables/sweetalert2.min.css' %}">
   <link rel="stylesheet" href="{% static 'web/css/admin-datatables.css' %}">
+  <link rel="stylesheet" href="{% static 'web/css/vitadent-brand-panels.css' %}">
   {% block estilos_gestion %}{% endblock %}
 </head>
 <body class="admin-body">
@@ -33,13 +34,12 @@
   <div class="page-container">
     <aside class="sidebar-menu" aria-label="Navegación de gestión">
       <div class="sidebar-header">
-        <div class="logo"><a href="{% url 'gestion_inicio' %}" aria-label="VitaDent, ir al resumen"><img src="{% static 'web/img/vitadent-logo.png' %}" alt="VitaDent · Inteligencia odontológica"></a></div>
+        <div class="logo"><a href="{% url 'gestion_citas' %}" aria-label="VitaDent, ir a solicitudes de cita"><img src="{% static 'web/img/vitadent-logo-negativo.png' %}" alt="VitaDent · Inteligencia odontológica"></a></div>
         <p class="clinic-label">GESTIÓN DE CLÍNICA</p>
       </div>
       <div class="main-menu"><div class="menu-inner"><nav>
         <p class="sidebar-section-label">Agenda</p>
         <ul class="metismenu" id="menu">
-          <li class="{% if seccion_activa == 'resumen' %}active{% endif %}"><a href="{% url 'gestion_inicio' %}" {% if seccion_activa == 'resumen' %}aria-current="page"{% endif %}><i class="ti-dashboard" aria-hidden="true"></i><span>Resumen</span></a></li>
           <li class="{% if seccion_activa == 'citas' %}active{% endif %}"><a href="{% url 'gestion_citas' %}" {% if seccion_activa == 'citas' %}aria-current="page"{% endif %}><i class="ti-notepad" aria-hidden="true"></i><span>Solicitudes de cita</span></a></li>
           <li class="{% if seccion_activa == 'agenda' %}active{% endif %}"><a href="{% url 'gestion_agenda' %}" {% if seccion_activa == 'agenda' %}aria-current="page"{% endif %}><i class="ti-calendar" aria-hidden="true"></i><span>Agenda y horarios</span></a></li>
         </ul>

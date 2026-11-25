@@ -48,13 +48,13 @@ class TratamientoGestionForm(forms.ModelForm):
         labels = {
             "nombre": "Tratamiento",
             "area": "Área o especialidad",
-            "duracion_minutos": "Duración (minutos)",
+            "duracion_minutos": "Duración de la cita (minutos)",
             "activo": "Disponible en el catálogo",
         }
         widgets = {
             "nombre": forms.TextInput(attrs={"maxlength": 140}),
             "area": forms.TextInput(attrs={"maxlength": 100}),
-            "duracion_minutos": forms.NumberInput(attrs={"min": 1, "max": 32767, "step": 1}),
+            "duracion_minutos": forms.NumberInput(attrs={"min": 15, "max": 32760, "step": 15}),
         }
 
 

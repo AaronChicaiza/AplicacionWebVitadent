@@ -14,6 +14,9 @@ Aplicación web Django en español para el sitio público y la gestión odontol�
 ## Roles y seguridad
 
 - Administración gestiona solicitudes, catálogo, especialistas, horarios, pacientes, conversaciones y auditoría.
+- La agenda agrupa horarios por especialista y usa los colores solicitados. La duración editable de cada tratamiento admite 15 minutos como mínimo y pasos de 15; vacía usa 30 minutos predeterminados.
+- El dashboard agregado de ingresos y tratamientos está disponible solo en el espacio profesional de Verónica Martínez. El acceso raíz administrativo abre solicitudes de cita.
+- La migración `0010_vitadent_catalog_duration_rules` actualiza el catálogo de procedimientos. Ejecuta `python manage.py migrate` después de actualizar el proyecto.
 - Las secciones de gestión usan DataTables en español para buscar, ordenar y paginar. Los catálogos incluyen exportación; pacientes y citas no se exportan para proteger datos personales. Crear, editar y eliminar se hace dentro del panel, con formularios modales y confirmación.
 - Los registros relacionados con citas o historial se desactivan o se conservan en vez de borrarse físicamente.
 - Cada especialista inicia sesión con su cuenta propia y ve solo las citas asignadas a su perfil.

@@ -6,6 +6,15 @@ from uuid import uuid4
 from .validaciones import validar_identificacion_ecuador
 
 
+def validar_duracion_tratamiento(minutos):
+    if minutos is None:
+        return
+    if minutos < 15:
+        raise ValidationError("La duración mínima de una cita es de 15 minutos.")
+    if minutos % 15:
+        raise ValidationError("La duración debe definirse en intervalos de 15 minutos.")
+
+
 def generar_codigo_cita():
     return uuid4().hex[:10].upper()
 
@@ -51,7 +60,12 @@ class Sucursal(models.Model):
 class Tratamiento(models.Model):
     nombre = models.CharField(max_length=140, unique=True)
     area = models.CharField(max_length=100)
-    duracion_minutos = models.PositiveSmallIntegerField(null=True, blank=True)
+    duracion_minutos = models.PositiveSmallIntegerField(
+        null=True,
+        blank=True,
+        validators=[validar_duracion_tratamiento],
+        help_text="Mínimo 15 minutos; aumenta en intervalos de 15. Si se deja vacío, la cita usa 30 minutos.",
+    )
     activo = models.BooleanField(default=True)
 
     class Meta:

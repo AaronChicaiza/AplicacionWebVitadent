@@ -2,12 +2,13 @@ import json
 import hmac
 import re
 import math
+import unicodedata
 from datetime import date, datetime, timedelta
 from decimal import Decimal, InvalidOperation
 from urllib.parse import quote
 
 from django.conf import settings
-from django.core.exceptions import ValidationError
+from django.core.exceptions import PermissionDenied, ValidationError
 from django.contrib import messages
 from django.contrib.auth.forms import AuthenticationForm, PasswordChangeForm
 from django.contrib.auth import update_session_auth_hash
@@ -25,7 +26,7 @@ from django.db.models import Count, Max, OuterRef, Q, Subquery, Sum
 from django.db.models.functions import TruncDate, TruncMonth, TruncWeek
 from django.utils import timezone
 
-from .datos_demo import ESPECIALISTAS, GRUPOS_TRATAMIENTOS
+from .datos_demo import ESPECIALISTAS, GRUPOS_TRATAMIENTOS, ORDEN_AREAS_TRATAMIENTO
 from .models import AccesoPersonal, Cita, CitaEvento, Conversacion, Especialista, EventoAuditoria, HorarioAtencion, MensajeConversacion, Paciente, Sucursal, Tratamiento
 from .serializers import OperacionCitaWhatsAppSerializer, SolicitudWhatsAppSerializer
 from .servicios_whatsapp import enviar_mensaje_whatsapp, firma_meta_valida, procesar_evento_whatsapp
@@ -53,7 +54,9 @@ def contexto_base(**adicionales):
         } for indice, item in enumerate(catalogo)]
     else:
         especialistas_contexto = ESPECIALISTAS
-    tratamientos_db = list(Tratamiento.objects.filter(activo=True).order_by("area", "nombre"))
+    tratamientos_db = list(Tratamiento.objects.filter(activo=True))
+    orden_areas = {nombre: indice for indice, nombre in enumerate(ORDEN_AREAS_TRATAMIENTO)}
+    tratamientos_db.sort(key=lambda item: (orden_areas.get(item.area, len(orden_areas)), item.area.casefold(), item.nombre.casefold()))
     if tratamientos_db:
         grupos = {}
         for item in tratamientos_db:
@@ -350,7 +353,49 @@ class AccesoDjangoView(LoginView):
 # ----------------- PANEL DE ADMINISTRACIÓN -----------------
 @staff_member_required(login_url="acceso_personal")
 def gestion_inicio(request):
-    citas = Cita.objects.select_related("paciente", "tratamiento", "especialista").order_by("-creado_en")
+    return redirect("gestion_citas")
+
+
+def _es_veronica_martinez(perfil):
+    if not perfil or not perfil.activo:
+        return False
+    nombre = unicodedata.normalize("NFD", perfil.nombre_completo.casefold())
+    nombre = "".join(caracter for caracter in nombre if unicodedata.category(caracter) != "Mn")
+    palabras = re.findall(r"[a-z]+", nombre)
+    if palabras and palabras[0] in {"dra", "doctora"}:
+        palabras = palabras[1:]
+    return palabras == ["veronica", "martinez"]
+
+
+COLORES_AGENDA_ESPECIALISTAS = {
+    "veronica": "#DCF73A",
+    "santiago": "#F4C542",
+    "daniela": "#303030",
+    "odalis": "#D875A4",
+    "karen": "#EA8C37",
+    "mishel": "#8666A9",
+    "adrian": "#D34A48",
+    "wilson": "#77D1E9",
+    "daysi": "#4475A9",
+}
+
+
+def _clave_color_especialista(nombre_completo):
+    nombre = unicodedata.normalize("NFD", nombre_completo.casefold())
+    nombre = "".join(caracter for caracter in nombre if unicodedata.category(caracter) != "Mn")
+    palabras = re.findall(r"[a-z]+", nombre)
+    return next((persona for persona in COLORES_AGENDA_ESPECIALISTAS if persona in palabras), None)
+
+
+@login_required(login_url="acceso_personal")
+def especialista_dashboard(request):
+    perfil = getattr(request.user, "perfil_especialista", None)
+    if not _es_veronica_martinez(perfil):
+        raise PermissionDenied("Este dashboard está habilitado únicamente para Verónica Martínez.")
+    return _renderizar_dashboard(request, perfil)
+
+
+def _renderizar_dashboard(request, perfil):
     hoy = timezone.localdate()
     inicio_semana = hoy - timedelta(days=hoy.weekday())
     inicio_mes = hoy.replace(day=1)
@@ -403,11 +448,14 @@ def gestion_inicio(request):
         periodo = date(indice // 12, indice % 12 + 1, 1)
         meses.append((periodo, f"{meses_es[periodo.month - 1]} {str(periodo.year)[-2:]}"))
     ingresos_mes = datos_por_periodo(TruncMonth, meses[0][0], hoy)
+    barras_diarias = barras(dias, ingresos_dia)
+    barras_semanales = barras(semanas, ingresos_semana)
+    barras_mensuales = barras(meses, ingresos_mes)
 
     atenciones = list(Cita.objects.filter(estado=Cita.Estado.ATENDIDA).values(
         "tratamiento__nombre"
     ).annotate(total=Count("pk")).order_by("-total", "tratamiento__nombre"))
-    colores = ["#00aebc", "#91b900", "#145d62", "#8ca39f"]
+    colores = ["#77D1E9", "#DCF73A", "#4475A9", "#303030"]
     if len(atenciones) > 4:
         atenciones = atenciones[:3] + [{
             "tratamiento__nombre": "Otros",
@@ -446,17 +494,23 @@ def gestion_inicio(request):
 
     return render(
         request,
-        "web/admin/resumen.html",
+        "web/doctor/dashboard_especialista.html",
         contexto_base(
-            seccion_activa="resumen",
+            seccion_especialista="dashboard",
+            puede_ver_dashboard=True,
+            perfil=perfil,
             total_citas=Cita.objects.count(),
             pendientes=Cita.objects.filter(estado=Cita.Estado.SOLICITADA).count(),
             total_especialistas=Especialista.objects.filter(activo=True).count(),
             total_tratamientos=Tratamiento.objects.filter(activo=True).count(),
-            citas_recientes=citas[:6],
-            barras_diarias=barras(dias, ingresos_dia),
-            barras_semanales=barras(semanas, ingresos_semana),
-            barras_mensuales=barras(meses, ingresos_mes),
+            barras_diarias=barras_diarias,
+            barras_semanales=barras_semanales,
+            barras_mensuales=barras_mensuales,
+            periodos_dashboard=[
+                {"titulo": "Diario", "barras": barras_diarias, "periodo": "Últimos 7 días"},
+                {"titulo": "Semanal", "barras": barras_semanales, "periodo": "Últimas 8 semanas"},
+                {"titulo": "Mensual", "barras": barras_mensuales, "periodo": "Últimos 6 meses"},
+            ],
             ingreso_hoy=ingresos.filter(atendida_en__date=hoy).aggregate(total=Sum("monto_ingreso"))["total"] or Decimal("0"),
             ingreso_semana=ingresos.filter(atendida_en__date__gte=inicio_semana, atendida_en__date__lte=hoy).aggregate(total=Sum("monto_ingreso"))["total"] or Decimal("0"),
             ingreso_mes=ingresos.filter(atendida_en__date__gte=inicio_mes, atendida_en__date__lte=hoy).aggregate(total=Sum("monto_ingreso"))["total"] or Decimal("0"),
@@ -714,12 +768,26 @@ def gestion_agenda(request):
             else:
                 messages.error(request, _resumen_errores_formulario(form))
             return redirect("gestion_agenda")
+    prioridades = {nombre: indice for indice, nombre in enumerate(COLORES_AGENDA_ESPECIALISTAS)}
+    columnas = []
+    especialistas = list(Especialista.objects.filter(activo=True).prefetch_related("horarios"))
+    for especialista in especialistas:
+        clave = _clave_color_especialista(especialista.nombre_completo)
+        especialista.color_agenda = COLORES_AGENDA_ESPECIALISTAS.get(clave, "#4475A9")
+        especialista.horarios_agenda = list(especialista.horarios.all().order_by("dia_semana", "hora_inicio"))
+        columnas.append((prioridades.get(clave, len(prioridades)), especialista.nombre_completo.casefold(), especialista))
+    columnas.sort(key=lambda item: (item[0], item[1]))
+    horarios = list(HorarioAtencion.objects.select_related("especialista").order_by("especialista__nombre_completo", "dia_semana", "hora_inicio"))
+    for horario in horarios:
+        clave = _clave_color_especialista(horario.especialista.nombre_completo)
+        horario.especialista.color_agenda = COLORES_AGENDA_ESPECIALISTAS.get(clave, "#4475A9")
     return render(
         request,
         "web/admin/agenda.html",
         contexto_base(
             seccion_activa="agenda",
-            horarios=HorarioAtencion.objects.select_related("especialista").all(),
+            horarios=horarios,
+            agenda_especialistas=[item[2] for item in columnas],
             horario_form=HorarioGestionForm(),
         ),
     )
@@ -788,12 +856,16 @@ def gestion_tratamientos(request):
             else:
                 messages.error(request, _resumen_errores_formulario(form))
             return redirect("gestion_tratamientos")
+    orden_areas = {nombre: indice for indice, nombre in enumerate(ORDEN_AREAS_TRATAMIENTO)}
     return render(
         request,
         "web/admin/tratamientos.html",
         contexto_base(
             seccion_activa="tratamientos",
-            catalogo_tratamientos=Tratamiento.objects.annotate(total_citas=Count("citas")).order_by("area", "nombre"),
+            catalogo_tratamientos=sorted(
+                Tratamiento.objects.annotate(total_citas=Count("citas")),
+                key=lambda item: (orden_areas.get(item.area, len(orden_areas)), item.area.casefold(), item.nombre.casefold()),
+            ),
             tratamiento_form=TratamientoGestionForm(),
         ),
     )
@@ -924,6 +996,7 @@ def espacio_especialista(request):
     return render(request, "web/espacio_especialista.html", contexto_base(
         perfil=perfil,
         seccion_especialista=seccion,
+        puede_ver_dashboard=_es_veronica_martinez(perfil),
         citas=citas,
         citas_proximas=citas.filter(estado__in=[Cita.Estado.CONFIRMADA, Cita.Estado.REPROGRAMADA], fecha_hora_solicitada__gte=timezone.now())[:5],
         pacientes=Paciente.objects.filter(citas__especialista=perfil, citas__estado__in=estados_activos).annotate(

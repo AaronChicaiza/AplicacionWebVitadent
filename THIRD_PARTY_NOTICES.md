@@ -25,3 +25,7 @@ Bootstrap, jQuery, jQuery Validation, Font Awesome y otros recursos conservan su
 ## DataTables y exportación
 
 DataTables y su extensión Buttons se distribuyen bajo la licencia MIT; los archivos locales conservan sus avisos del titular SpryMedia. JSZip, pdfmake y SweetAlert2 se distribuyen con sus avisos de licencia incluidos en sus respectivas distribuciones. Se incorporan recursos locales siguiendo el patrón de DataTables del proyecto de Gestión de Flotas del propietario del repositorio.
+
+## Marca y tipografía del panel
+
+La variante negativa blanca del logotipo se generó a partir del activo de VitaDent incluido en el proyecto, siguiendo la aplicación negativa sobre fondo oscuro mostrada en el Manual de Marca VitaDent 2024. Los paneles utilizan Raleway desde Google Fonts; Raleway se distribuye bajo SIL Open Font License.

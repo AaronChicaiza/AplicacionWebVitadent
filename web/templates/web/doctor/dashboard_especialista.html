@@ -1,0 +1,30 @@
+{% extends 'web/doctor/plantilla_especialista.html' %}
+{% block titulo %}Dashboard de clínica · VitaDent{% endblock %}
+{% block contenido_especialista %}
+<div class="admin-title-row dashboard-title"><div><h1>Dashboard de clínica</h1><p>Ingresos registrados y tratamientos atendidos.</p></div></div>
+<section class="admin-summary dashboard-summary" aria-label="Resumen de la clínica">
+  <div class="summary-item"><span>Ingresos de hoy</span><strong>${{ ingreso_hoy|floatformat:2 }}</strong><small>Atenciones registradas hoy</small></div>
+  <div class="summary-item"><span>Ingresos esta semana</span><strong>${{ ingreso_semana|floatformat:2 }}</strong><small>Desde el lunes hasta hoy</small></div>
+  <div class="summary-item"><span>Ingresos este mes</span><strong>${{ ingreso_mes|floatformat:2 }}</strong><small>Acumulado del mes actual</small></div>
+  <div class="summary-item"><span>Tratamientos realizados</span><strong>{{ atenciones_realizadas }}</strong><small>Atenciones marcadas como realizadas</small></div>
+</section>
+{% if not ingresos_registrados %}<p class="dashboard-empty-note" role="status">Los gráficos de ingresos se completarán cuando se registren citas atendidas con su valor cobrado.</p>{% endif %}
+<section class="income-charts" aria-label="Ingresos de la clínica por periodo">
+  {% for panel in periodos_dashboard %}
+  <section class="admin-panel income-panel{% if not ingresos_registrados %} income-panel-empty{% endif %}">
+    <header class="panel-header"><div><h2>{{ panel.titulo }}</h2><p>{{ panel.periodo }}</p></div></header>
+    <div class="income-bars{% if panel.titulo == 'Semanal' %} income-bars-week{% endif %}" role="img" aria-label="Gráfico de barras de ingresos {{ panel.titulo|lower }}">
+      {% if not ingresos_registrados %}<p class="income-empty-label">Sin ingresos registrados</p>{% endif %}
+      {% for barra in panel.barras %}<div class="income-bar-item" title="{{ barra.etiqueta }}: {{ barra.valor }}"><div class="income-bar-stage"><span class="income-bar" style="height:{{ barra.altura }}%" data-hay-ingreso="{{ barra.tiene_ingreso|yesno:'si,no' }}"></span></div><span class="income-bar-label">{{ barra.etiqueta }}</span></div>{% endfor %}
+    </div>
+  </section>
+  {% endfor %}
+</section>
+<section class="admin-panel treatment-panel">
+  <header class="panel-header"><div><h2>Tratamientos más realizados</h2><p>Porcentaje de las citas marcadas como atendidas</p></div><span class="admin-count">{{ atenciones_realizadas }} atenciones</span></header>
+  <div class="treatment-chart-content">
+    <div class="treatment-pie-wrap {% if not tratamientos_mas_realizados %}treatment-pie-wrap-empty{% endif %}"><div class="treatment-pie {% if not tratamientos_mas_realizados %}treatment-pie-empty{% endif %}" role="img" aria-label="Porcentaje de tratamientos atendidos"><svg viewBox="0 0 200 200" aria-hidden="true" focusable="false">{% for item in tratamientos_mas_realizados %}<path d="{{ item.ruta_svg }}" fill="{{ item.color }}"></path>{% endfor %}</svg></div></div>
+    {% if tratamientos_mas_realizados %}<ul class="treatment-legend" aria-label="Tratamientos y porcentaje de atenciones">{% for item in tratamientos_mas_realizados %}<li><span class="treatment-key" style="--treatment-color:{{ item.color }}" aria-hidden="true"></span><span class="treatment-name">{{ item.nombre }}</span><span class="treatment-count">{{ item.cantidad }}</span><strong>{{ item.porcentaje }}%</strong></li>{% endfor %}</ul>{% else %}<div class="treatment-empty"><h3>Aún no hay tratamientos atendidos</h3><p>El gráfico aparecerá cuando se registren las primeras atenciones.</p></div>{% endif %}
+  </div>
+</section>
+{% endblock %}

@@ -10,6 +10,7 @@
         {% for field in form %}
           <div class="form-group{% if field.field.widget.input_type == 'checkbox' %} admin-crud-check{% endif %}">
             {% if field.field.widget.input_type == 'checkbox' %}{{ field }}<label for="{{ field.id_for_label }}">{{ field.label }}</label>{% else %}<label for="{{ field.id_for_label }}">{{ field.label }}</label>{{ field }}{% endif %}
+            {% if field.help_text %}<small class="admin-field-help">{{ field.help_text }}</small>{% endif %}
             {% for error in field.errors %}<span class="admin-modal-error">{{ error }}</span>{% endfor %}
           </div>
         {% endfor %}
