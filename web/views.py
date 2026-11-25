@@ -393,6 +393,14 @@ def _clave_color_especialista(nombre_completo):
     return next((persona for persona in COLORES_AGENDA_ESPECIALISTAS if persona in palabras), None)
 
 
+def _aplicar_color_agenda(especialista):
+    """Asigna una clase CSS estable para no depender de estilos inline bloqueados por CSP."""
+    clave = _clave_color_especialista(especialista.nombre_completo)
+    especialista.clase_color_agenda = f"specialist-color--{clave or 'default'}"
+    especialista.color_agenda = COLORES_AGENDA_ESPECIALISTAS.get(clave, "#4475A9")
+    especialista.color_agenda_texto = COLORES_TEXTO_AGENDA_ESPECIALISTAS.get(clave, "#FFFFFF")
+
+
 @login_required(login_url="acceso_personal")
 def especialista_dashboard(request):
     perfil = getattr(request.user, "perfil_especialista", None)
@@ -708,9 +716,7 @@ def gestion_citas(request):
     citas = list(citas)
     for cita in citas:
         if cita.especialista_id:
-            clave = _clave_color_especialista(cita.especialista.nombre_completo)
-            cita.especialista.color_agenda = COLORES_AGENDA_ESPECIALISTAS.get(clave, "#4475A9")
-            cita.especialista.color_agenda_texto = COLORES_TEXTO_AGENDA_ESPECIALISTAS.get(clave, "#303030")
+            _aplicar_color_agenda(cita.especialista)
     return render(
         request,
         "web/admin/citas.html",
@@ -785,15 +791,13 @@ def gestion_agenda(request):
     especialistas = list(Especialista.objects.filter(activo=True).prefetch_related("horarios"))
     for especialista in especialistas:
         clave = _clave_color_especialista(especialista.nombre_completo)
-        especialista.color_agenda = COLORES_AGENDA_ESPECIALISTAS.get(clave, "#4475A9")
+        _aplicar_color_agenda(especialista)
         especialista.horarios_agenda = list(especialista.horarios.all().order_by("dia_semana", "hora_inicio"))
         columnas.append((prioridades.get(clave, len(prioridades)), especialista.nombre_completo.casefold(), especialista))
     columnas.sort(key=lambda item: (item[0], item[1]))
     horarios = list(HorarioAtencion.objects.select_related("especialista").order_by("especialista__nombre_completo", "dia_semana", "hora_inicio"))
     for horario in horarios:
-        clave = _clave_color_especialista(horario.especialista.nombre_completo)
-        horario.especialista.color_agenda = COLORES_AGENDA_ESPECIALISTAS.get(clave, "#4475A9")
-        horario.especialista.color_agenda_texto = COLORES_TEXTO_AGENDA_ESPECIALISTAS.get(clave, "#303030")
+        _aplicar_color_agenda(horario.especialista)
     return render(
         request,
         "web/admin/agenda.html",
@@ -839,9 +843,7 @@ def gestion_especialistas(request):
         ).order_by("nombre_completo")
     )
     for especialista in catalogo_especialistas:
-        clave = _clave_color_especialista(especialista.nombre_completo)
-        especialista.color_agenda = COLORES_AGENDA_ESPECIALISTAS.get(clave, "#4475A9")
-        especialista.color_agenda_texto = COLORES_TEXTO_AGENDA_ESPECIALISTAS.get(clave, "#303030")
+        _aplicar_color_agenda(especialista)
     return render(
         request,
         "web/admin/especialistas.html",
