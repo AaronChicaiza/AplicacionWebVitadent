@@ -26,7 +26,7 @@ from django.db.models import Count, Max, OuterRef, Q, Subquery, Sum
 from django.db.models.functions import TruncDate, TruncMonth, TruncWeek
 from django.utils import timezone
 
-from .datos_demo import ESPECIALISTAS, GRUPOS_TRATAMIENTOS, ORDEN_AREAS_TRATAMIENTO
+from .datos_demo import ESPECIALISTAS, GRUPOS_TRATAMIENTOS, ordenar_catalogo_tratamientos
 from .models import AccesoPersonal, Cita, CitaEvento, Conversacion, Especialista, EventoAuditoria, HorarioAtencion, MensajeConversacion, Paciente, Sucursal, Tratamiento
 from .serializers import OperacionCitaWhatsAppSerializer, SolicitudWhatsAppSerializer
 from .servicios_whatsapp import enviar_mensaje_whatsapp, firma_meta_valida, procesar_evento_whatsapp
@@ -55,13 +55,13 @@ def contexto_base(**adicionales):
     else:
         especialistas_contexto = ESPECIALISTAS
     tratamientos_db = list(Tratamiento.objects.filter(activo=True))
-    orden_areas = {nombre: indice for indice, nombre in enumerate(ORDEN_AREAS_TRATAMIENTO)}
-    tratamientos_db.sort(key=lambda item: (orden_areas.get(item.area, len(orden_areas)), item.area.casefold(), item.nombre.casefold()))
+    pares_activos = {(item.nombre, item.area) for item in tratamientos_db}
     if tratamientos_db:
-        grupos = {}
-        for item in tratamientos_db:
-            grupos.setdefault(item.area, []).append(item.nombre)
-        tratamientos_contexto = [{"nombre": nombre, "procedimientos": items} for nombre, items in grupos.items()]
+        tratamientos_contexto = [
+            {**grupo, "procedimientos": [nombre for nombre in grupo["procedimientos"] if (nombre, grupo["nombre"]) in pares_activos]}
+            for grupo in GRUPOS_TRATAMIENTOS
+            if any((nombre, grupo["nombre"]) in pares_activos for nombre in grupo["procedimientos"])
+        ]
     else:
         tratamientos_contexto = GRUPOS_TRATAMIENTOS
     contexto = {
@@ -706,7 +706,7 @@ def gestion_citas(request):
             seccion_activa="citas", citas=citas, estado_filtro=estado, busqueda=busqueda,
             estados_cita=Cita.Estado.choices, ahora=timezone.now(), cita_form=CitaGestionForm(),
             pacientes_catalogo=Paciente.objects.order_by("nombre_completo"),
-            tratamientos_catalogo=Tratamiento.objects.filter(activo=True).order_by("area", "nombre"),
+            tratamientos_catalogo=ordenar_catalogo_tratamientos(Tratamiento.objects.filter(activo=True)),
             especialistas_catalogo=Especialista.objects.filter(activo=True).order_by("nombre_completo"),
             sucursales_catalogo=Sucursal.objects.filter(activa=True).order_by("nombre"),
         ),
@@ -856,16 +856,12 @@ def gestion_tratamientos(request):
             else:
                 messages.error(request, _resumen_errores_formulario(form))
             return redirect("gestion_tratamientos")
-    orden_areas = {nombre: indice for indice, nombre in enumerate(ORDEN_AREAS_TRATAMIENTO)}
     return render(
         request,
         "web/admin/tratamientos.html",
         contexto_base(
             seccion_activa="tratamientos",
-            catalogo_tratamientos=sorted(
-                Tratamiento.objects.annotate(total_citas=Count("citas")),
-                key=lambda item: (orden_areas.get(item.area, len(orden_areas)), item.area.casefold(), item.nombre.casefold()),
-            ),
+            catalogo_tratamientos=ordenar_catalogo_tratamientos(Tratamiento.objects.filter(activo=True).annotate(total_citas=Count("citas"))),
             tratamiento_form=TratamientoGestionForm(),
         ),
     )

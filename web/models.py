@@ -58,7 +58,7 @@ class Sucursal(models.Model):
 
 
 class Tratamiento(models.Model):
-    nombre = models.CharField(max_length=140, unique=True)
+    nombre = models.CharField(max_length=140)
     area = models.CharField(max_length=100)
     duracion_minutos = models.PositiveSmallIntegerField(
         null=True,
@@ -70,6 +70,7 @@ class Tratamiento(models.Model):
 
     class Meta:
         ordering = ["area", "nombre"]
+        constraints = [models.UniqueConstraint(fields=["nombre", "area"], name="tratamiento_nombre_area_unico")]
         verbose_name = "tratamiento"
         verbose_name_plural = "tratamientos"
 

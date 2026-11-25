@@ -12,7 +12,7 @@
       <div class="hero-actions"><a class="btn btn-primary btn-lg" href="{% url 'asistente_citas' %}">Agendar por WhatsApp <span aria-hidden="true">↗</span></a><a class="btn btn-outline btn-lg" href="{% url 'tratamientos' %}">Ver tratamientos</a></div>
       <div class="trust-row vitadent-facts" aria-label="Información de la clínica">
         <div class="trust"><div class="num">09</div><div class="lbl">Profesionales</div></div>
-        <div class="trust"><div class="num">09</div><div class="lbl">Áreas de atención</div></div>
+        <div class="trust"><div class="num">08</div><div class="lbl">Áreas de atención</div></div>
         <div class="trust"><div class="num">L–S</div><div class="lbl">Atención con cita</div></div>
         <div class="trust"><div class="num">VD</div><div class="lbl">Asistente virtual</div></div>
       </div>
@@ -24,13 +24,10 @@
 </section>
 <section class="section section-tint" id="services"><div class="container">
   <div class="section-head center"><span class="eyebrow">Áreas de atención</span><h2>El cuidado adecuado para cada necesidad.</h2><p>Explora los servicios que constan en la información de VitaDent. La indicación de tratamiento se define con un profesional.</p></div>
-  <div class="svc-grid mt-tight">
-    <article class="svc-card"><div class="svc-ico" aria-hidden="true">✳</div><h3>Odontología general</h3><p>Diagnóstico, prevención y procedimientos de cuidado cotidiano.</p><a class="svc-link" href="{% url 'tratamientos' %}#general">Explorar área <span aria-hidden="true">→</span></a></article>
-    <article class="svc-card"><div class="svc-ico" aria-hidden="true">⌁</div><h3>Ortodoncia</h3><p>Atención especializada para la alineación y controles ortodónticos.</p><a class="svc-link" href="{% url 'tratamientos' %}#ortodoncia">Explorar área <span aria-hidden="true">→</span></a></article>
-    <article class="svc-card"><div class="svc-ico" aria-hidden="true">◇</div><h3>Rehabilitación oral</h3><p>Alternativas para recuperar función oral según valoración clínica.</p><a class="svc-link" href="{% url 'tratamientos' %}#rehabilitacion">Explorar área <span aria-hidden="true">→</span></a></article>
-    <article class="svc-card"><div class="svc-ico" aria-hidden="true">＋</div><h3>Odontología infantil</h3><p>Procedimientos de cuidado y prevención para pacientes infantiles.</p><a class="svc-link" href="{% url 'tratamientos' %}#infantil">Explorar área <span aria-hidden="true">→</span></a></article>
-    <article class="svc-card"><div class="svc-ico" aria-hidden="true">⌕</div><h3>Endodoncia y cirugía</h3><p>Especialidades para atención de necesidades específicas.</p><a class="svc-link" href="{% url 'tratamientos' %}#especialidades">Ver procedimientos <span aria-hidden="true">→</span></a></article>
-    <article class="svc-card"><div class="svc-ico" aria-hidden="true">◎</div><h3>Implantología</h3><p>Consulta las opciones registradas en el catálogo de atención.</p><a class="svc-link" href="{% url 'tratamientos' %}#especialidades">Ver procedimientos <span aria-hidden="true">→</span></a></article>
+  <div class="svc-grid treatment-catalog home-treatment-catalog">
+    {% for grupo in grupos_tratamientos %}
+    <article class="treatment-category" id="inicio-{{ grupo.id }}"><img class="treatment-category-image" src="{% static grupo.imagen %}" alt="{{ grupo.alt }}" loading="lazy"><div class="treatment-category-content"><h3>{{ grupo.nombre }}</h3><ul class="treatment-items">{% for procedimiento in grupo.procedimientos %}<li>{{ procedimiento }}</li>{% endfor %}</ul><a class="svc-link" href="{% url 'tratamientos' %}#{{ grupo.id }}">Ver área <span aria-hidden="true">→</span></a></div></article>
+    {% endfor %}
   </div>
   <div class="section-action"><a class="btn btn-ghost" href="{% url 'tratamientos' %}">Ver todas las áreas de atención <span aria-hidden="true">↗</span></a></div>
 </div></section>

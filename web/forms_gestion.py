@@ -6,8 +6,9 @@ solo controla la presentación y nunca sustituye estas comprobaciones.
 
 from django import forms
 from django.contrib.auth import get_user_model
-from django.db.models import Q
+from django.db.models import Case, IntegerField, Q, Value, When
 
+from .datos_demo import ORDEN_AREAS_TRATAMIENTO, ORDEN_PARES_TRATAMIENTO
 from .models import Especialista, HorarioAtencion, Paciente, Sucursal, Tratamiento, Cita
 from .validaciones import especialidad_admite_tratamiento
 
@@ -42,6 +43,8 @@ class EspecialistaGestionForm(forms.ModelForm):
 
 
 class TratamientoGestionForm(forms.ModelForm):
+    area = forms.ChoiceField(choices=[(area, area) for area in ORDEN_AREAS_TRATAMIENTO], label="Área o especialidad")
+
     class Meta:
         model = Tratamiento
         fields = ("nombre", "area", "duracion_minutos", "activo")
@@ -53,9 +56,14 @@ class TratamientoGestionForm(forms.ModelForm):
         }
         widgets = {
             "nombre": forms.TextInput(attrs={"maxlength": 140}),
-            "area": forms.TextInput(attrs={"maxlength": 100}),
             "duracion_minutos": forms.NumberInput(attrs={"min": 15, "max": 32760, "step": 15}),
         }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        area_actual = getattr(self.instance, "area", "")
+        if area_actual and area_actual not in ORDEN_AREAS_TRATAMIENTO:
+            self.fields["area"].choices = [*self.fields["area"].choices, (area_actual, f"{area_actual} (inactiva)")]
 
 
 class PacienteGestionForm(forms.ModelForm):
@@ -136,7 +144,8 @@ class CitaGestionForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields["tratamiento"].queryset = Tratamiento.objects.filter(activo=True).order_by("area", "nombre")
+        orden_catalogo = Case(*[When(nombre=nombre, area=area, then=Value(indice)) for indice, (nombre, area) in enumerate(ORDEN_PARES_TRATAMIENTO)], default=Value(len(ORDEN_PARES_TRATAMIENTO)), output_field=IntegerField())
+        self.fields["tratamiento"].queryset = Tratamiento.objects.filter(activo=True).order_by(orden_catalogo)
         self.fields["especialista"].queryset = Especialista.objects.filter(activo=True).order_by("nombre_completo")
         self.fields["sucursal"].queryset = Sucursal.objects.filter(activa=True).order_by("nombre")
         self.fields["especialista"].required = False

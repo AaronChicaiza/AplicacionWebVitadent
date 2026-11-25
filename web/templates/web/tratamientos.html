@@ -1,17 +1,19 @@
 {% extends 'web/plantilla_publica.html' %}
+{% load static %}
 {% block titulo %}Tratamientos y áreas de atención · VitaDent{% endblock %}
 {% block contenido %}
-<section class="page-hero"><div class="container"><p class="crumbs"><a href="{% url 'inicio' %}">Inicio</a> › Tratamientos</p><h1>Áreas de atención de VitaDent</h1><p>Revisa los procedimientos incluidos en el catálogo de la clínica. La valoración profesional determina el tratamiento indicado para cada caso.</p></div></section>
-<section class="section section-tint"><div class="container"><div class="section-head"><span class="eyebrow">Catálogo de servicios</span><h2>Atención odontológica según tus necesidades.</h2><p>Los costos no se muestran en este sitio. Consulta con la clínica para recibir información según una valoración profesional.</p></div>
+<section class="page-hero"><div class="container"><p class="crumbs"><a href="{% url 'inicio' %}">Inicio</a> › Tratamientos</p><h1>Tratamientos y áreas de atención</h1><p>Revisa los procedimientos disponibles en VitaDent. El profesional determinará el tratamiento indicado después de la valoración.</p></div></section>
+<section class="section section-tint"><div class="container"><div class="section-head"><h2>Atención odontológica según tus necesidades</h2><p>Los costos no se muestran en este sitio. Consulta con la clínica para recibir información según una valoración profesional.</p></div>
   <div class="svc-grid treatment-catalog">
     {% for grupo in grupos_tratamientos %}
-      <article class="svc-card treatment-category" id="{% if grupo.nombre == 'Odontología general' %}general{% elif grupo.nombre == 'Odontología infantil' %}infantil{% elif grupo.nombre == 'Ortodoncia' %}ortodoncia{% elif grupo.nombre == 'Rehabilitación oral' %}rehabilitacion{% else %}especialidades{% endif %}">
-        <div class="svc-ico" aria-hidden="true">{% if forloop.counter == 1 %}✳{% elif forloop.counter == 2 %}＋{% elif forloop.counter == 3 %}⌁{% elif forloop.counter == 4 %}◇{% else %}◎{% endif %}</div>
-        <h3>{{ grupo.nombre }}</h3><p>Procedimientos disponibles en esta área:</p>
-        <ul class="treatment-items">{% for procedimiento in grupo.procedimientos %}<li>{{ procedimiento }}</li>{% endfor %}</ul>
+      <article class="treatment-category" id="{{ grupo.id }}">
+        <img class="treatment-category-image" src="{% static grupo.imagen %}" alt="{{ grupo.alt }}" loading="lazy">
+        <div class="treatment-category-content"><h3>{{ grupo.nombre }}</h3>
+          <ul class="treatment-items">{% for procedimiento in grupo.procedimientos %}<li>{{ procedimiento }}</li>{% endfor %}</ul>
+        </div>
       </article>
     {% endfor %}
   </div>
 </div></section>
-<section class="section"><div class="container cta-card"><div><span class="eyebrow">¿Tienes dudas?</span><h2>El asistente te orienta para iniciar.</h2><p>Cuéntale el motivo de consulta para comenzar tu solicitud de cita.</p></div><a class="btn btn-primary btn-lg" href="{% url 'asistente_citas' %}">Conversar para agendar <span aria-hidden="true">↗</span></a></div></section>
+<section class="section"><div class="container cta-card"><div><h2>¿Tienes dudas sobre un tratamiento?</h2><p>El asistente puede orientarte para iniciar tu solicitud de cita.</p></div><a class="btn btn-primary btn-lg" href="{% url 'asistente_citas' %}">Conversar para agendar <span aria-hidden="true">↗</span></a></div></section>
 {% endblock %}

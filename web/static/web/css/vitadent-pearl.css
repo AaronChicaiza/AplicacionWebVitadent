@@ -42,11 +42,20 @@ body{margin:0;overflow-x:hidden}
 .footer-brand img{width:177px;height:59px}
 .footer-chat-link{display:inline-flex;gap:8px;font-weight:800}
 .footer-about{max-width:320px}
-.treatment-catalog{margin-top:2.4rem}
-.treatment-category{scroll-margin-top:100px}
-.treatment-category>p{font-size:.92rem;margin:0 0 .7rem}
-.treatment-items{display:grid;gap:.48rem;margin:0;padding-left:1.15rem;color:var(--body);font-size:.91rem;line-height:1.5}
-.treatment-items li::marker{color:var(--teal-600)}
+.treatment-catalog{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1.6rem;margin-top:2.4rem}
+.treatment-category{min-width:0;overflow:hidden;scroll-margin-top:100px;background:#fff;border-radius:22px;box-shadow:0 8px 26px rgba(18,56,62,.07)}
+.treatment-category-image{display:block;width:100%;height:220px;object-fit:cover;background:#eaf8f7}
+.treatment-category-content{padding:1.4rem 1.55rem 1.55rem}
+.treatment-category h3{margin:0 0 .85rem;color:#102e32;font-size:1.28rem;font-weight:800}
+.treatment-items{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.58rem 1.2rem;margin:0;padding:0;list-style:none;color:#40595b;font-size:.9rem;line-height:1.45}
+.treatment-items li{position:relative;padding-left:1rem}
+.treatment-items li::before{position:absolute;left:0;top:.58em;width:6px;height:6px;border-radius:50%;background:var(--teal-600);content:''}
+.home-treatment-catalog{grid-template-columns:repeat(3,minmax(0,1fr));gap:1.2rem}
+.home-treatment-catalog .treatment-category-image{height:170px}
+.home-treatment-catalog .treatment-category-content{padding:1.15rem}
+.home-treatment-catalog .treatment-category h3{font-size:1.12rem}
+.home-treatment-catalog .treatment-items{grid-template-columns:1fr;font-size:.84rem}
+.home-treatment-catalog .svc-link{margin-top:1rem}
 .access-section{padding-top:clamp(2rem,4vw,3rem)}
 .access-card{background:#fff;border:1px solid var(--line);border-radius:var(--radius-lg);box-shadow:var(--shadow-sm)}
 .doctor-access{background:#f5faf2}
@@ -68,5 +77,6 @@ body{margin:0;overflow-x:hidden}
 .booking-section{padding-top:clamp(2rem,5vw,3.5rem)}
 .access-footnote{grid-column:1/-1;margin:0;color:var(--muted);font-size:.85rem}
 @media(max-width:991.98px){.hero-photo-card{min-height:420px}.team-directory{grid-template-columns:repeat(2,minmax(0,1fr))}.hero-photo-note{font-size:.68rem}}
-@media(max-width:767.98px){.topbar .container{justify-content:center}.topbar-left{display:none}.topbar-offer{margin:auto}.team-preview-grid,.team-directory{grid-template-columns:1fr;max-width:430px}.cta-card{align-items:flex-start;flex-direction:column}.hero-photo-card{min-height:390px}.footer-bottom{justify-content:center;text-align:center}.vitadent-brand img{width:145px;height:49px}}
+@media(max-width:991.98px){.home-treatment-catalog{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:767.98px){.topbar .container{justify-content:center}.topbar-left{display:none}.topbar-offer{margin:auto}.team-preview-grid,.team-directory{grid-template-columns:1fr;max-width:430px}.cta-card{align-items:flex-start;flex-direction:column}.hero-photo-card{min-height:390px}.footer-bottom{justify-content:center;text-align:center}.vitadent-brand img{width:145px;height:49px}.treatment-catalog,.home-treatment-catalog{grid-template-columns:1fr}.treatment-category-image{height:205px}.treatment-items{grid-template-columns:1fr 1fr}}
 @media(max-width:479.98px){.hero .trust-row{grid-template-columns:repeat(2,1fr)}.hero-photo-card{min-height:330px}.hero-photo-caption{right:16px;bottom:19px;left:16px}.hero-photo-caption strong{font-size:1.08rem}.hero-photo-mark{width:42px;height:42px}.team-directory .team-photo{aspect-ratio:16/9}}
