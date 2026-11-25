@@ -369,7 +369,7 @@ def _es_veronica_martinez(perfil):
 
 COLORES_AGENDA_ESPECIALISTAS = {
     "veronica": "#70A83B",
-    "santiago": "#F4C542",
+    "santiago": "#FFDE00",
     "daniela": "#303030",
     "odalis": "#D875A4",
     "karen": "#EA8C37",

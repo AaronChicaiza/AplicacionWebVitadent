@@ -40,7 +40,7 @@ body.admin-body { background: var(--vd-paper); color: var(--vd-charcoal); font-f
 .specialist-schedule-columns { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 235px), 1fr)); gap: 12px; padding: 2px 2px 12px; }
 .specialist-schedule-column { min-width: 0; padding: 0 14px 9px; border: 1px solid var(--vd-line); border-top: 4px solid var(--specialist-accent, #4475a9); background: #fff; box-shadow: 0 4px 15px rgba(48, 48, 48, .035); }
 .specialist-schedule-column:nth-child(1) { --specialist-accent: #70a83b; }
-.specialist-schedule-column:nth-child(2) { --specialist-accent: #f4c542; }
+.specialist-schedule-column:nth-child(2) { --specialist-accent: #ffde00; }
 .specialist-schedule-column:nth-child(3) { --specialist-accent: #303030; }
 .specialist-schedule-column:nth-child(4) { --specialist-accent: #d875a4; }
 .specialist-schedule-column:nth-child(5) { --specialist-accent: #ea8c37; }
