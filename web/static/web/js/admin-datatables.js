@@ -120,6 +120,14 @@ document.addEventListener('DOMContentLoaded', function () {
       Object.keys(button.dataset).forEach(function (key) {
         if (!key.startsWith('record')) return;
         const fieldName = key.slice(6).replace(/^[A-Z]/, function (letter) { return letter.toLowerCase(); });
+        const hourPart = form.elements.namedItem(fieldName + '_0');
+        const minutePart = form.elements.namedItem(fieldName + '_1');
+        if (hourPart && minutePart) {
+          const timeParts = String(button.dataset[key] || '').slice(0, 5).split(':');
+          hourPart.value = timeParts[0] || '';
+          minutePart.value = timeParts[1] || '';
+          return;
+        }
         const field = form.elements.namedItem(fieldName);
         if (!field) return;
         if (field.type === 'checkbox') field.checked = button.dataset[key] === 'true';

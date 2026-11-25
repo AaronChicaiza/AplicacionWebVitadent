@@ -87,6 +87,31 @@ class PacienteGestionForm(forms.ModelForm):
         return self.cleaned_data.get("identificacion") or None
 
 
+class SelectorHoraWidget(forms.MultiWidget):
+    """Selector simple de hora y minutos en dos listas cortas."""
+
+    def __init__(self, attrs=None):
+        horas = [('', 'Hora')] + [(f'{hora:02d}', f'{hora:02d}') for hora in range(24)]
+        minutos = [('', 'Minutos')] + [(f'{minuto:02d}', f'{minuto:02d}') for minuto in range(60)]
+        widgets = (
+            forms.Select(choices=horas, attrs={'aria-label': 'Hora'}),
+            forms.Select(choices=minutos, attrs={'aria-label': 'Minutos'}),
+        )
+        super().__init__(widgets, attrs)
+
+    def decompress(self, value):
+        if value:
+            if isinstance(value, str):
+                value = forms.TimeField().to_python(value)
+            return [f'{value.hour:02d}', f'{value.minute:02d}']
+        return ['', '']
+
+    def value_from_datadict(self, data, files, name):
+        hora = data.get(f'{name}_0', '')
+        minuto = data.get(f'{name}_1', '')
+        return f'{hora}:{minuto}' if hora and minuto else ''
+
+
 class HorarioGestionForm(forms.ModelForm):
     class Meta:
         model = HorarioAtencion
@@ -98,9 +123,13 @@ class HorarioGestionForm(forms.ModelForm):
             "hora_fin": "Hora de fin",
             "activo": "Horario activo",
         }
+        help_texts = {
+            "hora_inicio": "Elige la hora y los minutos por separado (formato de 24 horas).",
+            "hora_fin": "Elige la hora y los minutos por separado (formato de 24 horas).",
+        }
         widgets = {
-            "hora_inicio": forms.TimeInput(format="%H:%M", attrs={"type": "time"}),
-            "hora_fin": forms.TimeInput(format="%H:%M", attrs={"type": "time"}),
+            "hora_inicio": SelectorHoraWidget(),
+            "hora_fin": SelectorHoraWidget(),
         }
 
     def __init__(self, *args, **kwargs):
