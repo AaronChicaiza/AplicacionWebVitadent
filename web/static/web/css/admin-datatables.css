@@ -4,9 +4,12 @@
 .admin-count{font-variant-numeric:tabular-nums}
 .admin-crud-actions{display:flex;align-items:center;justify-content:flex-end;gap:6px;white-space:nowrap}
 .admin-crud-actions form{display:inline-flex;margin:0}
-.admin-icon-action{display:inline-grid;width:34px;height:32px;place-items:center;border:1px solid #ccd8d3;border-radius:3px;background:#fff;color:#254b49;font:inherit;font-size:12px;text-decoration:none;cursor:pointer}
-.admin-icon-action:hover,.admin-icon-action:focus-visible{border-color:#087d83;background:#f1f8f5;color:#075d63;outline:2px solid transparent}
-.admin-icon-action-danger{border-color:#e2ceca;color:#933b33}
+.admin-icon-action{display:inline-grid;width:38px;height:36px;place-items:center;border:1px solid #b8d8d3;border-radius:5px;background:#f1f8f6;color:#075d63;font:inherit;text-decoration:none;cursor:pointer;transition:background-color .16s ease,border-color .16s ease,color .16s ease,transform .16s ease}
+.admin-action-icon{display:block;width:17px;height:17px;fill:none;stroke:currentColor;stroke-linecap:round;stroke-linejoin:round;stroke-width:1.8}
+.admin-icon-action:hover{transform:translateY(-1px);border-color:#087d83;background:#e1f2ef;color:#064c51}
+.admin-icon-action:focus-visible{outline:3px solid #087d834d;outline-offset:2px}
+.admin-icon-action-danger{border-color:#e3c4c0;background:#fff7f6;color:#9e342d}
+.admin-icon-action-danger:hover{border-color:#b64137;background:#fdeae8;color:#812a23}
 .admin-crud-form{display:grid;gap:14px}
 .admin-crud-form .form-row{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
 .admin-crud-form .form-group{display:grid;gap:6px;min-width:0}

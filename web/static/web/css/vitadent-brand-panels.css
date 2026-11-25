@@ -37,10 +37,19 @@ body.admin-body { background: var(--vd-paper); color: var(--vd-charcoal); font-f
 .schedule-board-heading { margin: 0 0 12px; }
 .schedule-board-heading h2 { margin: 0 0 4px; color: var(--vd-charcoal); font: 700 18px/1.25 'Raleway', sans-serif; }
 .schedule-board-heading p { margin: 0; color: #59635f; font-size: 12px; }
-.specialist-schedule-columns { display: grid; grid-auto-columns: minmax(190px, 1fr); grid-auto-flow: column; grid-template-rows: 1fr; gap: 12px; overflow-x: auto; padding: 2px 2px 12px; scroll-snap-type: x proximity; scrollbar-color: var(--vd-blue) #e9eeeb; scrollbar-width: thin; }
-.specialist-schedule-column { min-width: 190px; padding: 14px 15px 9px; border: 1px solid var(--vd-line); border-top: 4px solid var(--specialist-accent); background: #fff; box-shadow: 0 4px 15px rgba(48, 48, 48, .035); scroll-snap-align: start; }
-.specialist-schedule-column > header { display: grid; grid-template-columns: 13px minmax(0, 1fr); align-items: center; gap: 0 9px; padding-bottom: 10px; border-bottom: 1px solid var(--vd-line); }
-.specialist-color-dot { width: 12px; height: 12px; border: 1px solid rgba(48, 48, 48, .14); border-radius: 50%; background: var(--specialist-accent); }
+.specialist-schedule-columns { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 235px), 1fr)); gap: 12px; padding: 2px 2px 12px; }
+.specialist-schedule-column { min-width: 0; padding: 0 14px 9px; border: 1px solid var(--vd-line); border-top: 4px solid var(--specialist-accent, #4475a9); background: #fff; box-shadow: 0 4px 15px rgba(48, 48, 48, .035); }
+.specialist-schedule-column:nth-child(1) { --specialist-accent: #70a83b; }
+.specialist-schedule-column:nth-child(2) { --specialist-accent: #f4c542; }
+.specialist-schedule-column:nth-child(3) { --specialist-accent: #303030; }
+.specialist-schedule-column:nth-child(4) { --specialist-accent: #d875a4; }
+.specialist-schedule-column:nth-child(5) { --specialist-accent: #ea8c37; }
+.specialist-schedule-column:nth-child(6) { --specialist-accent: #8666a9; }
+.specialist-schedule-column:nth-child(7) { --specialist-accent: #d34a48; }
+.specialist-schedule-column:nth-child(8) { --specialist-accent: #77d1e9; }
+.specialist-schedule-column:nth-child(9) { --specialist-accent: #4475a9; }
+.specialist-schedule-column > header { display: grid; grid-template-columns: 16px minmax(0, 1fr); align-items: center; gap: 0 9px; margin: 0 -14px 0; padding: 12px 14px 10px; border-bottom: 1px solid var(--vd-line); background: color-mix(in srgb, var(--specialist-accent, #4475a9) 12%, white); }
+.specialist-color-dot { width: 14px; height: 14px; border: 1px solid rgba(48, 48, 48, .18); border-radius: 50%; background-color: var(--specialist-accent, #4475a9); }
 .specialist-schedule-column h3 { overflow: hidden; margin: 0; color: var(--vd-charcoal); font: 700 13px/1.35 'Raleway', sans-serif; text-overflow: ellipsis; }
 .specialist-schedule-total { grid-column: 2; margin-top: 3px; color: #59635f; font-size: 10px; }
 .specialist-schedule-column ul { display: grid; gap: 0; margin: 0; padding: 5px 0 0; list-style: none; }
@@ -54,4 +63,4 @@ body.admin-body { background: var(--vd-paper); color: var(--vd-charcoal); font-f
 .admin-field-help { display: block; margin-top: 5px; color: #59635f; font-size: 11px; line-height: 1.45; }
 .doctor-body .doctor-demo-banner { background: #e8f7fb; color: #303030; }
 
-@media (max-width: 680px) { .specialist-schedule-columns { grid-auto-columns: minmax(220px, 86vw); } .specialist-schedule-column { min-width: 0; } }
+@media (max-width: 680px) { .specialist-schedule-columns { grid-template-columns: repeat(auto-fit, minmax(min(100%, 250px), 1fr)); } }
