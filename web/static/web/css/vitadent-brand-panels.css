@@ -39,16 +39,16 @@ body.admin-body { background: var(--vd-paper); color: var(--vd-charcoal); font-f
 .schedule-board-heading p { margin: 0; color: #59635f; font-size: 12px; }
 .specialist-schedule-columns { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 235px), 1fr)); gap: 12px; padding: 2px 2px 12px; }
 .specialist-schedule-column { min-width: 0; padding: 0 14px 9px; border: 1px solid var(--vd-line); border-top: 4px solid var(--specialist-accent, #4475a9); background: #fff; box-shadow: 0 4px 15px rgba(48, 48, 48, .035); }
-.specialist-color--veronica { --specialist-accent: #70a83b; --specialist-label-ink: #303030; }
-.specialist-color--santiago { --specialist-accent: #ffde00; --specialist-label-ink: #303030; }
-.specialist-color--daniela { --specialist-accent: #303030; --specialist-label-ink: #fff; }
-.specialist-color--odalis { --specialist-accent: #d875a4; --specialist-label-ink: #303030; }
-.specialist-color--karen { --specialist-accent: #ea8c37; --specialist-label-ink: #303030; }
-.specialist-color--mishel { --specialist-accent: #8666a9; --specialist-label-ink: #fff; }
-.specialist-color--adrian { --specialist-accent: #d34a48; --specialist-label-ink: #fff; }
-.specialist-color--wilson { --specialist-accent: #77d1e9; --specialist-label-ink: #303030; }
-.specialist-color--daysi { --specialist-accent: #4475a9; --specialist-label-ink: #fff; }
-.specialist-color--default { --specialist-accent: #4475a9; --specialist-label-ink: #fff; }
+.specialist-color--veronica { --specialist-accent: #70a83b; }
+.specialist-color--santiago { --specialist-accent: #ffde00; }
+.specialist-color--daniela { --specialist-accent: #303030; }
+.specialist-color--odalis { --specialist-accent: #d875a4; }
+.specialist-color--karen { --specialist-accent: #ea8c37; }
+.specialist-color--mishel { --specialist-accent: #8666a9; }
+.specialist-color--adrian { --specialist-accent: #d34a48; }
+.specialist-color--wilson { --specialist-accent: #77d1e9; }
+.specialist-color--daysi { --specialist-accent: #4475a9; }
+.specialist-color--default { --specialist-accent: #4475a9; }
 .specialist-schedule-column > header { display: grid; grid-template-columns: 16px minmax(0, 1fr); align-items: center; gap: 0 9px; margin: 0 -14px 0; padding: 12px 14px 10px; border-bottom: 1px solid var(--vd-line); background: color-mix(in srgb, var(--specialist-accent, #4475a9) 12%, white); }
 .specialist-color-dot { width: 14px; height: 14px; border: 1px solid rgba(48, 48, 48, .18); border-radius: 50%; background-color: var(--specialist-accent, #4475a9); }
 .specialist-schedule-column h3 { overflow: hidden; margin: 0; color: var(--vd-charcoal); font: 700 13px/1.35 'Raleway', sans-serif; text-overflow: ellipsis; }
@@ -58,8 +58,8 @@ body.admin-body { background: var(--vd-paper); color: var(--vd-charcoal); font-f
 .specialist-schedule-column li:last-child { border-bottom: 0; }
 .specialist-schedule-column li strong { color: var(--vd-charcoal); font-size: 11px; font-variant-numeric: tabular-nums; }
 .specialist-schedule-column li.specialist-no-hours { color: #59635f; font-size: 11px; }
-.schedule-specialist-label { display: inline-flex; align-items: center; gap: 8px; max-width: 100%; padding: 5px 9px; border: 1px solid var(--specialist-accent, #4475a9); border-left-width: 4px; border-radius: 5px; background-color: var(--specialist-accent, #4475a9); color: var(--specialist-label-ink, #fff); font-weight: 700; }
-.specialist-label-dot { flex: 0 0 9px; width: 9px; height: 9px; border: 1px solid var(--specialist-label-ink, #fff); border-radius: 50%; background-color: var(--specialist-accent, #4475a9); }
+.schedule-specialist-label { display: inline-flex; align-items: center; gap: 8px; max-width: 100%; padding: 5px 9px; border: 1px solid color-mix(in srgb, var(--specialist-accent, #4475a9) 28%, white); border-top: 2px solid var(--specialist-accent, #4475a9); border-radius: 5px; background-color: color-mix(in srgb, var(--specialist-accent, #4475a9) 12%, white); color: var(--vd-charcoal); font-weight: 700; }
+.specialist-label-dot { flex: 0 0 9px; width: 9px; height: 9px; border: 1px solid color-mix(in srgb, var(--specialist-accent, #4475a9) 78%, var(--vd-charcoal)); border-radius: 50%; background-color: var(--specialist-accent, #4475a9); }
 .admin-time-input{font-variant-numeric:tabular-nums;letter-spacing:.04em}
 .schedule-management-table { margin-top: 15px; }
 .admin-field-help { display: block; margin-top: 5px; color: #59635f; font-size: 11px; line-height: 1.45; }
