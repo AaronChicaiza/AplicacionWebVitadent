@@ -760,19 +760,26 @@ def gestion_agenda(request):
         _aplicar_color_agenda(especialista)
     especialistas.sort(key=lambda item: (prioridades.get(_clave_color_especialista(item.nombre_completo), len(prioridades)), item.nombre_completo))
     citas = list(Cita.objects.filter(fecha_hora_solicitada__gte=inicio, fecha_hora_solicitada__lt=fin, especialista__activo=True, estado__in=[Cita.Estado.CONFIRMADA, Cita.Estado.REPROGRAMADA, Cita.Estado.ATENDIDA]).select_related("paciente", "tratamiento", "especialista"))
-    if citas:
-        primera = min(timezone.localtime(cita.fecha_hora_solicitada).hour for cita in citas)
-        ultima = max(timezone.localtime(cita.fecha_hora_solicitada + timedelta(minutes=cita.tratamiento.duracion_minutos or 30)).hour + 1 for cita in citas)
-        hora_inicial = max(0, primera - 1)
-        horas = list(range(hora_inicial, min(24, ultima + 1)))
+    # Es el horario general de la clínica, no una disponibilidad fija del profesional.
+    if dia.weekday() < 5:
+        hora_inicial, hora_final = 9, 20
+        horario_general = "Lunes a viernes · 09:00–19:30"
+    elif dia.weekday() == 5:
+        hora_inicial, hora_final = 8, 16
+        horario_general = "Sábado · 08:00–15:30"
     else:
-        hora_inicial, horas = 0, []
+        hora_inicial, hora_final = 8, 16
+        horario_general = "Domingo · atención especial, confirmar con la clínica"
+    if citas:
+        hora_inicial = min(hora_inicial, min(timezone.localtime(cita.fecha_hora_solicitada).hour for cita in citas))
+        hora_final = max(hora_final, max(timezone.localtime(cita.fecha_hora_solicitada + timedelta(minutes=cita.tratamiento.duracion_minutos or 30)).hour + 1 for cita in citas))
+    horas = list(range(max(0, hora_inicial), min(24, hora_final)))
     for cita in citas:
         _aplicar_color_agenda(cita.especialista)
         local = timezone.localtime(cita.fecha_hora_solicitada)
         cita.minuto_inicio = (local.hour - hora_inicial) * 60 + local.minute
         cita.alto_minutos = cita.tratamiento.duracion_minutos or 30
-    return render(request, "web/admin/agenda.html", contexto_base(seccion_activa="agenda", fecha_agenda=dia, horas_agenda=horas, especialistas_agenda=especialistas, citas_agenda=citas))
+    return render(request, "web/admin/agenda.html", contexto_base(seccion_activa="agenda", fecha_agenda=dia, horas_agenda=horas, horario_general=horario_general, especialistas_agenda=especialistas, citas_agenda=citas))
 
 
 @staff_member_required(login_url="acceso_personal")
