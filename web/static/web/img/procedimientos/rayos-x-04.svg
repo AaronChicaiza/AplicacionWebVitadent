@@ -1,8 +1,12 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 400" role="img">
+<title>Carpal</title>
 <rect width="640" height="400" fill="#edf6f6"/>
-<circle cx="535" cy="58" r="115" fill="#dff0e8"/>
-<circle cx="85" cy="365" r="105" fill="#e4f3ed"/>
-<rect x="42" y="28" width="556" height="344" rx="25" fill="#ffffff" fill-opacity=".68" stroke="#cde1dd" stroke-width="2"/>
-<rect x="115" y="53" width="410" height="285" rx="20" fill="#173840"/><rect x="129" y="67" width="382" height="257" rx="12" fill="#244d55"/><path d="M260 301 L256 227 L224 164 Q219 150 232 145 Q241 143 250 157 L280 204 L270 105 Q269 90 281 89 Q293 90 294 105 L304 187 L307 80 Q308 68 320 67 Q333 69 333 84 L334 185 L351 99 Q355 87 367 90 Q378 95 373 109 L360 198 L384 143 Q393 131 405 138 Q414 146 406 159 L366 245 L350 301 Z" fill="none" stroke="#d2f3ec" stroke-width="9" stroke-linecap="round" stroke-linejoin="round" /><circle cx="282" cy="160" r="5" fill="#c8e900" /><circle cx="320" cy="143" r="5" fill="#c8e900" /><circle cx="359" cy="159" r="5" fill="#c8e900" /><circle cx="289" cy="230" r="5" fill="#c8e900" /><circle cx="331" cy="227" r="5" fill="#c8e900" />
-<path d="M70 343 H570" stroke="#a7d4ce" stroke-width="2"/>
+<rect x="42" y="28" width="556" height="344" rx="25" fill="#ffffff" stroke="#cde1dd" stroke-width="2"/>
+<rect x="115" y="53" width="410" height="285" rx="20" fill="#173840"/><rect x="129" y="67" width="382" height="257" rx="12" fill="#244d55"/><path d="M260 301 L256 227 L224 164 Q219 150 232 145 Q241 143 250 157 L280 204 L270 105 Q269 90 281 89 Q293 90 294 105 L304 187 L307 80 Q308 68 320 67 Q333 69 333 84 L334 185 L351 99 Q355 87 367 90 Q378 95 373 109 L360 198 L384 143 Q393 131 405 138 Q414 146 406 159 L366 245 L350 301 Z" fill="none" stroke="#d2f3ec" stroke-width="9" stroke-linecap="round" stroke-linejoin="round" /><path d="M282 118 v25" fill="none" stroke="#c8e900" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" /><path d="M320 100 v25" fill="none" stroke="#c8e900" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" /><path d="M359 122 v25" fill="none" stroke="#c8e900" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" /><circle cx="282" cy="160" r="6" fill="#c8e900" /><circle cx="320" cy="143" r="6" fill="#c8e900" /><circle cx="359" cy="159" r="6" fill="#c8e900" /><circle cx="289" cy="230" r="6" fill="#c8e900" /><circle cx="331" cy="227" r="6" fill="#c8e900" />
+<rect x="43" y="329" width="554" height="42" rx="0" fill="#e3f4ef"/>
+<path d="M43 329 H597" stroke="#b6d8d3" stroke-width="2"/>
+<circle cx="70" cy="350" r="6" fill="#087f89"/>
+<text x="84" y="356" font-family="Arial, sans-serif" font-size="17" font-weight="700" fill="#133b40">Mano y muñeca</text>
+<circle cx="362" cy="350" r="6" fill="#c8e900"/>
+<text x="376" y="356" font-family="Arial, sans-serif" font-size="17" font-weight="700" fill="#133b40">Maduración ósea</text>
 </svg>

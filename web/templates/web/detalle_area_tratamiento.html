@@ -12,7 +12,7 @@
   <div class="procedure-grid">
     {% for procedimiento in grupo.detalles %}
       <article class="procedure-card" id="procedimiento-{{ forloop.counter }}">
-        <img class="procedure-image" src="{% static procedimiento.imagen %}" alt="Ilustración esquemática de {{ procedimiento.nombre|lower }}" loading="lazy" width="640" height="400">
+        <img class="procedure-image" src="{% static procedimiento.imagen %}?v=4" alt="Ilustración esquemática de {{ procedimiento.nombre|lower }}" loading="lazy" width="640" height="400">
         <div class="procedure-copy"><h3>{{ procedimiento.nombre }}</h3><div class="procedure-explanation"><div><h4>¿Qué es?</h4><p>{{ procedimiento.descripcion }}</p></div><div><h4>¿Para qué sirve?</h4><p>{{ procedimiento.proposito }}</p></div></div></div>
       </article>
     {% endfor %}

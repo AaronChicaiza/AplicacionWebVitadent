@@ -1,8 +1,15 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 400" role="img">
+<title>Frenectomías</title>
 <rect width="640" height="400" fill="#edf6f6"/>
-<circle cx="535" cy="58" r="115" fill="#dff0e8"/>
-<circle cx="85" cy="365" r="105" fill="#e4f3ed"/>
-<rect x="42" y="28" width="556" height="344" rx="25" fill="#ffffff" fill-opacity=".68" stroke="#cde1dd" stroke-width="2"/>
-<path d="M175 215 Q320 282 465 215 M320 153 V227" fill="none" stroke="#087f89" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" /><path d="M287 176 L351 213" fill="none" stroke="#c8e900" stroke-width="9" stroke-linecap="round" stroke-linejoin="round" /><path d="M335 178 L307 210" fill="none" stroke="#c8e900" stroke-width="9" stroke-linecap="round" stroke-linejoin="round" />
-<path d="M70 343 H570" stroke="#a7d4ce" stroke-width="2"/>
+<rect x="42" y="28" width="556" height="344" rx="25" fill="#ffffff" stroke="#cde1dd" stroke-width="2"/>
+<path d="M171 179 Q320 105 469 179 Q449 291 320 312 Q191 291 171 179 Z" fill="#913f59" stroke="#18555b" stroke-width="7"/>
+      <path d="M182 180 Q320 124 458 180 Q320 230 182 180 Z" fill="#ffffff" stroke="#d9a7a1" stroke-width="4"/>
+      <path d="M233 250 Q320 201 407 250 Q320 298 233 250 Z" fill="#e7a0a2" stroke="#bd7383" stroke-width="4"/>
+      <path d="M178 166 Q320 105 462 166 M178 192 Q320 328 462 192" fill="none" stroke="#eeb6a8" stroke-width="13" stroke-linecap="round"/><path d="M320 210 V270" fill="none" stroke="#c8e900" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" /><circle cx="320" cy="228" r="16" fill="none" stroke="#087f89" stroke-width="5"/>
+<rect x="43" y="329" width="554" height="42" rx="0" fill="#e3f4ef"/>
+<path d="M43 329 H597" stroke="#b6d8d3" stroke-width="2"/>
+<circle cx="70" cy="350" r="6" fill="#087f89"/>
+<text x="84" y="356" font-family="Arial, sans-serif" font-size="17" font-weight="700" fill="#133b40">Frenillo oral</text>
+<circle cx="362" cy="350" r="6" fill="#c8e900"/>
+<text x="376" y="356" font-family="Arial, sans-serif" font-size="17" font-weight="700" fill="#133b40">Zona de intervención</text>
 </svg>

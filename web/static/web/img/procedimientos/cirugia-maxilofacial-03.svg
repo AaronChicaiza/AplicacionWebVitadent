@@ -1,8 +1,23 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 400" role="img">
+<title>Bichectomías</title>
 <rect width="640" height="400" fill="#eff8f5"/>
-<circle cx="535" cy="58" r="115" fill="#dff0e8"/>
-<circle cx="85" cy="365" r="105" fill="#e4f3ed"/>
-<rect x="42" y="28" width="556" height="344" rx="25" fill="#ffffff" fill-opacity=".68" stroke="#cde1dd" stroke-width="2"/>
-<path d="M228 88 Q169 178 239 278 Q303 340 409 280 Q467 193 415 98 M301 200 Q320 222 341 200" fill="none" stroke="#087f89" stroke-width="9" stroke-linecap="round" stroke-linejoin="round" /><circle cx="243" cy="211" r="31" fill="#afe2df" /><circle cx="397" cy="211" r="31" fill="#afe2df" />
-<path d="M70 343 H570" stroke="#a7d4ce" stroke-width="2"/>
+<rect x="42" y="28" width="556" height="344" rx="25" fill="#ffffff" stroke="#cde1dd" stroke-width="2"/>
+<g stroke-linecap="round" stroke-linejoin="round">
+      <path d="M205 138 Q190 57 320 54 Q450 57 435 138 L426 227 Q410 304 320 315 Q230 304 214 227 Z" fill="#f6d3bb" stroke="#18555b" stroke-width="6"/>
+      <path d="M203 148 Q178 91 221 60 Q276 18 343 37 Q421 24 444 93 L433 147 Q415 106 390 81 Q333 103 270 78 Q228 108 203 148 Z" fill="#314d50"/>
+      <path d="M213 174 Q183 152 190 194 Q197 220 218 221 M427 174 Q457 152 450 194 Q443 220 422 221" fill="#f6d3bb" stroke="#18555b" stroke-width="5"/>
+      <path d="M255 162 Q280 148 301 162 M339 162 Q360 148 385 162" fill="none" stroke="#314d50" stroke-width="5"/>
+      <ellipse cx="279" cy="175" rx="11" ry="7" fill="#ffffff"/><ellipse cx="361" cy="175" rx="11" ry="7" fill="#ffffff"/>
+      <circle cx="280" cy="175" r="5" fill="#18555b"/><circle cx="360" cy="175" r="5" fill="#18555b"/>
+      <path d="M320 177 Q311 212 320 218 L335 220" fill="none" stroke="#b77e70" stroke-width="4"/>
+      <path d="M274 249 Q320 282 366 249 Q345 293 320 291 Q295 293 274 249 Z" fill="#8d5961" stroke="#a26d72" stroke-width="3"/>
+      <path d="M281 253 Q320 268 359 253 L351 268 Q320 276 289 268 Z" fill="#ffffff"/>
+      <path d="M282 252 Q320 238 358 252" fill="none" stroke="#ae7373" stroke-width="4"/>
+    </g><circle cx="232" cy="224" r="28" fill="#c8e900" fill-opacity=".42"/><circle cx="408" cy="224" r="28" fill="#c8e900" fill-opacity=".42"/><path d="M168 224 H195 M472 224 H445" fill="none" stroke="#087f89" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" />
+<rect x="43" y="329" width="554" height="42" rx="0" fill="#e3f4ef"/>
+<path d="M43 329 H597" stroke="#b6d8d3" stroke-width="2"/>
+<circle cx="70" cy="350" r="6" fill="#087f89"/>
+<text x="84" y="356" font-family="Arial, sans-serif" font-size="17" font-weight="700" fill="#133b40">Anatomía de mejillas</text>
+<circle cx="362" cy="350" r="6" fill="#c8e900"/>
+<text x="376" y="356" font-family="Arial, sans-serif" font-size="17" font-weight="700" fill="#133b40">Grasa bucal</text>
 </svg>

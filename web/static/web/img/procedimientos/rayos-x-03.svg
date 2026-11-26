@@ -1,8 +1,20 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 400" role="img">
+<title>Lateral de cráneo</title>
 <rect width="640" height="400" fill="#eff8f5"/>
-<circle cx="535" cy="58" r="115" fill="#dff0e8"/>
-<circle cx="85" cy="365" r="105" fill="#e4f3ed"/>
-<rect x="42" y="28" width="556" height="344" rx="25" fill="#ffffff" fill-opacity=".68" stroke="#cde1dd" stroke-width="2"/>
-<rect x="115" y="53" width="410" height="285" rx="20" fill="#173840"/><rect x="129" y="67" width="382" height="257" rx="12" fill="#244d55"/><path d="M253 95 Q392 64 432 166 Q458 207 424 222 L394 222 L388 250 Q373 299 314 290 Q247 270 231 203 Q215 139 253 95 Z" fill="none" stroke="#d2f3ec" stroke-width="9" stroke-linecap="round" stroke-linejoin="round" /><path d="M366 161 Q384 151 404 163 M392 190 L434 203 L392 211 M274 232 Q340 209 389 234" fill="none" stroke="#c8e900" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" />
-<path d="M70 343 H570" stroke="#a7d4ce" stroke-width="2"/>
+<rect x="42" y="28" width="556" height="344" rx="25" fill="#ffffff" stroke="#cde1dd" stroke-width="2"/>
+<rect x="115" y="53" width="410" height="285" rx="20" fill="#173840"/><rect x="129" y="67" width="382" height="257" rx="12" fill="#244d55"/><g transform="translate(0 1)" opacity=".86"><g stroke-linecap="round" stroke-linejoin="round">
+      <path d="M244 94 Q319 33 387 83 Q425 109 418 164 L449 203 Q453 213 434 219 L414 225 Q427 238 408 248 Q417 260 403 274 Q383 303 332 292 L317 326 L231 326 Q248 279 235 236 Q188 168 244 94 Z" fill="#f6d3bb" stroke="#18555b" stroke-width="6"/>
+      <path d="M239 134 Q211 72 292 54 Q365 35 410 98 Q374 86 350 74 Q299 106 261 103 Z" fill="#314d50"/>
+      <ellipse cx="251" cy="195" rx="22" ry="30" fill="#f1c5ae" stroke="#b77e70" stroke-width="4"/>
+      <path d="M360 164 Q383 151 400 166" fill="none" stroke="#314d50" stroke-width="5"/>
+      <ellipse cx="382" cy="172" rx="8" ry="6" fill="#ffffff"/><circle cx="384" cy="172" r="4" fill="#18555b"/>
+      <path d="M397 233 Q416 226 429 233 M395 246 Q410 253 422 245" fill="none" stroke="#a9686a" stroke-width="4"/>
+      <path d="M325 273 Q352 292 386 275" fill="none" stroke="#b77e70" stroke-width="3"/>
+    </g></g><path d="M279 227 Q340 210 412 240" fill="none" stroke="#c8e900" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" /><path d="M207 268 H425" fill="none" stroke="#b9e8e8" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="7 7"/>
+<rect x="43" y="329" width="554" height="42" rx="0" fill="#e3f4ef"/>
+<path d="M43 329 H597" stroke="#b6d8d3" stroke-width="2"/>
+<circle cx="70" cy="350" r="6" fill="#087f89"/>
+<text x="84" y="356" font-family="Arial, sans-serif" font-size="17" font-weight="700" fill="#133b40">Perfil del cráneo</text>
+<circle cx="362" cy="350" r="6" fill="#c8e900"/>
+<text x="376" y="356" font-family="Arial, sans-serif" font-size="17" font-weight="700" fill="#133b40">Relación maxilar</text>
 </svg>

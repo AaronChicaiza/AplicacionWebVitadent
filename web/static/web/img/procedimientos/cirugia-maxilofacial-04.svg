@@ -1,8 +1,20 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 400" role="img">
+<title>Lipopapada</title>
 <rect width="640" height="400" fill="#edf6f6"/>
-<circle cx="535" cy="58" r="115" fill="#dff0e8"/>
-<circle cx="85" cy="365" r="105" fill="#e4f3ed"/>
-<rect x="42" y="28" width="556" height="344" rx="25" fill="#ffffff" fill-opacity=".68" stroke="#cde1dd" stroke-width="2"/>
-<path d="M253 74 Q344 88 380 165 Q421 217 374 282 L341 303 M266 281 Q310 310 341 303" fill="none" stroke="#087f89" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" /><path d="M305 282 Q351 272 384 238" fill="none" stroke="#c8e900" stroke-width="9" stroke-linecap="round" stroke-linejoin="round" />
-<path d="M70 343 H570" stroke="#a7d4ce" stroke-width="2"/>
+<rect x="42" y="28" width="556" height="344" rx="25" fill="#ffffff" stroke="#cde1dd" stroke-width="2"/>
+<g stroke-linecap="round" stroke-linejoin="round">
+      <path d="M244 94 Q319 33 387 83 Q425 109 418 164 L449 203 Q453 213 434 219 L414 225 Q427 238 408 248 Q417 260 403 274 Q383 303 332 292 L317 326 L231 326 Q248 279 235 236 Q188 168 244 94 Z" fill="#f6d3bb" stroke="#18555b" stroke-width="6"/>
+      <path d="M239 134 Q211 72 292 54 Q365 35 410 98 Q374 86 350 74 Q299 106 261 103 Z" fill="#314d50"/>
+      <ellipse cx="251" cy="195" rx="22" ry="30" fill="#f1c5ae" stroke="#b77e70" stroke-width="4"/>
+      <path d="M360 164 Q383 151 400 166" fill="none" stroke="#314d50" stroke-width="5"/>
+      <ellipse cx="382" cy="172" rx="8" ry="6" fill="#ffffff"/><circle cx="384" cy="172" r="4" fill="#18555b"/>
+      <path d="M397 233 Q416 226 429 233 M395 246 Q410 253 422 245" fill="none" stroke="#a9686a" stroke-width="4"/>
+      <path d="M325 273 Q352 292 386 275" fill="none" stroke="#b77e70" stroke-width="3"/>
+    </g><path d="M331 284 Q374 305 409 267 Q397 304 352 319 Z" fill="#c8e900" fill-opacity=".65" stroke="#087f89" stroke-width="4"/><path d="M404 313 L445 286" fill="none" stroke="#087f89" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" />
+<rect x="43" y="329" width="554" height="42" rx="0" fill="#e3f4ef"/>
+<path d="M43 329 H597" stroke="#b6d8d3" stroke-width="2"/>
+<circle cx="70" cy="350" r="6" fill="#087f89"/>
+<text x="84" y="356" font-family="Arial, sans-serif" font-size="17" font-weight="700" fill="#133b40">Perfil facial</text>
+<circle cx="362" cy="350" r="6" fill="#c8e900"/>
+<text x="376" y="356" font-family="Arial, sans-serif" font-size="17" font-weight="700" fill="#133b40">Zona submentoniana</text>
 </svg>
