@@ -26,20 +26,3 @@ def validar_identificacion_ecuador(valor):
         raise ValidationError("El RUC no tiene un establecimiento válido.")
 
 
-def especialidad_admite_tratamiento(area, especialidad):
-    """Comparación conservadora; asignaciones dudosas se dejan a recepción."""
-    area = _normalizar(area)
-    especialidad = _normalizar(especialidad)
-    if area == "especialidades":
-        return True
-    if area in especialidad or especialidad in area:
-        return True
-    if area == "cirugia oral" and "maxilofacial" in especialidad:
-        return True
-    return False
-
-
-def _normalizar(valor):
-    import unicodedata
-    texto = unicodedata.normalize("NFKD", str(valor or "").casefold())
-    return "".join(c for c in texto if not unicodedata.combining(c)).strip()

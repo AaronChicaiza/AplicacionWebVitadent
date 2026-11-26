@@ -26,7 +26,6 @@ from .serializers import (
     SucursalSerializer,
     TratamientoSerializer,
 )
-from .validaciones import especialidad_admite_tratamiento
 
 
 def pagina(queryset, request, serializer):
@@ -90,8 +89,6 @@ class DisponibilidadAPI(APIView):
                 tratamiento = get_object_or_404(Tratamiento, pk=int(tratamiento_id), activo=True)
             except (ValueError, TypeError):
                 raise ValidationError({"tratamiento": "El tratamiento debe ser un identificador del catálogo."})
-            if not especialidad_admite_tratamiento(tratamiento.area, especialista.especialidad):
-                raise ValidationError({"especialista": "El profesional no corresponde al tratamiento."})
 
         duracion = tratamiento.duracion_minutos if tratamiento and tratamiento.duracion_minutos else 30
         inicio_dia = timezone.make_aware(datetime.combine(fecha, time.min))
@@ -172,8 +169,6 @@ class CitaDetalleAPI(APIView):
                 if not cita.especialista.activo:
                     raise ValidationError({"estado": "El especialista ya no está activo."})
                 Especialista.objects.select_for_update().get(pk=cita.especialista_id)
-                if not especialidad_admite_tratamiento(cita.tratamiento.area, cita.especialista.especialidad):
-                    raise ValidationError({"estado": "El especialista no corresponde al tratamiento."})
                 duracion = cita.tratamiento.duracion_minutos or 30
                 fin = cita.fecha_hora_solicitada + timedelta(minutes=duracion)
                 conflictos = Cita.objects.filter(especialista=cita.especialista, estado__in=[Cita.Estado.CONFIRMADA, Cita.Estado.REPROGRAMADA], fecha_hora_solicitada__lt=fin).exclude(pk=cita.pk).select_related("tratamiento")

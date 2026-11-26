@@ -10,7 +10,6 @@ from django.db.models import Case, IntegerField, Q, Value, When
 
 from .datos_demo import ORDEN_AREAS_TRATAMIENTO, ORDEN_PARES_TRATAMIENTO
 from .models import Especialista, HorarioAtencion, Paciente, Sucursal, Tratamiento, Cita
-from .validaciones import especialidad_admite_tratamiento
 
 
 class EspecialistaGestionForm(forms.ModelForm):
@@ -159,11 +158,7 @@ class CitaGestionForm(forms.ModelForm):
 
     def clean(self):
         datos = super().clean()
-        tratamiento = datos.get("tratamiento")
-        especialista = datos.get("especialista")
         fecha = datos.get("fecha_hora_solicitada")
-        if tratamiento and especialista and not especialidad_admite_tratamiento(tratamiento.area, especialista.especialidad):
-            self.add_error("especialista", "Este especialista no corresponde al área del tratamiento.")
         if fecha:
             from django.utils import timezone
             if fecha <= timezone.now():

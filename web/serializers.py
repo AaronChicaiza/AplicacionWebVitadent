@@ -10,7 +10,7 @@ from django.utils import timezone
 from rest_framework import serializers
 
 from .models import Cita, Conversacion, Especialista, MensajeConversacion, Paciente, Sucursal, Tratamiento
-from .validaciones import especialidad_admite_tratamiento, validar_identificacion_ecuador
+from .validaciones import validar_identificacion_ecuador
 
 
 class TratamientoSerializer(serializers.ModelSerializer):
@@ -70,8 +70,6 @@ class SolicitudWhatsAppSerializer(serializers.Serializer):
             especialista = Especialista.objects.filter(nombre_completo__iexact=especialista_nombre, activo=True).first()
             if not especialista:
                 raise serializers.ValidationError({"especialista": "El especialista no está en el catálogo activo."})
-            if not especialidad_admite_tratamiento(tratamiento.area, especialista.especialidad):
-                raise serializers.ValidationError({"especialista": "Ese especialista no corresponde al área elegida."})
             attrs["especialista_obj"] = especialista
         else:
             attrs["especialista_obj"] = None

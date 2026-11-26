@@ -30,7 +30,6 @@ from .datos_demo import ESPECIALISTAS, GRUPOS_TRATAMIENTOS, DESCRIPCIONES_PROCED
 from .models import AccesoPersonal, Cita, CitaEvento, Conversacion, Especialista, EventoAuditoria, HorarioAtencion, MensajeConversacion, Paciente, Sucursal, Tratamiento
 from .serializers import OperacionCitaWhatsAppSerializer, SolicitudWhatsAppSerializer
 from .servicios_whatsapp import enviar_mensaje_whatsapp, firma_meta_valida, procesar_evento_whatsapp
-from .validaciones import especialidad_admite_tratamiento
 from .forms_gestion import (
     CitaGestionForm,
     EspecialistaGestionForm,
@@ -556,8 +555,6 @@ def _validar_bloque_cita(cita):
     """Comprueba agenda y solapamientos antes de mover una cita ya confirmada."""
     if not cita.especialista or not cita.especialista.activo:
         return "Asigna un especialista activo antes de reprogramar esta cita."
-    if not especialidad_admite_tratamiento(cita.tratamiento.area, cita.especialista.especialidad):
-        return "El especialista seleccionado no corresponde al tratamiento."
     if cita.fecha_hora_solicitada <= timezone.now():
         return "La nueva fecha debe ser futura."
 
@@ -632,7 +629,7 @@ def gestion_citas(request):
             _auditar_gestion(request, "cancelar_cita", cita)
             messages.success(request, f"La cita {cita.codigo} quedó cancelada.")
         elif accion == "confirmar" and cita.estado in {Cita.Estado.SOLICITADA, Cita.Estado.REPROGRAMADA}:
-            especialista_compatible = bool(cita.especialista and cita.especialista.activo and especialidad_admite_tratamiento(cita.tratamiento.area, cita.especialista.especialidad))
+            especialista_activo = bool(cita.especialista and cita.especialista.activo)
             duracion = cita.tratamiento.duracion_minutos or 30
             fin_solicitado = cita.fecha_hora_solicitada + timedelta(minutes=duracion)
             conflicto = False
@@ -646,8 +643,8 @@ def gestion_citas(request):
                     otra.fecha_hora_solicitada + timedelta(minutes=otra.tratamiento.duracion_minutos or 30) > cita.fecha_hora_solicitada
                     for otra in existentes
                 )
-            if not especialista_compatible:
-                messages.error(request, "El tratamiento no corresponde a la especialidad del profesional asignado. Corrige la asignación antes de confirmar.")
+            if not especialista_activo:
+                messages.error(request, "Asigna un especialista activo antes de confirmar.")
             elif timezone.localtime(fin_solicitado).date() != timezone.localtime(cita.fecha_hora_solicitada).date():
                 messages.error(request, "La cita debe terminar el mismo día.")
             elif conflicto:

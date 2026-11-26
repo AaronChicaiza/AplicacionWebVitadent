@@ -9,7 +9,7 @@ from django.core.exceptions import ValidationError
 from django.utils import timezone
 
 from .models import Cita, CitaEvento, Especialista, Paciente, Tratamiento
-from .validaciones import especialidad_admite_tratamiento, validar_identificacion_ecuador
+from .validaciones import validar_identificacion_ecuador
 
 
 def normalizar(texto):
@@ -229,8 +229,6 @@ def responder_solicitud(request, texto):
             return {"respuesta": "No envié la solicitud. Puedes empezar otra cuando quieras; escribe «reservar cita».", "reiniciar": True}
         tratamiento = Tratamiento.objects.get(pk=datos["tratamiento_id"], activo=True)
         especialista = Especialista.objects.filter(pk=datos.get("especialista_id"), activo=True).first()
-        if especialista and not especialidad_admite_tratamiento(tratamiento.area, especialista.especialidad):
-            return {"respuesta": "Ese profesional no figura en el catálogo para el área seleccionada. Inicia una nueva solicitud y elige «cualquiera» para que recepción asigne."}
         fecha_hora = datetime.fromisoformat(datos["fecha_hora"])
         with transaction.atomic():
             paciente, creado = Paciente.objects.get_or_create(
