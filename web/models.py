@@ -141,6 +141,8 @@ class Cita(models.Model):
     idempotency_key = models.CharField(max_length=64, unique=True, null=True, blank=True)
     fecha_hora_solicitada = models.DateTimeField()
     estado = models.CharField(max_length=16, choices=Estado.choices, default=Estado.SOLICITADA)
+    comentario = models.TextField(blank=True, max_length=1000)
+    monto_total = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     monto_ingreso = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     atendida_en = models.DateTimeField(null=True, blank=True)
     codigo = models.CharField(max_length=12, unique=True, default=generar_codigo_cita)
@@ -153,6 +155,12 @@ class Cita(models.Model):
 
     def __str__(self):
         return f"{self.codigo} · {self.paciente} · {self.fecha_hora_solicitada:%d/%m/%Y %H:%M}"
+
+    @property
+    def saldo_pendiente(self):
+        if self.monto_total is None:
+            return None
+        return self.monto_total - (self.monto_ingreso or 0)
 
 
 class Conversacion(models.Model):

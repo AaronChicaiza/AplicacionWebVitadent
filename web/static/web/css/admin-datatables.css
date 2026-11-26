@@ -58,18 +58,22 @@
 /* Citas: las acciones se distribuyen dentro de su columna. */
 #tabla-citas { width: 100% !important; table-layout: fixed; }
 #tabla-citas th, #tabla-citas td { min-width: 0; overflow-wrap: anywhere; padding-left: 8px; padding-right: 8px; }
-#tabla-citas th:nth-child(1) { width: 19%; }
-#tabla-citas th:nth-child(2) { width: 15%; }
-#tabla-citas th:nth-child(3) { width: 15%; }
-#tabla-citas th:nth-child(4) { width: 18%; }
-#tabla-citas th:nth-child(5) { width: 11%; }
-#tabla-citas th:nth-child(6) { width: 22%; }
+#tabla-citas th:nth-child(1) { width: 13%; }
+#tabla-citas th:nth-child(2) { width: 11%; }
+#tabla-citas th:nth-child(3) { width: 12%; }
+#tabla-citas th:nth-child(4) { width: 13%; }
+#tabla-citas th:nth-child(5) { width: 15%; }
+#tabla-citas th:nth-child(6) { width: 16%; }
+#tabla-citas th:nth-child(7) { width: 8%; }
+#tabla-citas th:nth-child(8) { width: 12%; }
 #tabla-citas .schedule-specialist-label { white-space: normal; }
 #tabla-citas .cita-actions { display: grid; gap: 8px; justify-content: stretch; white-space: normal; min-width: 0; }
-#tabla-citas .cita-actions-main { display: flex; align-items: center; gap: 8px; min-width: 0; }
+#tabla-citas .cita-actions-main { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; min-width: 0; }
 #tabla-citas .cita-actions form { min-width: 0; }
-#tabla-citas .cita-actions form.attendance-form { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 5px; width: 100%; min-width: 0; margin: 0; }
-#tabla-citas .attendance-form input { width: 100%; min-width: 0; height: 34px; }
+#tabla-citas .cita-note { display: block; max-height: 5.5em; overflow: auto; line-height: 1.4; white-space: normal; }
+#tabla-citas .cita-payment { display: grid; gap: 2px; font-size: 11px; line-height: 1.35; }
+#tabla-citas .cita-payment span { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 3px; }
+#tabla-citas .cita-payment span:last-child { color: #145b54; }
 #tabla-citas .cita-action-button { display: inline-flex; align-items: center; justify-content: center; gap: 5px; min-height: 34px; padding: 5px 8px; border: 1px solid #9ac8bf; border-radius: 7px; background: #eaf7f3; color: #145b54; font-size: 11px; font-weight: 700; cursor: pointer; }
 #tabla-citas .cita-action-button:hover { background: #d3eee6; }
 #tabla-citas .cita-action-button:focus-visible { outline: 2px solid #087d83; outline-offset: 2px; }

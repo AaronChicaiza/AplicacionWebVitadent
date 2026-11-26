@@ -139,20 +139,32 @@ class CitaGestionForm(forms.ModelForm):
 
     class Meta:
         model = Cita
-        fields = ("paciente", "tratamiento", "especialista", "sucursal", "fecha_hora_solicitada")
+        fields = ("paciente", "tratamiento", "especialista", "sucursal", "fecha_hora_solicitada", "comentario", "monto_total", "monto_ingreso")
         labels = {
             "paciente": "Paciente",
             "tratamiento": "Tratamiento",
             "especialista": "Especialista",
             "sucursal": "Sucursal",
+            "comentario": "Nota de la cita",
+            "monto_total": "Total acordado (USD)",
+            "monto_ingreso": "Pagado hasta ahora (USD)",
+        }
+        widgets = {
+            "comentario": forms.Textarea(attrs={"rows": 3, "maxlength": 1000}),
+            "monto_total": forms.NumberInput(attrs={"min": 0, "step": "0.01", "placeholder": "0.00"}),
+            "monto_ingreso": forms.NumberInput(attrs={"min": 0, "step": "0.01", "placeholder": "0.00"}),
+        }
+        help_texts = {
+            "monto_total": "Importe acordado para esta cita. Déjalo vacío si aún no se conoce.",
+            "monto_ingreso": "Suma efectivamente recibida. El saldo se calcula automáticamente.",
         }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         orden_catalogo = Case(*[When(nombre=nombre, area=area, then=Value(indice)) for indice, (nombre, area) in enumerate(ORDEN_PARES_TRATAMIENTO)], default=Value(len(ORDEN_PARES_TRATAMIENTO)), output_field=IntegerField())
-        self.fields["tratamiento"].queryset = Tratamiento.objects.filter(activo=True).order_by(orden_catalogo)
-        self.fields["especialista"].queryset = Especialista.objects.filter(activo=True).order_by("nombre_completo")
-        self.fields["sucursal"].queryset = Sucursal.objects.filter(activa=True).order_by("nombre")
+        self.fields["tratamiento"].queryset = Tratamiento.objects.filter(Q(activo=True) | Q(pk=self.instance.tratamiento_id)).order_by(orden_catalogo)
+        self.fields["especialista"].queryset = Especialista.objects.filter(Q(activo=True) | Q(pk=self.instance.especialista_id)).order_by("nombre_completo")
+        self.fields["sucursal"].queryset = Sucursal.objects.filter(Q(activa=True) | Q(pk=self.instance.sucursal_id)).order_by("nombre")
         self.fields["especialista"].required = False
         self.fields["sucursal"].required = False
 
@@ -161,6 +173,17 @@ class CitaGestionForm(forms.ModelForm):
         fecha = datos.get("fecha_hora_solicitada")
         if fecha:
             from django.utils import timezone
-            if fecha <= timezone.now():
+            fecha_cambio = not self.instance.pk or fecha.replace(second=0, microsecond=0) != self.instance.fecha_hora_solicitada.replace(second=0, microsecond=0)
+            if fecha <= timezone.now() and fecha_cambio and self.instance.estado != Cita.Estado.ATENDIDA:
                 self.add_error("fecha_hora_solicitada", "Selecciona una fecha futura.")
+        total = datos.get("monto_total")
+        pagado = datos.get("monto_ingreso")
+        if total is not None and total < 0:
+            self.add_error("monto_total", "El total no puede ser negativo.")
+        if pagado is not None and pagado < 0:
+            self.add_error("monto_ingreso", "Lo pagado no puede ser negativo.")
+        if pagado is not None and total is None:
+            self.add_error("monto_total", "Indica el total acordado para calcular el saldo.")
+        elif total is not None and pagado is not None and pagado > total:
+            self.add_error("monto_ingreso", "Lo pagado no puede superar el total acordado.")
         return datos

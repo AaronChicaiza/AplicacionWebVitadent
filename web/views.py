@@ -4,7 +4,7 @@ import re
 import math
 import unicodedata
 from datetime import date, datetime, timedelta
-from decimal import Decimal, InvalidOperation
+from decimal import Decimal
 from urllib.parse import quote
 
 from django.conf import settings
@@ -582,16 +582,25 @@ def gestion_citas(request):
         if accion in {"crear", "editar"}:
             pk = request.POST.get("cita_id") or request.POST.get("registro_id")
             cita_existente = get_object_or_404(Cita, pk=pk) if accion == "editar" else None
-            if cita_existente and cita_existente.estado in {Cita.Estado.CANCELADA, Cita.Estado.ATENDIDA}:
-                messages.error(request, "Las citas canceladas o atendidas no se pueden editar; el historial se conserva.")
+            if cita_existente and cita_existente.estado == Cita.Estado.CANCELADA:
+                messages.error(request, "Una cita cancelada no se puede editar.")
                 return redirect("gestion_citas")
+            fecha_previa = cita_existente.fecha_hora_solicitada if cita_existente else None
             form = CitaGestionForm(request.POST, instance=cita_existente)
             if form.is_valid():
-                fecha_previa = cita_existente.fecha_hora_solicitada if cita_existente else None
+                cambios = set(form.changed_data)
+                if cita_existente and fecha_previa and form.cleaned_data["fecha_hora_solicitada"].replace(second=0, microsecond=0) == fecha_previa.replace(second=0, microsecond=0):
+                    cambios.discard("fecha_hora_solicitada")
+                campos_agenda = {"paciente", "tratamiento", "especialista", "sucursal", "fecha_hora_solicitada"}
+                if cita_existente and cita_existente.estado == Cita.Estado.ATENDIDA and cambios & campos_agenda:
+                    messages.error(request, "En una cita atendida solo se pueden modificar la nota y los importes.")
+                    return redirect("gestion_citas")
                 cita = form.save(commit=False)
+                if "fecha_hora_solicitada" not in cambios and fecha_previa:
+                    cita.fecha_hora_solicitada = fecha_previa
                 cita_previa = cita_existente
                 with transaction.atomic():
-                    if cita_previa and cita_previa.estado in {Cita.Estado.CONFIRMADA, Cita.Estado.REPROGRAMADA}:
+                    if cita_previa and cambios & campos_agenda and cita_previa.estado in {Cita.Estado.CONFIRMADA, Cita.Estado.REPROGRAMADA}:
                         if not cita.especialista_id:
                             messages.error(request, "Asigna un especialista activo antes de reprogramar esta cita.")
                             return redirect("gestion_citas")
@@ -605,7 +614,7 @@ def gestion_citas(request):
                     if cita_previa is None:
                         CitaEvento.objects.create(cita=cita, accion=CitaEvento.Accion.SOLICITADA, actor=request.user)
                         mensaje = f"Se registró la solicitud {cita.codigo}. Aún debe confirmarse desde el panel."
-                    else:
+                    elif cambios & campos_agenda:
                         CitaEvento.objects.create(
                             cita=cita,
                             accion=CitaEvento.Accion.REPROGRAMADA,
@@ -615,6 +624,8 @@ def gestion_citas(request):
                             actor=request.user,
                         )
                         mensaje = f"Se actualizaron los datos de la cita {cita.codigo}."
+                    else:
+                        mensaje = f"Se actualizaron la nota y los importes de la cita {cita.codigo}."
                     _auditar_gestion(request, "crear_cita" if cita_previa is None else "editar_cita", cita)
                 messages.success(request, mensaje)
             else:
@@ -678,28 +689,15 @@ def gestion_citas(request):
                     _auditar_gestion(request, "confirmar_cita", cita)
                 messages.success(request, f"La cita {cita.codigo} quedó confirmada.")
         elif accion == "atender" and cita.estado in {Cita.Estado.CONFIRMADA, Cita.Estado.REPROGRAMADA}:
-            try:
-                monto = Decimal(request.POST.get("monto_ingreso", "").strip().replace(",", "."))
-                if not monto.is_finite() or monto < 0 or monto > Decimal("99999999.99") or monto.as_tuple().exponent < -2:
-                    raise InvalidOperation
-            except (InvalidOperation, AttributeError):
-                messages.error(request, "Ingresa el valor cobrado con hasta dos decimales; puede ser 0.00 si no hubo ingreso.")
+            if cita.fecha_hora_solicitada > timezone.now():
+                messages.error(request, "No se puede registrar como atendida antes de la fecha de la cita.")
             else:
-                if cita.fecha_hora_solicitada > timezone.now():
-                    messages.error(request, "No se puede registrar como atendida antes de la fecha de la cita.")
-                else:
-                    cita.estado = Cita.Estado.ATENDIDA
-                    cita.monto_ingreso = monto
-                    cita.atendida_en = timezone.now()
-                    cita.save(update_fields=["estado", "monto_ingreso", "atendida_en"])
-                    CitaEvento.objects.create(
-                        cita=cita,
-                        accion=CitaEvento.Accion.ATENDIDA,
-                        motivo=f"Ingreso registrado: USD {monto:.2f}",
-                        actor=request.user,
-                    )
-                    _auditar_gestion(request, "registrar_atencion", cita)
-                    messages.success(request, f"Se registró la atención y el ingreso de la cita {cita.codigo}.")
+                cita.estado = Cita.Estado.ATENDIDA
+                cita.atendida_en = timezone.now()
+                cita.save(update_fields=["estado", "atendida_en"])
+                CitaEvento.objects.create(cita=cita, accion=CitaEvento.Accion.ATENDIDA, actor=request.user)
+                _auditar_gestion(request, "registrar_atencion", cita)
+                messages.success(request, f"La cita {cita.codigo} quedó registrada como atendida.")
         else:
             messages.warning(request, "La acción no corresponde al estado actual de la cita.")
         return redirect("gestion_citas")
