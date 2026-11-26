@@ -69,18 +69,20 @@ class TratamientoGestionForm(forms.ModelForm):
 class PacienteGestionForm(forms.ModelForm):
     class Meta:
         model = Paciente
-        fields = ("nombre_completo", "identificacion", "telefono", "correo")
+        fields = ("nombre_completo", "identificacion", "telefono", "correo", "nota")
         labels = {
             "nombre_completo": "Nombre completo",
             "identificacion": "Identificación",
             "telefono": "Teléfono",
             "correo": "Correo electrónico",
+            "nota": "Nota interna",
         }
         widgets = {
             "nombre_completo": forms.TextInput(attrs={"maxlength": 160, "autocomplete": "name"}),
             "identificacion": forms.TextInput(attrs={"maxlength": 13, "inputmode": "numeric"}),
             "telefono": forms.TextInput(attrs={"maxlength": 20, "autocomplete": "tel"}),
             "correo": forms.EmailInput(attrs={"maxlength": 254, "autocomplete": "email"}),
+            "nota": forms.Textarea(attrs={"maxlength": 1000, "rows": 3}),
         }
 
     def clean_identificacion(self):

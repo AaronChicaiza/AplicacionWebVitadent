@@ -13,7 +13,7 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from .models import Cita, CitaEvento, Conversacion, Especialista, EventoAuditoria, HorarioAtencion, Paciente, Sucursal, Tratamiento
+from .models import Cita, CitaEvento, Conversacion, Especialista, EventoAuditoria, Paciente, Sucursal, Tratamiento
 from .serializers import (
     CambioEstadoCitaSerializer,
     CitaLecturaSerializer,
@@ -102,22 +102,8 @@ class DisponibilidadAPI(APIView):
             fecha_hora_solicitada__gte=inicio_dia,
             fecha_hora_solicitada__lt=fin_dia,
         ).select_related("tratamiento").only("fecha_hora_solicitada", "tratamiento__duracion_minutos"))
-        horarios = HorarioAtencion.objects.filter(especialista=especialista, dia_semana=fecha.weekday(), activo=True)
+        # La clínica asigna el horario al confirmar; aquí no se prometen franjas libres.
         bloques = []
-        ahora = timezone.now()
-        for horario in horarios:
-            cursor = datetime.combine(fecha, horario.hora_inicio)
-            limite = datetime.combine(fecha, horario.hora_fin)
-            paso = timedelta(minutes=duracion)
-            while cursor + paso <= limite:
-                inicio = timezone.make_aware(cursor)
-                fin = inicio + paso
-                if inicio > ahora and not any(
-                    otra.fecha_hora_solicitada < fin and otra.fecha_hora_solicitada + timedelta(minutes=otra.tratamiento.duracion_minutos or 30) > inicio
-                    for otra in ocupadas
-                ):
-                    bloques.append({"inicio": inicio.isoformat(), "fin": fin.isoformat()})
-                cursor += paso
         return Response({"fecha": fecha.isoformat(), "especialista": especialista.pk, "duracion_minutos": duracion, "bloques": bloques})
 
 
@@ -188,11 +174,7 @@ class CitaDetalleAPI(APIView):
                 Especialista.objects.select_for_update().get(pk=cita.especialista_id)
                 if not especialidad_admite_tratamiento(cita.tratamiento.area, cita.especialista.especialidad):
                     raise ValidationError({"estado": "El especialista no corresponde al tratamiento."})
-                local = timezone.localtime(cita.fecha_hora_solicitada)
                 duracion = cita.tratamiento.duracion_minutos or 30
-                horario = HorarioAtencion.objects.filter(especialista=cita.especialista, dia_semana=local.weekday(), activo=True, hora_inicio__lte=local.time(), hora_fin__gte=(local + timedelta(minutes=duracion)).time()).exists()
-                if not horario:
-                    raise ValidationError({"estado": "No hay un horario de atención configurado para ese bloque."})
                 fin = cita.fecha_hora_solicitada + timedelta(minutes=duracion)
                 conflictos = Cita.objects.filter(especialista=cita.especialista, estado__in=[Cita.Estado.CONFIRMADA, Cita.Estado.REPROGRAMADA], fecha_hora_solicitada__lt=fin).exclude(pk=cita.pk).select_related("tratamiento")
                 if any(otra.fecha_hora_solicitada + timedelta(minutes=otra.tratamiento.duracion_minutos or 30) > cita.fecha_hora_solicitada for otra in conflictos):

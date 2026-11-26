@@ -8,7 +8,7 @@ from django.db import transaction
 from django.core.exceptions import ValidationError
 from django.utils import timezone
 
-from .models import Cita, CitaEvento, Especialista, HorarioAtencion, Paciente, Tratamiento
+from .models import Cita, CitaEvento, Especialista, Paciente, Tratamiento
 from .validaciones import especialidad_admite_tratamiento, validar_identificacion_ecuador
 
 
@@ -84,29 +84,8 @@ def responder_solicitud(request, texto):
         hoy = timezone.localdate()
         if dia < hoy or dia > hoy + timedelta(days=90):
             return {"respuesta": "La consulta debe ser para hoy o dentro de los próximos 90 días."}
-        tratamiento = Tratamiento.objects.get(pk=estado["tratamiento_id"], activo=True)
-        duracion = tratamiento.duracion_minutos or 30
-        candidatos = []
-        for horario in HorarioAtencion.objects.filter(dia_semana=dia.weekday(), activo=True, especialista__activo=True).select_related("especialista"):
-            if not especialidad_admite_tratamiento(tratamiento.area, horario.especialista.especialidad):
-                continue
-            inicio = timezone.make_aware(datetime.combine(dia, horario.hora_inicio), timezone.get_current_timezone())
-            fin_bloque = timezone.make_aware(datetime.combine(dia, horario.hora_fin), timezone.get_current_timezone())
-            paso = 30
-            actual = inicio
-            while actual + timedelta(minutes=duracion) <= fin_bloque:
-                fin = actual + timedelta(minutes=duracion)
-                if actual > timezone.now():
-                    ocupadas = Cita.objects.filter(especialista=horario.especialista, estado__in=[Cita.Estado.CONFIRMADA, Cita.Estado.REPROGRAMADA], fecha_hora_solicitada__lt=fin).select_related("tratamiento")
-                    cruce = any(c.fecha_hora_solicitada + timedelta(minutes=c.tratamiento.duracion_minutos or 30) > actual for c in ocupadas)
-                    if not cruce:
-                        candidatos.append((actual, horario.especialista.nombre_completo))
-                actual += timedelta(minutes=paso)
         request.session.pop("flujo_cita", None)
-        if not candidatos:
-            return {"respuesta": "No hay bloques visibles para ese tratamiento y día, o la clínica aún no configuró horarios individuales. Recepción debe verificar la disponibilidad."}
-        opciones = "; ".join(f"{nombre}: {hora:%H:%M}" for hora, nombre in candidatos[:10])
-        return {"respuesta": f"Bloques disponibles registrados para {dia:%d/%m/%Y}: {opciones}. Son horarios libres en el sistema; puedes iniciar una solicitud para reservar uno."}
+        return {"respuesta": f"Para {dia:%d/%m/%Y}, indícame la hora que prefieres. Recepción asignará al especialista y confirmará el horario después de revisar sus citas ocupadas."}
 
     if estado["paso"] == "verificar_identificacion":
         try:

@@ -17,10 +17,11 @@ class Command(BaseCommand):
             ("Dra. Daysi Amores", "Odontología general"),
             ("Dra. Karen Iza", "Odontología general"),
             ("Dr. Wilson Moya", "Rehabilitación oral"),
-            ("Dr. Santiago Romero", "Implantología"),
         ]
         for nombre, especialidad in equipo:
             Especialista.objects.update_or_create(nombre_completo=nombre, defaults={"especialidad": especialidad, "activo": True})
+
+        Especialista.objects.filter(nombre_completo="Dr. Santiago Romero", activo=True).update(activo=False)
 
         catalogo = [(procedimiento, grupo["nombre"]) for grupo in GRUPOS_TRATAMIENTOS for procedimiento in grupo["procedimientos"]]
         pares_catalogo = set(catalogo)

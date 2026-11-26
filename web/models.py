@@ -108,6 +108,7 @@ class Paciente(models.Model):
         validators=[RegexValidator(r"^[0-9+() -]{7,20}$", "Ingresa un teléfono válido.")],
     )
     correo = models.EmailField(blank=True)
+    nota = models.TextField(blank=True, max_length=1000)
     creado_en = models.DateTimeField(auto_now_add=True)
 
     class Meta:

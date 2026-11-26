@@ -26,7 +26,7 @@ from django.db.models import Count, Max, OuterRef, Q, Subquery, Sum
 from django.db.models.functions import TruncDate, TruncMonth, TruncWeek
 from django.utils import timezone
 
-from .datos_demo import ESPECIALISTAS, GRUPOS_TRATAMIENTOS, ordenar_catalogo_tratamientos
+from .datos_demo import ESPECIALISTAS, GRUPOS_TRATAMIENTOS, DESCRIPCIONES_PROCEDIMIENTOS, ordenar_catalogo_tratamientos
 from .models import AccesoPersonal, Cita, CitaEvento, Conversacion, Especialista, EventoAuditoria, HorarioAtencion, MensajeConversacion, Paciente, Sucursal, Tratamiento
 from .serializers import OperacionCitaWhatsAppSerializer, SolicitudWhatsAppSerializer
 from .servicios_whatsapp import enviar_mensaje_whatsapp, firma_meta_valida, procesar_evento_whatsapp
@@ -82,7 +82,12 @@ def healthz(request):
 
 
 def tratamientos(request):
-    return render(request, "web/tratamientos.html", contexto_base())
+    contexto = contexto_base()
+    contexto["grupos_detalle"] = [
+        {**grupo, "detalles": [{"nombre": nombre, "descripcion": DESCRIPCIONES_PROCEDIMIENTOS.get(nombre, "El profesional explica los pasos después de valorar tu caso.") } for nombre in grupo["procedimientos"]]}
+        for grupo in contexto["grupos_tratamientos"]
+    ]
+    return render(request, "web/tratamientos.html", contexto)
 
 
 def especialistas(request):
@@ -278,10 +283,6 @@ def api_whatsapp_reprogramar_cita(request):
             return JsonResponse({"error": "Recepción debe revisar esta solicitud de reprogramación."}, status=409)
         Especialista.objects.select_for_update().get(pk=cita.especialista_id)
         duracion = cita.tratamiento.duracion_minutos or 30
-        local = timezone.localtime(nueva_fecha)
-        horario = HorarioAtencion.objects.filter(especialista=cita.especialista, dia_semana=local.weekday(), activo=True, hora_inicio__lte=local.time(), hora_fin__gte=(local + timedelta(minutes=duracion)).time()).exists()
-        if not horario:
-            return JsonResponse({"error": "El horario propuesto no está dentro de la agenda del especialista."}, status=409)
         fin = nueva_fecha + timedelta(minutes=duracion)
         ocupadas = Cita.objects.filter(especialista=cita.especialista, estado__in=[Cita.Estado.CONFIRMADA, Cita.Estado.REPROGRAMADA], fecha_hora_solicitada__lt=fin).exclude(pk=cita.pk).select_related("tratamiento")
         if any(otra.fecha_hora_solicitada + timedelta(minutes=otra.tratamiento.duracion_minutos or 30) > nueva_fecha for otra in ocupadas):
@@ -560,19 +561,10 @@ def _validar_bloque_cita(cita):
     if cita.fecha_hora_solicitada <= timezone.now():
         return "La nueva fecha debe ser futura."
 
-    inicio_local = timezone.localtime(cita.fecha_hora_solicitada)
     duracion = cita.tratamiento.duracion_minutos or 30
     fin = cita.fecha_hora_solicitada + timedelta(minutes=duracion)
-    fin_local = timezone.localtime(fin)
-    horario = HorarioAtencion.objects.filter(
-        especialista=cita.especialista,
-        dia_semana=inicio_local.weekday(),
-        activo=True,
-        hora_inicio__lte=inicio_local.time(),
-        hora_fin__gt=inicio_local.time(),
-    ).first()
-    if not horario or fin_local.date() != inicio_local.date() or fin_local.time() > horario.hora_fin:
-        return "La nueva fecha no cabe dentro de un horario activo del especialista."
+    if timezone.localtime(fin).date() != timezone.localtime(cita.fecha_hora_solicitada).date():
+        return "La cita debe terminar el mismo día."
 
     otras = Cita.objects.filter(
         especialista=cita.especialista,
@@ -640,22 +632,11 @@ def gestion_citas(request):
             _auditar_gestion(request, "cancelar_cita", cita)
             messages.success(request, f"La cita {cita.codigo} quedó cancelada.")
         elif accion == "confirmar" and cita.estado in {Cita.Estado.SOLICITADA, Cita.Estado.REPROGRAMADA}:
-            horario = None
-            cita_local = timezone.localtime(cita.fecha_hora_solicitada)
-            if cita.especialista_id:
-                horario = HorarioAtencion.objects.filter(
-                    especialista=cita.especialista,
-                    dia_semana=cita_local.weekday(),
-                    activo=True,
-                    hora_inicio__lte=cita_local.time(),
-                    hora_fin__gt=cita_local.time(),
-                ).first()
-            especialista_compatible = bool(cita.especialista and especialidad_admite_tratamiento(cita.tratamiento.area, cita.especialista.especialidad))
+            especialista_compatible = bool(cita.especialista and cita.especialista.activo and especialidad_admite_tratamiento(cita.tratamiento.area, cita.especialista.especialidad))
             duracion = cita.tratamiento.duracion_minutos or 30
             fin_solicitado = cita.fecha_hora_solicitada + timedelta(minutes=duracion)
-            cabe_en_bloque = bool(horario and timezone.localtime(fin_solicitado).time() <= horario.hora_fin)
             conflicto = False
-            if horario:
+            if cita.especialista_id:
                 existentes = Cita.objects.filter(
                     especialista=cita.especialista,
                     estado__in=[Cita.Estado.CONFIRMADA, Cita.Estado.REPROGRAMADA],
@@ -667,8 +648,8 @@ def gestion_citas(request):
                 )
             if not especialista_compatible:
                 messages.error(request, "El tratamiento no corresponde a la especialidad del profesional asignado. Corrige la asignación antes de confirmar.")
-            elif not horario or not cabe_en_bloque:
-                messages.error(request, "No se puede confirmar: asigna un especialista y configura su horario individual para ese día y hora.")
+            elif timezone.localtime(fin_solicitado).date() != timezone.localtime(cita.fecha_hora_solicitada).date():
+                messages.error(request, "La cita debe terminar el mismo día.")
             elif conflicto:
                 messages.error(request, "Ese bloque se cruza con otra cita confirmada. Reprograma la solicitud antes de confirmarla.")
             elif cita.fecha_hora_solicitada <= timezone.now():
@@ -768,46 +749,27 @@ def gestion_pacientes(request):
 
 @staff_member_required(login_url="acceso_personal")
 def gestion_agenda(request):
-    if request.method == "POST":
-        accion = request.POST.get("accion", "")
-        horario = get_object_or_404(HorarioAtencion, pk=request.POST.get("registro_id")) if request.POST.get("registro_id") else None
-        if accion == "eliminar" and horario:
-            pk = horario.pk
-            horario.delete()
-            EventoAuditoria.objects.create(actor=request.user, accion="eliminar_horario", tipo_objeto="HorarioAtencion", identificador_objeto=str(pk), detalles={"accion_panel": "eliminar"})
-            messages.success(request, "Se eliminó el horario.")
-            return redirect("gestion_agenda")
-        if accion in {"crear", "editar"}:
-            form = HorarioGestionForm(request.POST, instance=horario if accion == "editar" else None)
-            if form.is_valid():
-                horario = form.save()
-                _auditar_gestion(request, "crear_horario" if accion == "crear" else "editar_horario", horario)
-                messages.success(request, "Horario de atención actualizado exitosamente." if accion == "editar" else "Horario de atención creado exitosamente.")
-            else:
-                messages.error(request, _resumen_errores_formulario(form))
-            return redirect("gestion_agenda")
+    from datetime import time
+    fecha_texto = request.GET.get("fecha", "")
+    try:
+        dia = date.fromisoformat(fecha_texto) if fecha_texto else timezone.localdate()
+    except ValueError:
+        dia = timezone.localdate()
+    inicio = timezone.make_aware(datetime.combine(dia, time.min))
+    fin = inicio + timedelta(days=1)
+    especialistas = list(Especialista.objects.filter(activo=True))
     prioridades = {nombre: indice for indice, nombre in enumerate(COLORES_AGENDA_ESPECIALISTAS)}
-    columnas = []
-    especialistas = list(Especialista.objects.filter(activo=True).prefetch_related("horarios"))
     for especialista in especialistas:
-        clave = _clave_color_especialista(especialista.nombre_completo)
         _aplicar_color_agenda(especialista)
-        especialista.horarios_agenda = list(especialista.horarios.all().order_by("dia_semana", "hora_inicio"))
-        columnas.append((prioridades.get(clave, len(prioridades)), especialista.nombre_completo.casefold(), especialista))
-    columnas.sort(key=lambda item: (item[0], item[1]))
-    horarios = list(HorarioAtencion.objects.select_related("especialista").order_by("especialista__nombre_completo", "dia_semana", "hora_inicio"))
-    for horario in horarios:
-        _aplicar_color_agenda(horario.especialista)
-    return render(
-        request,
-        "web/admin/agenda.html",
-        contexto_base(
-            seccion_activa="agenda",
-            horarios=horarios,
-            agenda_especialistas=[item[2] for item in columnas],
-            horario_form=HorarioGestionForm(),
-        ),
-    )
+    especialistas.sort(key=lambda item: (prioridades.get(_clave_color_especialista(item.nombre_completo), len(prioridades)), item.nombre_completo))
+    citas = list(Cita.objects.filter(fecha_hora_solicitada__gte=inicio, fecha_hora_solicitada__lt=fin, especialista__activo=True, estado__in=[Cita.Estado.CONFIRMADA, Cita.Estado.REPROGRAMADA, Cita.Estado.ATENDIDA]).select_related("paciente", "tratamiento", "especialista"))
+    horas = list(range(24))
+    for cita in citas:
+        _aplicar_color_agenda(cita.especialista)
+        local = timezone.localtime(cita.fecha_hora_solicitada)
+        cita.minuto_inicio = (local.hour - horas[0]) * 60 + local.minute
+        cita.alto_minutos = cita.tratamiento.duracion_minutos or 30
+    return render(request, "web/admin/agenda.html", contexto_base(seccion_activa="agenda", fecha_agenda=dia, horas_agenda=horas, especialistas_agenda=especialistas, citas_agenda=citas))
 
 
 @staff_member_required(login_url="acceso_personal")
@@ -1027,5 +989,5 @@ def espacio_especialista(request):
         total_pacientes=citas.values("paciente_id").distinct().count(),
         citas_solicitadas=citas.filter(estado=Cita.Estado.SOLICITADA).count(),
         citas_atendidas=citas.filter(estado=Cita.Estado.ATENDIDA).count(),
-        horarios=HorarioAtencion.objects.filter(especialista=perfil, activo=True),
+
     ))

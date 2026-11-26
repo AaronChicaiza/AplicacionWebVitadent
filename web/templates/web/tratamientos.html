@@ -5,11 +5,11 @@
 <section class="page-hero"><div class="container"><p class="crumbs"><a href="{% url 'inicio' %}">Inicio</a> › Tratamientos</p><h1>Tratamientos y áreas de atención</h1><p>Revisa los procedimientos disponibles en VitaDent. El profesional determinará el tratamiento indicado después de la valoración.</p></div></section>
 <section class="section section-tint"><div class="container"><div class="section-head"><h2>Atención odontológica según tus necesidades</h2><p>Los costos no se muestran en este sitio. Consulta con la clínica para recibir información según una valoración profesional.</p></div>
   <div class="svc-grid treatment-catalog">
-    {% for grupo in grupos_tratamientos %}
+    {% for grupo in grupos_detalle %}
       <article class="treatment-category" id="{{ grupo.id }}">
         <img class="treatment-category-image" src="{% static grupo.imagen %}" alt="{{ grupo.alt }}" loading="lazy">
         <div class="treatment-category-content"><h3>{{ grupo.nombre }}</h3>
-          <ul class="treatment-items">{% for procedimiento in grupo.procedimientos %}<li>{{ procedimiento }}</li>{% endfor %}</ul>
+          <div class="treatment-details">{% for procedimiento in grupo.detalles %}<details><summary>{{ procedimiento.nombre }}</summary><p>{{ procedimiento.descripcion }}</p><p class="treatment-illustration-note">Imagen referencial del área; la técnica concreta depende de la valoración profesional.</p></details>{% endfor %}</div>
         </div>
       </article>
     {% endfor %}
