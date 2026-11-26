@@ -9,6 +9,7 @@ urlpatterns = [
     # Sitio público
     path("", views.inicio, name="inicio"),
     path("tratamientos/", views.tratamientos, name="tratamientos"),
+    path("tratamientos/<slug:area_id>/", views.detalle_area_tratamiento, name="detalle_area_tratamiento"),
     path("equipo/", views.especialistas, name="especialistas"),
     path("citas/", views.asistente_citas, name="asistente_citas"),
     path("api/interna/solicitudes/", views.api_interna_crear_solicitud, name="api_interna_crear_solicitud"),

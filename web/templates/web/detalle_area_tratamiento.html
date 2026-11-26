@@ -1,0 +1,24 @@
+{% extends 'web/plantilla_publica.html' %}
+{% load static %}
+{% block titulo %}{{ grupo.nombre }} · Tratamientos VitaDent{% endblock %}
+{% block css_extra %}<link rel="stylesheet" href="{% static 'web/css/tratamientos-detalle.css' %}">{% endblock %}
+{% block contenido %}
+<section class="page-hero treatment-area-hero"><div class="container">
+  <p class="crumbs"><a href="{% url 'inicio' %}">Inicio</a> › <a href="{% url 'tratamientos' %}">Tratamientos</a> › {{ grupo.nombre }}</p>
+  <div class="treatment-area-intro"><div><h1>{{ grupo.nombre }}</h1><p>Conoce qué incluye cada procedimiento y para qué puede utilizarse. La elección del tratamiento depende de una valoración odontológica individual.</p><a class="treatment-back-link" href="{% url 'tratamientos' %}">← Volver a todas las áreas</a></div><img src="{% static grupo.imagen %}" alt="{{ grupo.alt }}" loading="eager"></div>
+</div></section>
+<section class="section section-tint"><div class="container">
+  <div class="section-head treatment-area-section-head"><h2>Procedimientos de {{ grupo.nombre }}</h2><p>Las imágenes son ilustraciones esquemáticas de cada procedimiento; no representan una radiografía, resultado clínico ni caso real.</p></div>
+  <div class="procedure-grid">
+    {% for procedimiento in grupo.detalles %}
+      <article class="procedure-card" id="procedimiento-{{ forloop.counter }}">
+        <img class="procedure-image" src="{% static procedimiento.imagen %}" alt="Ilustración esquemática de {{ procedimiento.nombre|lower }}" loading="lazy" width="640" height="400">
+        <div class="procedure-copy"><h3>{{ procedimiento.nombre }}</h3><div class="procedure-explanation"><div><h4>¿Qué es?</h4><p>{{ procedimiento.descripcion }}</p></div><div><h4>¿Para qué sirve?</h4><p>{{ procedimiento.proposito }}</p></div></div></div>
+      </article>
+    {% endfor %}
+  </div>
+  <p class="treatment-clinical-note">La descripción es orientativa. Tu profesional explicará la técnica, sus alternativas y los cuidados de acuerdo con tu caso.</p>
+  {% if grupo.fuentes %}<div class="treatment-sources"><h3>Información general para consultar</h3><ul>{% for titulo, enlace in grupo.fuentes %}<li><a href="{{ enlace }}" target="_blank" rel="noopener noreferrer">{{ titulo }} <span aria-hidden="true">↗</span></a></li>{% endfor %}</ul></div>{% endif %}
+</div></section>
+<section class="section"><div class="container cta-card"><div><h2>¿Quieres consultar sobre {{ grupo.nombre }}?</h2><p>Inicia una solicitud de cita y el equipo te orientará según tu necesidad.</p></div><a class="btn btn-primary btn-lg" href="{% url 'asistente_citas' %}">Agendar una cita <span aria-hidden="true">↗</span></a></div></section>
+{% endblock %}

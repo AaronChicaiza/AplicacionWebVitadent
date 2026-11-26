@@ -21,7 +21,7 @@
       <a class="brand vitadent-brand" href="{% url 'inicio' %}" aria-label="VitaDent, inicio"><img src="{% static 'web/img/vitadent-logo.png' %}" alt="VitaDent · Inteligencia odontológica"></a>
       <nav aria-label="Navegación principal"><ul class="nav-links">
         <li><a href="{% url 'inicio' %}" {% if request.path == '/' %}aria-current="page"{% endif %}>Inicio</a></li>
-        <li><a href="{% url 'tratamientos' %}" {% if request.path == '/tratamientos/' %}aria-current="page"{% endif %}>Tratamientos</a></li>
+        <li><a href="{% url 'tratamientos' %}" {% if '/tratamientos/' in request.path %}aria-current="page"{% endif %}>Tratamientos</a></li>
         <li><a href="{% url 'especialistas' %}" {% if request.path == '/equipo/' %}aria-current="page"{% endif %}>Especialistas</a></li>
         <li><a href="{% url 'acceso_personal' %}">Personal</a></li>
       </ul></nav>

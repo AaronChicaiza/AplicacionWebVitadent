@@ -1,16 +1,18 @@
 {% extends 'web/plantilla_publica.html' %}
 {% load static %}
 {% block titulo %}Tratamientos y áreas de atención · VitaDent{% endblock %}
+{% block css_extra %}<link rel="stylesheet" href="{% static 'web/css/tratamientos-detalle.css' %}">{% endblock %}
 {% block contenido %}
-<section class="page-hero"><div class="container"><p class="crumbs"><a href="{% url 'inicio' %}">Inicio</a> › Tratamientos</p><h1>Tratamientos y áreas de atención</h1><p>Revisa los procedimientos disponibles en VitaDent. El profesional determinará el tratamiento indicado después de la valoración.</p></div></section>
-<section class="section section-tint"><div class="container"><div class="section-head"><h2>Atención odontológica según tus necesidades</h2><p>Los costos no se muestran en este sitio. Consulta con la clínica para recibir información según una valoración profesional.</p></div>
+<section class="page-hero"><div class="container"><p class="crumbs"><a href="{% url 'inicio' %}">Inicio</a> › Tratamientos</p><h1>Tratamientos y áreas de atención</h1><p>Conoce los procedimientos disponibles en VitaDent. Cada caso requiere una valoración profesional para decidir qué atención corresponde.</p></div></section>
+<section class="section section-tint"><div class="container"><div class="section-head"><h2>Explora un área de atención</h2><p>Selecciona un área para ver sus procedimientos, ilustraciones y una explicación de su propósito.</p></div>
   <div class="svc-grid treatment-catalog">
-    {% for grupo in grupos_detalle %}
+    {% for grupo in grupos_tratamientos %}
       <article class="treatment-category" id="{{ grupo.id }}">
-        <img class="treatment-category-image" src="{% static grupo.imagen %}" alt="{{ grupo.alt }}" loading="lazy">
-        <div class="treatment-category-content"><h3>{{ grupo.nombre }}</h3>
-          <div class="treatment-details">{% for procedimiento in grupo.detalles %}<details><summary>{{ procedimiento.nombre }}</summary><p>{{ procedimiento.descripcion }}</p><p class="treatment-illustration-note">Imagen referencial del área; la técnica concreta depende de la valoración profesional.</p></details>{% endfor %}</div>
-        </div>
+        <a class="treatment-category-link" href="{% url 'detalle_area_tratamiento' grupo.id %}" aria-label="Ver procedimientos de {{ grupo.nombre }}">
+          <img class="treatment-category-image" src="{% static grupo.imagen %}" alt="{{ grupo.alt }}" loading="lazy">
+          <span class="treatment-category-content"><span class="treatment-category-heading">{{ grupo.nombre }}<span aria-hidden="true">↗</span></span><span class="treatment-category-count">{{ grupo.procedimientos|length }} procedimientos</span></span>
+        </a>
+        <ul class="treatment-items treatment-category-list">{% for procedimiento in grupo.procedimientos %}<li>{{ procedimiento }}</li>{% endfor %}</ul>
       </article>
     {% endfor %}
   </div>

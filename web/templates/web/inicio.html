@@ -26,7 +26,7 @@
   <div class="section-head center"><span class="eyebrow">Áreas de atención</span><h2>El cuidado adecuado para cada necesidad.</h2><p>Explora los servicios que constan en la información de VitaDent. La indicación de tratamiento se define con un profesional.</p></div>
   <div class="svc-grid treatment-catalog home-treatment-catalog">
     {% for grupo in grupos_tratamientos %}
-    <article class="treatment-category" id="inicio-{{ grupo.id }}"><img class="treatment-category-image" src="{% static grupo.imagen %}" alt="{{ grupo.alt }}" loading="lazy"><div class="treatment-category-content"><h3>{{ grupo.nombre }}</h3><ul class="treatment-items">{% for procedimiento in grupo.procedimientos %}<li>{{ procedimiento }}</li>{% endfor %}</ul><a class="svc-link" href="{% url 'tratamientos' %}#{{ grupo.id }}">Ver área <span aria-hidden="true">→</span></a></div></article>
+    <article class="treatment-category" id="inicio-{{ grupo.id }}"><img class="treatment-category-image" src="{% static grupo.imagen %}" alt="{{ grupo.alt }}" loading="lazy"><div class="treatment-category-content"><h3>{{ grupo.nombre }}</h3><ul class="treatment-items">{% for procedimiento in grupo.procedimientos %}<li>{{ procedimiento }}</li>{% endfor %}</ul><a class="svc-link" href="{% url 'detalle_area_tratamiento' grupo.id %}">Ver área <span aria-hidden="true">→</span></a></div></article>
     {% endfor %}
   </div>
   <div class="section-action"><a class="btn btn-ghost" href="{% url 'tratamientos' %}">Ver todas las áreas de atención <span aria-hidden="true">↗</span></a></div>

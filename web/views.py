@@ -26,7 +26,7 @@ from django.db.models import Count, Max, OuterRef, Q, Subquery, Sum
 from django.db.models.functions import TruncDate, TruncMonth, TruncWeek
 from django.utils import timezone
 
-from .datos_demo import ESPECIALISTAS, GRUPOS_TRATAMIENTOS, DESCRIPCIONES_PROCEDIMIENTOS, ordenar_catalogo_tratamientos
+from .datos_demo import ESPECIALISTAS, GRUPOS_TRATAMIENTOS, DESCRIPCIONES_PROCEDIMIENTOS, PROPOSITOS_PROCEDIMIENTOS, FUENTES_AREAS, ordenar_catalogo_tratamientos
 from .models import AccesoPersonal, Cita, CitaEvento, Conversacion, Especialista, EventoAuditoria, HorarioAtencion, MensajeConversacion, Paciente, Sucursal, Tratamiento
 from .serializers import OperacionCitaWhatsAppSerializer, SolicitudWhatsAppSerializer
 from .servicios_whatsapp import enviar_mensaje_whatsapp, firma_meta_valida, procesar_evento_whatsapp
@@ -81,12 +81,29 @@ def healthz(request):
 
 
 def tratamientos(request):
+    return render(request, "web/tratamientos.html", contexto_base())
+
+
+def detalle_area_tratamiento(request, area_id):
     contexto = contexto_base()
-    contexto["grupos_detalle"] = [
-        {**grupo, "detalles": [{"nombre": nombre, "descripcion": DESCRIPCIONES_PROCEDIMIENTOS.get(nombre, "El profesional explica los pasos después de valorar tu caso.") } for nombre in grupo["procedimientos"]]}
-        for grupo in contexto["grupos_tratamientos"]
-    ]
-    return render(request, "web/tratamientos.html", contexto)
+    grupo = next((item for item in contexto["grupos_tratamientos"] if item["id"] == area_id), None)
+    if grupo is None:
+        from django.http import Http404
+        raise Http404("Área de tratamientos no disponible")
+    contexto["grupo"] = {
+        **grupo,
+        "fuentes": FUENTES_AREAS.get(area_id, []),
+        "detalles": [
+            {
+                "nombre": nombre,
+                "descripcion": DESCRIPCIONES_PROCEDIMIENTOS[nombre],
+                "proposito": PROPOSITOS_PROCEDIMIENTOS[nombre],
+                "imagen": f"web/img/procedimientos/{area_id}-{indice:02}.svg",
+            }
+            for indice, nombre in enumerate(grupo["procedimientos"], start=1)
+        ],
+    }
+    return render(request, "web/detalle_area_tratamiento.html", contexto)
 
 
 def especialistas(request):
