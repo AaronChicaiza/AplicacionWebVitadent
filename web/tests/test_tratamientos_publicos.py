@@ -11,6 +11,8 @@ def test_catalogo_enlaza_areas_y_cada_procedimiento_tiene_ilustracion(client):
     assert catalogo.status_code == 200
 
     for grupo in GRUPOS_TRATAMIENTOS:
+        assert grupo["imagen"].startswith("web/img/areas/")
+        assert finders.find(grupo["imagen"])
         ruta = reverse("detalle_area_tratamiento", args=[grupo["id"]])
         assert ruta in catalogo.content.decode()
         respuesta = client.get(ruta)

@@ -55,6 +55,7 @@ body{margin:0;overflow-x:hidden}
 .home-treatment-catalog .treatment-category-content{padding:1.15rem}
 .home-treatment-catalog .treatment-category h3{font-size:1.12rem}
 .home-treatment-catalog .treatment-items{grid-template-columns:1fr;font-size:.84rem}
+.image-disclaimer-text{margin:1rem 0 0;text-align:center;color:#476369;font-size:.78rem;line-height:1.5}
 .home-treatment-catalog .svc-link{margin-top:1rem}
 .access-section{padding-top:clamp(2rem,4vw,3rem)}
 .access-card{background:#fff;border:1px solid var(--line);border-radius:var(--radius-lg);box-shadow:var(--shadow-sm)}
