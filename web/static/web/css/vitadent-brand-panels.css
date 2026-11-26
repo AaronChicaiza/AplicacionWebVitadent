@@ -67,12 +67,17 @@ body.admin-body { background: var(--vd-paper); color: var(--vd-charcoal); font-f
 
 @media (max-width: 680px) { .specialist-schedule-columns { grid-template-columns: repeat(auto-fit, minmax(min(100%, 250px), 1fr)); } }
 
-.agenda-scroll { overflow-x: auto; }
-.agenda-grid { display: grid; grid-template-columns: 72px repeat(8, minmax(170px, 1fr)); min-width: max-content; }
-.agenda-corner, .agenda-doctor { position: sticky; top: 0; z-index: 2; min-height: 58px; padding: 14px 10px; background: #fff; border-bottom: 1px solid var(--vd-line); font-weight: 700; }
+.agenda-scroll { overflow-x: hidden; }
+.agenda-grid { display: grid; grid-template-columns: 58px repeat(8, minmax(0, 1fr)); width: 100%; min-width: 0; }
+.agenda-corner, .agenda-doctor { position: sticky; top: 0; z-index: 2; min-height: 46px; padding: 7px 5px; background: #fff; border-bottom: 1px solid var(--vd-line); font-weight: 700; }
 .agenda-doctor { display: flex; align-items: center; gap: 8px; background: color-mix(in srgb, var(--specialist-accent) 12%, white); border-top: 4px solid var(--specialist-accent); }
 .agenda-time-rail { color: #526969; font-variant-numeric: tabular-nums; }
-.agenda-time-rail > div { height: 60px; padding: 4px 8px; border-top: 1px solid var(--vd-line); }
-.agenda-lane { position: relative; height: 1440px; border-left: 1px solid var(--vd-line); background: repeating-linear-gradient(to bottom, #fff 0, #fff 59px, var(--vd-line) 59px, var(--vd-line) 60px); }
+.agenda-time-rail > div { height: var(--agenda-hour-size, 36px); padding: 3px 4px; border-top: 1px solid var(--vd-line); }
+.agenda-lane { position: relative; height: calc(var(--agenda-hour-size, 36px) * var(--agenda-hours, 10)); border-left: 1px solid var(--vd-line); background: repeating-linear-gradient(to bottom, #fff 0, #fff calc(var(--agenda-hour-size, 36px) - 1px), var(--vd-line) calc(var(--agenda-hour-size, 36px) - 1px), var(--vd-line) var(--agenda-hour-size, 36px)); }
 .agenda-appointment { position: absolute; left: 3px; right: 3px; z-index: 1; overflow: hidden; padding: 5px 8px; border-left: 4px solid var(--specialist-accent); border-radius: 4px; background: color-mix(in srgb, var(--specialist-accent) 18%, white); color: var(--vd-charcoal); font-size: 12px; line-height: 1.25; }
 .agenda-appointment small { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+.agenda-doctor { min-width: 0; overflow-wrap: anywhere; font-size: 11px; line-height: 1.2; }
+.agenda-doctor .specialist-label-dot { flex-shrink: 0; }
+.agenda-appointment { padding: 2px 4px; font-size: 10px; }
+@media (max-width: 850px) { .agenda-doctor { font-size: 9px; } .agenda-doctor .specialist-label-dot { width: 6px; height: 6px; flex-basis: 6px; } .agenda-appointment { font-size: 9px; } }

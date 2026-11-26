@@ -54,3 +54,23 @@
 .admin-panel .dt-paging .dt-paging-button:hover{border-color:#cbd8d2;background:#f4f8f5;color:#075d63!important}
 .admin-modal-error{color:#a43f36;font-size:11px}
 @media(max-width:700px){.admin-table-shell{padding:14px 12px}.admin-table-toolbar{align-items:flex-start;flex-direction:column}.admin-crud-form .form-row{grid-template-columns:1fr}.admin-modal .modal-body{padding:16px}.admin-panel .dt-layout-row{gap:9px}.admin-panel .dt-layout-cell{width:100%}.admin-panel .dt-search{width:100%}.admin-panel .dt-search input{width:min(100%,220px)}}
+
+/* Citas: las acciones se distribuyen dentro de su columna. */
+#tabla-citas { width: 100% !important; table-layout: fixed; }
+#tabla-citas th, #tabla-citas td { min-width: 0; overflow-wrap: anywhere; padding-left: 8px; padding-right: 8px; }
+#tabla-citas th:nth-child(1) { width: 19%; }
+#tabla-citas th:nth-child(2) { width: 15%; }
+#tabla-citas th:nth-child(3) { width: 15%; }
+#tabla-citas th:nth-child(4) { width: 18%; }
+#tabla-citas th:nth-child(5) { width: 11%; }
+#tabla-citas th:nth-child(6) { width: 22%; }
+#tabla-citas .schedule-specialist-label { white-space: normal; }
+#tabla-citas .cita-actions { flex-wrap: wrap; justify-content: flex-start; white-space: normal; }
+#tabla-citas .cita-actions form { min-width: 0; }
+#tabla-citas .attendance-form { display: flex; flex-wrap: wrap; align-items: center; gap: 4px; width: 100%; margin: 2px 0; }
+#tabla-citas .attendance-form input { width: 72px; min-width: 0; height: 34px; }
+#tabla-citas .cita-action-button { display: inline-flex; align-items: center; justify-content: center; gap: 5px; min-height: 34px; padding: 5px 8px; border: 1px solid #9ac8bf; border-radius: 7px; background: #eaf7f3; color: #145b54; font-size: 11px; font-weight: 700; cursor: pointer; }
+#tabla-citas .cita-action-button:hover { background: #d3eee6; }
+#tabla-citas .cita-action-button:focus-visible { outline: 2px solid #087d83; outline-offset: 2px; }
+#tabla-citas .admin-icon-action { flex-shrink: 0; }
+@media (max-width: 850px) { #tabla-citas th, #tabla-citas td { padding-left: 5px; padding-right: 5px; font-size: 11px; } #tabla-citas .cita-action-button span { display: none; } }

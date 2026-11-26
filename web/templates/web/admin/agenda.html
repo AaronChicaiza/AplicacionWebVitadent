@@ -1,14 +1,12 @@
 {% extends 'web/admin/plantilla_gestion.html' %}
-{% block titulo %}Agenda de citas · VitaDent<script src="/static/web/js/agenda-citas.js" defer></script>
-{% endblock %}
+{% block titulo %}Agenda de citas · VitaDent{% endblock %}
 {% block contenido_gestion %}
 <div class="admin-title-row"><div><h1>Agenda de citas</h1><p>Los turnos de cada especialista se asignan al confirmar la cita.</p></div><a class="admin-primary" href="{% url 'gestion_citas' %}">Gestionar citas</a></div>
 <form class="filter-row" method="get"><label>Fecha <input type="date" name="fecha" value="{{ fecha_agenda|date:'Y-m-d' }}"></label><button class="admin-primary" type="submit">Ver agenda</button></form>
-<section class="admin-panel"><div class="agenda-scroll"><div class="agenda-grid">
+{% if citas_agenda %}<section class="admin-panel"><div class="agenda-scroll"><div class="agenda-grid" data-hours="{{ horas_agenda|length }}">
   <div class="agenda-corner">Hora</div>{% for especialista in especialistas_agenda %}<div class="agenda-doctor {{ especialista.clase_color_agenda }}"><span class="specialist-label-dot" aria-hidden="true"></span>{{ especialista.nombre_completo }}</div>{% endfor %}
   <div class="agenda-time-rail">{% for hora in horas_agenda %}<div>{{ hora|stringformat:'02d' }}:00</div>{% endfor %}</div>
   {% for especialista in especialistas_agenda %}<div class="agenda-lane {{ especialista.clase_color_agenda }}">{% for cita in citas_agenda %}{% if cita.especialista_id == especialista.id %}<div class="agenda-appointment" data-top="{{ cita.minuto_inicio }}" data-duration="{{ cita.alto_minutos }}" title="{{ cita.paciente.nombre_completo }} · {{ cita.tratamiento.nombre }}"><strong>{{ cita.fecha_hora_solicitada|date:'H:i' }}</strong> {{ cita.paciente.nombre_completo }}<small>{{ cita.tratamiento.nombre }}</small></div>{% endif %}{% endfor %}</div>{% endfor %}
-</div></div></section>
-{% if not citas_agenda %}<p class="admin-table-empty">No hay citas confirmadas para esta fecha.</p>{% endif %}
+</div></div></section>{% else %}<p class="admin-table-empty">No hay citas confirmadas para esta fecha.</p>{% endif %}
 <script src="/static/web/js/agenda-citas.js" defer></script>
 {% endblock %}

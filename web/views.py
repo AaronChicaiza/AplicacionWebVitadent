@@ -760,11 +760,17 @@ def gestion_agenda(request):
         _aplicar_color_agenda(especialista)
     especialistas.sort(key=lambda item: (prioridades.get(_clave_color_especialista(item.nombre_completo), len(prioridades)), item.nombre_completo))
     citas = list(Cita.objects.filter(fecha_hora_solicitada__gte=inicio, fecha_hora_solicitada__lt=fin, especialista__activo=True, estado__in=[Cita.Estado.CONFIRMADA, Cita.Estado.REPROGRAMADA, Cita.Estado.ATENDIDA]).select_related("paciente", "tratamiento", "especialista"))
-    horas = list(range(24))
+    if citas:
+        primera = min(timezone.localtime(cita.fecha_hora_solicitada).hour for cita in citas)
+        ultima = max(timezone.localtime(cita.fecha_hora_solicitada + timedelta(minutes=cita.tratamiento.duracion_minutos or 30)).hour + 1 for cita in citas)
+        hora_inicial = max(0, primera - 1)
+        horas = list(range(hora_inicial, min(24, ultima + 1)))
+    else:
+        hora_inicial, horas = 0, []
     for cita in citas:
         _aplicar_color_agenda(cita.especialista)
         local = timezone.localtime(cita.fecha_hora_solicitada)
-        cita.minuto_inicio = (local.hour - horas[0]) * 60 + local.minute
+        cita.minuto_inicio = (local.hour - hora_inicial) * 60 + local.minute
         cita.alto_minutos = cita.tratamiento.duracion_minutos or 30
     return render(request, "web/admin/agenda.html", contexto_base(seccion_activa="agenda", fecha_agenda=dia, horas_agenda=horas, especialistas_agenda=especialistas, citas_agenda=citas))
 

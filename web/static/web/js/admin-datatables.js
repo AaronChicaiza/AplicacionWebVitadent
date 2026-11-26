@@ -94,7 +94,7 @@ document.addEventListener('DOMContentLoaded', function () {
       lengthMenu: [10, 25, 50, 100],
       order: [],
       autoWidth: false,
-      scrollX: true,
+      scrollX: table.id !== 'tabla-citas',
       columnDefs: actionColumn >= 0 ? [{ targets: actionColumn, orderable: false, searchable: false }] : [],
       language: language,
       layout: {
