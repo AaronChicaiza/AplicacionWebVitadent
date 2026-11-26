@@ -622,6 +622,25 @@ def gestion_citas(request):
             return redirect("gestion_citas")
 
         cita = get_object_or_404(Cita.objects.select_related("especialista", "tratamiento"), pk=request.POST.get("cita_id"))
+        if accion == "eliminar":
+            with transaction.atomic():
+                cita = get_object_or_404(Cita.objects.select_for_update(), pk=cita.pk)
+                if cita.estado != Cita.Estado.CANCELADA:
+                    messages.error(request, "Solo se pueden eliminar definitivamente las citas canceladas.")
+                else:
+                    codigo = cita.codigo
+                    identificador = cita.pk
+                    cita.eventos.all().delete()
+                    cita.delete()
+                    EventoAuditoria.objects.create(
+                        actor=request.user,
+                        accion="eliminar_cita_cancelada",
+                        tipo_objeto="Cita",
+                        identificador_objeto=str(identificador),
+                        detalles={"codigo": codigo, "estado_anterior": Cita.Estado.CANCELADA},
+                    )
+                    messages.success(request, f"La cita cancelada {codigo} se eliminó exitosamente.")
+            return redirect("gestion_citas")
         if accion == "cancelar" and cita.estado in {Cita.Estado.SOLICITADA, Cita.Estado.CONFIRMADA, Cita.Estado.REPROGRAMADA}:
             cita.estado = Cita.Estado.CANCELADA
             cita.save(update_fields=["estado"])
