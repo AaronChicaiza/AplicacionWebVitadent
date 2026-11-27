@@ -3,6 +3,10 @@ nlu:
   - intent: saludo
     examples: |
       - hola
+      - holi
+      - buenas
+      - buenos dias
+      - buenas noches
       - buenos días
       - buenas tardes, VitaDent
       - qué tal
@@ -14,6 +18,14 @@ nlu:
   - intent: reservar_cita
     examples: |
       - quiero reservar una cita
+      - quiero sacar un turno
+      - ayudeme agendando una cita
+      - quisiera agendar para mañana
+      - necesito una cita odontologica
+      - deseo reservar una consulta dental
+      - me da cita por favor
+      - quiero turno para [limpieza](tratamiento)
+      - necesito una cita para [calzas](tratamiento)
       - necesito agendar una consulta
       - quisiera sacar turno para odontología
       - me pueden ayudar con una cita dental
@@ -23,11 +35,17 @@ nlu:
   - intent: consultar_disponibilidad
     examples: |
       - qué horarios tienen disponibles
+      - hay un espacio libre esta semana
+      - que hora tiene para mañana
+      - tienen turno el viernes
+      - hay disponibilidad con la doctora [Odalis Monar](especialista)
       - hay citas para esta semana
       - quiero saber si hay espacio mañana
   - intent: cancelar_cita
     examples: |
       - quiero cancelar mi cita
+      - ya no voy a poder ir a la cita
+      - por favor anule mi turno
       - anula mi turno
       - ya no puedo asistir a mi reserva
   - intent: reprogramar_cita
@@ -35,6 +53,8 @@ nlu:
       - necesito cambiar la fecha de mi cita
       - puedo mover el turno para otro día
       - quiero reprogramar mi cita
+      - cambie mi cita para el lunes
+      - deseo mover el turno
   - intent: consultar_tratamientos
     examples: |
       - qué tratamientos ofrecen
@@ -53,6 +73,9 @@ nlu:
   - intent: solicitar_asesor_humano
     examples: |
       - quiero hablar con recepción
+      - pasame con una persona porfa
+      - quiero hablar con alguien de la clinica
+      - necesito ayuda humana
       - necesito que me atienda una persona
       - pásame con un asesor
   - intent: mensaje_fuera_de_alcance
@@ -66,11 +89,27 @@ nlu:
       - correcto
       - confirmo
       - envíala
+      - dale, si está bien
   - intent: negar
     examples: |
       - no
       - cancela
       - esos datos están mal
+      - mejor no
+      - no la envies
+  - intent: corregir_datos
+    examples: |
+      - me equivoqué en los datos
+      - quiero corregir la información
+      - escribí mal mi nombre
+      - puse mal la fecha
+      - cambiar el tratamiento
+  - intent: abandonar_flujo
+    examples: |
+      - salir de aquí
+      - ya no quiero seguir
+      - dejemos esto
+      - cancelar este proceso
   - intent: nlu_fallback
     examples: |
       - asdf qwer

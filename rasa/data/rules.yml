@@ -90,6 +90,24 @@ rules:
       - intent: negar
       - action: action_cancelar_solicitud
 
+  - rule: Corregir datos durante reserva
+    condition:
+      - active_loop: reserva_form
+    steps:
+      - intent: corregir_datos
+      - action: action_deactivate_loop
+      - active_loop: null
+      - action: action_cancelar_solicitud
+
+  - rule: Abandonar reserva
+    condition:
+      - active_loop: reserva_form
+    steps:
+      - intent: abandonar_flujo
+      - action: action_deactivate_loop
+      - active_loop: null
+      - action: action_cancelar_solicitud
+
   - rule: Consultar tratamientos
     steps:
       - intent: consultar_tratamientos
@@ -125,6 +143,42 @@ rules:
       - action: action_deactivate_loop
       - active_loop: null
       - action: utter_derivar
+
+  - rule: Abandonar cancelación
+    condition:
+      - active_loop: cancelar_form
+    steps:
+      - intent: abandonar_flujo
+      - action: action_deactivate_loop
+      - active_loop: null
+      - action: action_cancelar_solicitud
+
+  - rule: Abandonar reprogramación
+    condition:
+      - active_loop: reprogramar_form
+    steps:
+      - intent: abandonar_flujo
+      - action: action_deactivate_loop
+      - active_loop: null
+      - action: action_cancelar_solicitud
+
+  - rule: Abandonar disponibilidad
+    condition:
+      - active_loop: disponibilidad_form
+    steps:
+      - intent: abandonar_flujo
+      - action: action_deactivate_loop
+      - active_loop: null
+      - action: action_cancelar_solicitud
+
+  - rule: Abandonar consulta de cita
+    condition:
+      - active_loop: consulta_cita_form
+    steps:
+      - intent: abandonar_flujo
+      - action: action_deactivate_loop
+      - active_loop: null
+      - action: action_cancelar_solicitud
 
   - rule: Transferir cancelación a recepción
     condition:

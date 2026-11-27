@@ -13,6 +13,8 @@ intents:
   - solicitar_asesor_humano
   - afirmar
   - negar
+  - corregir_datos
+  - abandonar_flujo
   - mensaje_fuera_de_alcance
   - nlu_fallback
 

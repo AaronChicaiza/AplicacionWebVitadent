@@ -33,23 +33,40 @@ Aplicación web Django en español para el sitio público y la gestión odontol�
 5. Crea o usa una cuenta autorizada de administración: `python manage.py createsuperuser`.
 6. Inicia Django con `python manage.py runserver` y abre `http://127.0.0.1:8000/`.
 
-La base local usa SQLite. Para habilitar una cuenta de especialista, vincula su usuario con su perfil en Django Admin y configura sus horarios antes de confirmar solicitudes.
+PostgreSQL es la base principal tanto en ejecución local como en Docker. Para desarrollar con Django instalado localmente y PostgreSQL en Compose, inicia solo la base de datos y Redis:
+
+```powershell
+Copy-Item .env.example .env
+# Edita .env y reemplaza POSTGRES_PASSWORD por un secreto local propio.
+docker compose up -d db redis
+py -m venv .venv
+.venv\Scripts\Activate.ps1
+pip install -r requirements.txt
+python manage.py migrate
+python manage.py cargar_catalogo_vitadent
+python manage.py createsuperuser
+python manage.py runserver
+```
+
+El puerto PostgreSQL de Compose se publica únicamente en `127.0.0.1:5432`. Dentro de Docker Compose, la aplicación usa el hostname `db`; fuera de Compose usa `POSTGRES_HOST=127.0.0.1`. SQLite solo se habilita explícitamente para pruebas aisladas mediante `DJANGO_DATABASE_ENGINE=sqlite`; no es la base predeterminada ni se usa en producción. Para habilitar una cuenta de especialista, vincula su usuario con su perfil en Django Admin y configura horarios semanales antes de ofrecer disponibilidad.
 
 ## WhatsApp y Rasa
 
 Las variables necesarias están enumeradas en `.env.example`: número público, token de verificación, secreto de aplicación, token de acceso, identificador del número y token interno Rasa. El webhook que se registra en Meta es `https://<dominio-publico>/api/whatsapp/webhook/`; requiere HTTPS y la configuración de la aplicación y número empresarial de VitaDent.
 
-Rasa 3.6 y sus acciones corren en Python 3.10, separado del Django en Python 3.12. Para levantar el stack contenerizado con PostgreSQL y Redis, inicia Docker Desktop y ejecuta `docker compose up --build`. Compose expone Django solo en `127.0.0.1:8000`; Rasa, acciones, Redis y PostgreSQL permanecen en la red privada del proyecto.
+Rasa 3.6 y sus acciones corren en Python 3.10, separado del Django en Python 3.12. Completa `.env` con una contraseña PostgreSQL y un `VITADENT_RASA_TOKEN` aleatorios antes de iniciar todo el stack: `docker compose up --build`. Compose migra la base antes de iniciar Django. Expone Django en `127.0.0.1:8000`, PostgreSQL en `127.0.0.1:5432`; Rasa, acciones y Redis permanecen en la red privada del proyecto. Los datos persisten en volúmenes `postgres_data` y `redis_data`.
 
 ## Configuración antes de producción
 
-Configura una `DJANGO_SECRET_KEY` aleatoria de al menos 50 caracteres, `DJANGO_DEBUG=False`, hosts permitidos, credenciales únicas de PostgreSQL, Redis privado, HTTPS y secretos de Meta/Rasa. No publiques `.env`, la base de datos, claves ni datos de pacientes. La recepción debe aportar horarios reales, sucursales y políticas de confirmación/cancelación. Las solicitudes requieren revisión de disponibilidad por el personal; todavía no hay conexión con un proveedor de correo ni recordatorios programados.
+Configura una `DJANGO_SECRET_KEY` aleatoria de al menos 50 caracteres, `DJANGO_DEBUG=False`, hosts permitidos, credenciales únicas de PostgreSQL, Redis privado, HTTPS y secretos oficiales de Meta/Rasa. En PostgreSQL, las migraciones crean el esquema limpio; `cargar_catalogo_vitadent` añade el catálogo permitido. No migres datos personales reales. No publiques `.env`, la base de datos, claves ni datos de pacientes. La clínica debe configurar horarios semanales reales de los especialistas, sucursales, políticas de confirmación/cancelación y credenciales de Meta. Los mensajes de reserva siguen siendo solicitudes hasta que recepción confirme. Sin los valores oficiales de Meta el webhook puede validarse en pruebas simuladas, pero WhatsApp no está conectado en producción. No hay proveedor de correo ni recordatorios programados.
 
 ## Verificación del proyecto
 
 - Pruebas: `python -m pytest web/tests -q`.
+- PostgreSQL limpio: `docker compose up -d db`; `python manage.py migrate`; `python manage.py showmigrations`.
+- Conexión PostgreSQL desde Django: `python manage.py check --database default`.
 - Revisar configuración Django: `python manage.py check`.
 - Verificar esquema API: `python manage.py spectacular --validate --file NUL` (Windows).
 - Verificar Compose: `docker compose config --quiet`.
 
-Las pruebas locales cubren el rechazo de solicitudes internas sin token, firmas Meta, validación de campos, privacidad de citas por especialista y acceso del personal a la bandeja de WhatsApp. El modelo DIETClassifier necesita datos de entrenamiento anotados y evaluación antes de usarse en operación.
+Las pruebas existentes cubren el rechazo de solicitudes internas sin token, firmas Meta, validación de campos, privacidad de citas por especialista y acceso del personal a la bandeja de WhatsApp. Los bloques de disponibilidad se calculan desde los horarios activos en intervalos de 15 minutos y consideran solicitudes pendientes y citas confirmadas. Cada reserva vuelve a comprobar el horario dentro de una transacción que bloquea el perfil del especialista, y los cambios de estado revisan de nuevo la agenda. El modelo DIETClassifier necesita el corpus anotado de 300 mensajes y una evaluación reproducible antes de reportar F1; las metas de la tesis no son resultados medidos.

@@ -28,6 +28,7 @@ from django.utils import timezone
 
 from .datos_demo import ESPECIALISTAS, GRUPOS_TRATAMIENTOS, DESCRIPCIONES_PROCEDIMIENTOS, PROPOSITOS_PROCEDIMIENTOS, FUENTES_AREAS, ordenar_catalogo_tratamientos
 from .models import AccesoPersonal, Cita, CitaEvento, Conversacion, Especialista, EventoAuditoria, HorarioAtencion, MensajeConversacion, Paciente, Sucursal, Tratamiento
+from .agenda import bloque_disponible, bloques_disponibles
 from .serializers import OperacionCitaWhatsAppSerializer, SolicitudWhatsAppSerializer
 from .servicios_whatsapp import enviar_mensaje_whatsapp, firma_meta_valida, procesar_evento_whatsapp
 from .forms_gestion import (
@@ -140,6 +141,26 @@ def api_interna_crear_solicitud(request):
         return JsonResponse({"error": "Los datos no pasaron la validación.", "detalles": formulario.errors}, status=400)
     valores = formulario.validated_data
     with transaction.atomic():
+        existente = Cita.objects.filter(idempotency_key=valores["idempotency_key"]).first()
+        if existente:
+            return JsonResponse({"codigo": existente.codigo, "estado": existente.get_estado_display()}, status=200)
+
+        especialista_solicitado = valores.get("especialista_obj")
+        if especialista_solicitado:
+            candidatos = list(Especialista.objects.select_for_update().filter(pk=especialista_solicitado.pk, activo=True))
+        else:
+            # Bloquear los perfiles activos serializa solicitudes simultáneas "con cualquiera".
+            candidatos = list(Especialista.objects.select_for_update().filter(activo=True).order_by("pk"))
+        duracion = valores["tratamiento_obj"].duracion_minutos or 30
+        especialista_asignado = next((
+            candidato for candidato in candidatos
+            if bloque_disponible(candidato, valores["fecha_hora"], duracion)
+        ), None)
+        if not especialista_asignado:
+            return JsonResponse({
+                "error": "Ese horario no está disponible en la agenda configurada. Propón otra fecha u hora."
+            }, status=409)
+
         paciente, creado = Paciente.objects.get_or_create(
             identificacion=valores["identificacion"],
             defaults={"nombre_completo": valores["nombre"], "telefono": valores["telefono"], "correo": valores.get("correo", "")},
@@ -153,7 +174,7 @@ def api_interna_crear_solicitud(request):
             idempotency_key=valores["idempotency_key"],
             defaults={
                 "paciente": paciente,
-                "especialista": valores.get("especialista_obj"),
+                "especialista": especialista_asignado,
                 "tratamiento": valores["tratamiento_obj"],
                 "sucursal": valores.get("sucursal_obj"),
                 "fecha_hora_solicitada": valores["fecha_hora"],
@@ -180,6 +201,11 @@ def webhook_whatsapp(request):
         return JsonResponse({"error": "Método no permitido."}, status=405)
     if request.content_type != "application/json":
         return JsonResponse({"error": "Se requiere application/json."}, status=415)
+    try:
+        if int(request.META.get("CONTENT_LENGTH") or 0) > 262_144:
+            return JsonResponse({"error": "El webhook supera el tamaño permitido."}, status=413)
+    except (TypeError, ValueError):
+        return JsonResponse({"error": "Tamaño de solicitud no válido."}, status=400)
     cuerpo = request.body
     if len(cuerpo) > 262_144:
         return JsonResponse({"error": "El webhook supera el tamaño permitido."}, status=413)
@@ -299,10 +325,8 @@ def api_whatsapp_reprogramar_cita(request):
             return JsonResponse({"error": "Recepción debe revisar esta solicitud de reprogramación."}, status=409)
         Especialista.objects.select_for_update().get(pk=cita.especialista_id)
         duracion = cita.tratamiento.duracion_minutos or 30
-        fin = nueva_fecha + timedelta(minutes=duracion)
-        ocupadas = Cita.objects.filter(especialista=cita.especialista, estado__in=[Cita.Estado.CONFIRMADA, Cita.Estado.REPROGRAMADA], fecha_hora_solicitada__lt=fin).exclude(pk=cita.pk).select_related("tratamiento")
-        if any(otra.fecha_hora_solicitada + timedelta(minutes=otra.tratamiento.duracion_minutos or 30) > nueva_fecha for otra in ocupadas):
-            return JsonResponse({"error": "Ese bloque ya no está disponible. Propón otro horario."}, status=409)
+        if not bloque_disponible(cita.especialista, nueva_fecha, duracion, excluir_cita=cita.pk):
+            return JsonResponse({"error": "Ese bloque no coincide con la agenda o ya está ocupado. Propón otro horario."}, status=409)
         anterior = cita.fecha_hora_solicitada
         cita.fecha_hora_solicitada = nueva_fecha
         cita.estado = Cita.Estado.REPROGRAMADA
@@ -576,19 +600,32 @@ def _validar_bloque_cita(cita):
         return "La nueva fecha debe ser futura."
 
     duracion = cita.tratamiento.duracion_minutos or 30
-    fin = cita.fecha_hora_solicitada + timedelta(minutes=duracion)
-    if timezone.localtime(fin).date() != timezone.localtime(cita.fecha_hora_solicitada).date():
-        return "La cita debe terminar el mismo día."
+    if not bloque_disponible(cita.especialista, cita.fecha_hora_solicitada, duracion, excluir_cita=cita.pk):
+        return "Ese horario no coincide con la agenda o se cruza con otra cita o solicitud. Selecciona otro horario."
+    return ""
 
-    otras = Cita.objects.filter(
-        especialista=cita.especialista,
-        estado__in=[Cita.Estado.CONFIRMADA, Cita.Estado.REPROGRAMADA],
-        fecha_hora_solicitada__lt=fin,
-    ).exclude(pk=cita.pk).select_related("tratamiento")
-    for otra in otras:
-        fin_otra = otra.fecha_hora_solicitada + timedelta(minutes=otra.tratamiento.duracion_minutos or 30)
-        if fin_otra > cita.fecha_hora_solicitada:
-            return "Ese bloque se cruza con otra cita confirmada. Selecciona otro horario."
+
+def _confirmar_cita_en_agenda(cita_id, actor):
+    """Serializa confirmaciones del mismo especialista y valida el bloque bajo el bloqueo."""
+    with transaction.atomic():
+        cita = get_object_or_404(Cita.objects.select_related("tratamiento"), pk=cita_id)
+        if not cita.especialista_id:
+            return "Asigna un especialista activo antes de confirmar."
+        Especialista.objects.select_for_update().get(pk=cita.especialista_id)
+        cita = get_object_or_404(Cita.objects.select_for_update().select_related("especialista", "tratamiento"), pk=cita_id)
+        if cita.estado not in {Cita.Estado.SOLICITADA, Cita.Estado.REPROGRAMADA}:
+            return "La solicitud cambió de estado y ya no se puede confirmar."
+        if not cita.especialista.activo:
+            return "Asigna un especialista activo antes de confirmar."
+        if cita.fecha_hora_solicitada <= timezone.now():
+            return "La fecha solicitada ya pasó; actualízala antes de confirmar."
+        error = _validar_bloque_cita(cita)
+        if error:
+            return error
+        cita.estado = Cita.Estado.CONFIRMADA
+        cita.save(update_fields=["estado"])
+        CitaEvento.objects.create(cita=cita, accion=CitaEvento.Accion.CONFIRMADA, actor=actor)
+        EventoAuditoria.objects.create(actor=actor, accion="confirmar_cita", tipo_objeto="Cita", identificador_objeto=str(cita.pk), detalles={"origen": "panel_gestion"})
     return ""
 
 
@@ -676,34 +713,10 @@ def gestion_citas(request):
             _auditar_gestion(request, "cancelar_cita", cita)
             messages.success(request, f"La cita {cita.codigo} quedó cancelada.")
         elif accion == "confirmar" and cita.estado in {Cita.Estado.SOLICITADA, Cita.Estado.REPROGRAMADA}:
-            especialista_activo = bool(cita.especialista and cita.especialista.activo)
-            duracion = cita.tratamiento.duracion_minutos or 30
-            fin_solicitado = cita.fecha_hora_solicitada + timedelta(minutes=duracion)
-            conflicto = False
-            if cita.especialista_id:
-                existentes = Cita.objects.filter(
-                    especialista=cita.especialista,
-                    estado__in=[Cita.Estado.CONFIRMADA, Cita.Estado.REPROGRAMADA],
-                    fecha_hora_solicitada__lt=fin_solicitado,
-                ).exclude(pk=cita.pk).select_related("tratamiento")
-                conflicto = any(
-                    otra.fecha_hora_solicitada + timedelta(minutes=otra.tratamiento.duracion_minutos or 30) > cita.fecha_hora_solicitada
-                    for otra in existentes
-                )
-            if not especialista_activo:
-                messages.error(request, "Asigna un especialista activo antes de confirmar.")
-            elif timezone.localtime(fin_solicitado).date() != timezone.localtime(cita.fecha_hora_solicitada).date():
-                messages.error(request, "La cita debe terminar el mismo día.")
-            elif conflicto:
-                messages.error(request, "Ese bloque se cruza con otra cita confirmada. Reprograma la solicitud antes de confirmarla.")
-            elif cita.fecha_hora_solicitada <= timezone.now():
-                messages.error(request, "La fecha solicitada ya pasó; actualízala antes de confirmar.")
+            error = _confirmar_cita_en_agenda(cita.pk, request.user)
+            if error:
+                messages.error(request, error)
             else:
-                with transaction.atomic():
-                    cita.estado = Cita.Estado.CONFIRMADA
-                    cita.save(update_fields=["estado"])
-                    CitaEvento.objects.create(cita=cita, accion=CitaEvento.Accion.CONFIRMADA, actor=request.user)
-                    _auditar_gestion(request, "confirmar_cita", cita)
                 messages.success(request, f"La cita {cita.codigo} quedó confirmada.")
         elif accion == "atender" and cita.estado in {Cita.Estado.CONFIRMADA, Cita.Estado.REPROGRAMADA}:
             if cita.fecha_hora_solicitada > timezone.now():

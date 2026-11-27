@@ -14,6 +14,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from .models import Cita, CitaEvento, Conversacion, Especialista, EventoAuditoria, Paciente, Sucursal, Tratamiento
+from .agenda import bloque_disponible, bloques_disponibles
 from .serializers import (
     CambioEstadoCitaSerializer,
     CitaLecturaSerializer,
@@ -91,16 +92,7 @@ class DisponibilidadAPI(APIView):
                 raise ValidationError({"tratamiento": "El tratamiento debe ser un identificador del catálogo."})
 
         duracion = tratamiento.duracion_minutos if tratamiento and tratamiento.duracion_minutos else 30
-        inicio_dia = timezone.make_aware(datetime.combine(fecha, time.min))
-        fin_dia = inicio_dia + timedelta(days=1)
-        ocupadas = list(Cita.objects.filter(
-            especialista=especialista,
-            estado__in=[Cita.Estado.CONFIRMADA, Cita.Estado.REPROGRAMADA],
-            fecha_hora_solicitada__gte=inicio_dia,
-            fecha_hora_solicitada__lt=fin_dia,
-        ).select_related("tratamiento").only("fecha_hora_solicitada", "tratamiento__duracion_minutos"))
-        # La clínica asigna el horario al confirmar; aquí no se prometen franjas libres.
-        bloques = []
+        bloques = bloques_disponibles(especialista, fecha, duracion)
         return Response({"fecha": fecha.isoformat(), "especialista": especialista.pk, "duracion_minutos": duracion, "bloques": bloques})
 
 
@@ -170,10 +162,8 @@ class CitaDetalleAPI(APIView):
                     raise ValidationError({"estado": "El especialista ya no está activo."})
                 Especialista.objects.select_for_update().get(pk=cita.especialista_id)
                 duracion = cita.tratamiento.duracion_minutos or 30
-                fin = cita.fecha_hora_solicitada + timedelta(minutes=duracion)
-                conflictos = Cita.objects.filter(especialista=cita.especialista, estado__in=[Cita.Estado.CONFIRMADA, Cita.Estado.REPROGRAMADA], fecha_hora_solicitada__lt=fin).exclude(pk=cita.pk).select_related("tratamiento")
-                if any(otra.fecha_hora_solicitada + timedelta(minutes=otra.tratamiento.duracion_minutos or 30) > cita.fecha_hora_solicitada for otra in conflictos):
-                    raise ValidationError({"estado": "El horario se cruza con otra cita confirmada."})
+                if not bloque_disponible(cita.especialista, cita.fecha_hora_solicitada, duracion, excluir_cita=cita.pk):
+                    raise ValidationError({"estado": "El horario no coincide con la agenda o se cruza con otra cita o solicitud."})
             cita.estado = nuevo_estado
             cita.save(update_fields=["estado"])
             accion = {

@@ -86,21 +86,26 @@ if not DEBUG:
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-if os.environ.get("POSTGRES_DB"):
+DATABASE_ENGINE = os.environ.get("DJANGO_DATABASE_ENGINE", "postgresql").lower()
+if DATABASE_ENGINE == "sqlite":
+    # Opt-in only for isolated unit tests; PostgreSQL is the application default.
+    DATABASES = {"default": {
+        "ENGINE": "django.db.backends.sqlite3",
+        "NAME": os.environ.get("SQLITE_NAME", str(BASE_DIR / "db.sqlite3")),
+    }}
+elif DATABASE_ENGINE == "postgresql":
     DATABASES = {"default": {
         "ENGINE": "django.db.backends.postgresql",
-        "NAME": os.environ["POSTGRES_DB"],
-        "USER": os.environ.get("POSTGRES_USER", ""),
+        "NAME": os.environ.get("POSTGRES_DB", "vitadent"),
+        "USER": os.environ.get("POSTGRES_USER", "vitadent"),
         "PASSWORD": os.environ.get("POSTGRES_PASSWORD", ""),
         "HOST": os.environ.get("POSTGRES_HOST", "127.0.0.1"),
         "PORT": os.environ.get("POSTGRES_PORT", "5432"),
         "CONN_MAX_AGE": 60,
+        "OPTIONS": {"connect_timeout": 5},
     }}
 else:
-    DATABASES = {"default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
-    }}
+    raise ImproperlyConfigured("DJANGO_DATABASE_ENGINE admite postgresql o sqlite (solo pruebas aisladas).")
 
 CACHES = {
     "default": {
@@ -116,7 +121,7 @@ if os.environ.get("REDIS_URL"):
         "KEY_PREFIX": "vitadent",
     }
 
-if not DEBUG and not os.environ.get("POSTGRES_DB"):
+if not DEBUG and DATABASE_ENGINE != "postgresql":
     raise ImproperlyConfigured("Configura PostgreSQL con POSTGRES_DB para producción.")
 if not DEBUG and not os.environ.get("REDIS_URL"):
     raise ImproperlyConfigured("Configura REDIS_URL para límites distribuidos en producción.")
