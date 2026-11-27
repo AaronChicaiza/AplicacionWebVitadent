@@ -19,7 +19,7 @@ from django.http import HttpResponse, HttpResponseForbidden, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.core.paginator import Paginator
 from django.urls import reverse_lazy
-from django.views.decorators.http import require_POST
+from django.views.decorators.http import require_GET, require_POST
 from django.views.decorators.csrf import csrf_exempt
 from django.db import transaction
 from django.db.models import Count, Max, OuterRef, Q, Subquery, Sum
@@ -225,6 +225,51 @@ def _token_rasa_valido(request):
     token = getattr(settings, "VITADENT_RASA_TOKEN", "")
     bearer = request.headers.get("Authorization", "")
     return bool(token and bearer.startswith("Bearer ") and hmac.compare_digest(bearer[7:], token))
+
+
+@csrf_exempt
+@require_GET
+def api_interna_catalogo_rasa(request, tipo):
+    """Entrega a Rasa solo catálogos activos y mínimos, con token servidor-a-servidor."""
+    if not _token_rasa_valido(request):
+        return JsonResponse({"error": "No autorizado."}, status=401)
+    if tipo == "tratamientos":
+        resultados = list(Tratamiento.objects.filter(activo=True).order_by("nombre").values("id", "nombre", "area")[:100])
+    elif tipo == "especialistas":
+        resultados = list(Especialista.objects.filter(activo=True).order_by("nombre_completo").values("id", "nombre_completo", "especialidad")[:100])
+    elif tipo == "sucursales":
+        resultados = list(Sucursal.objects.filter(activa=True).order_by("nombre").values("id", "nombre", "direccion")[:100])
+    else:
+        return JsonResponse({"error": "Catálogo no permitido."}, status=404)
+    return JsonResponse({"results": resultados})
+
+
+@csrf_exempt
+@require_GET
+def api_interna_disponibilidad_rasa(request):
+    """Consulta agenda vigente para el diálogo Rasa sin exponer datos de pacientes."""
+    if not _token_rasa_valido(request):
+        return JsonResponse({"error": "No autorizado."}, status=401)
+    fecha_texto = request.GET.get("fecha", "")
+    especialista_texto = request.GET.get("especialista", "")
+    tratamiento_texto = request.GET.get("tratamiento", "")
+    try:
+        dia = date.fromisoformat(fecha_texto)
+        if fecha_texto != dia.isoformat() or dia < timezone.localdate() or dia > timezone.localdate() + timedelta(days=365):
+            raise ValueError
+        especialista = Especialista.objects.get(pk=int(especialista_texto), activo=True)
+        tratamiento = Tratamiento.objects.get(pk=int(tratamiento_texto), activo=True)
+    except (ValueError, TypeError, Especialista.DoesNotExist, Tratamiento.DoesNotExist):
+        return JsonResponse({"error": "Fecha, tratamiento o especialista no válidos."}, status=400)
+    duracion = tratamiento.duracion_minutos or 30
+    bloques = bloques_disponibles(especialista, dia, duracion)
+    return JsonResponse({
+        "fecha": dia.isoformat(),
+        "especialista": especialista.pk,
+        "tratamiento": tratamiento.pk,
+        "duracion_minutos": duracion,
+        "bloques": [{"inicio": bloque["inicio"].isoformat(), "fin": bloque["fin"].isoformat()} for bloque in bloques],
+    })
 
 
 def _obtener_cita_whatsapp(datos):
@@ -806,7 +851,7 @@ def gestion_agenda(request):
     for especialista in especialistas:
         _aplicar_color_agenda(especialista)
     especialistas.sort(key=lambda item: (prioridades.get(_clave_color_especialista(item.nombre_completo), len(prioridades)), item.nombre_completo))
-    citas = list(Cita.objects.filter(fecha_hora_solicitada__gte=inicio, fecha_hora_solicitada__lt=fin, especialista__activo=True, estado__in=[Cita.Estado.CONFIRMADA, Cita.Estado.REPROGRAMADA, Cita.Estado.ATENDIDA]).select_related("paciente", "tratamiento", "especialista"))
+    citas = list(Cita.objects.filter(fecha_hora_solicitada__gte=inicio, fecha_hora_solicitada__lt=fin, especialista__activo=True, estado__in=[Cita.Estado.SOLICITADA, Cita.Estado.CONFIRMADA, Cita.Estado.REPROGRAMADA, Cita.Estado.ATENDIDA]).select_related("paciente", "tratamiento", "especialista"))
     # Es el horario general de la clínica, no una disponibilidad fija del profesional.
     if dia.weekday() < 5:
         hora_inicial, hora_final = 9, 20
@@ -1026,18 +1071,19 @@ def espacio_especialista(request):
     perfil = getattr(request.user, "perfil_especialista", None)
     if not perfil or not perfil.activo:
         return redirigir_segun_rol(request.user)
-    citas = Cita.objects.filter(especialista=perfil).select_related("paciente", "tratamiento").order_by("fecha_hora_solicitada")
+    estados_activos = [Cita.Estado.SOLICITADA, Cita.Estado.CONFIRMADA, Cita.Estado.REPROGRAMADA, Cita.Estado.ATENDIDA]
+    citas = Cita.objects.filter(especialista=perfil, estado__in=estados_activos).select_related("paciente", "tratamiento").order_by("fecha_hora_solicitada")
     seccion = {
         "espacio_especialista": "resumen",
         "especialista_pacientes": "pacientes",
         "especialista_agenda": "agenda",
     }.get(request.resolver_match.url_name, "resumen")
-    estados_activos = [Cita.Estado.SOLICITADA, Cita.Estado.CONFIRMADA, Cita.Estado.REPROGRAMADA, Cita.Estado.ATENDIDA]
     return render(request, "web/espacio_especialista.html", contexto_base(
         perfil=perfil,
         seccion_especialista=seccion,
         puede_ver_dashboard=_es_veronica_martinez(perfil),
         citas=citas,
+        citas_agenda_count=citas.count(),
         citas_proximas=citas.filter(estado__in=[Cita.Estado.CONFIRMADA, Cita.Estado.REPROGRAMADA], fecha_hora_solicitada__gte=timezone.now())[:5],
         pacientes=Paciente.objects.filter(citas__especialista=perfil, citas__estado__in=estados_activos).annotate(
             total_citas=Count("citas", filter=Q(citas__especialista=perfil, citas__estado__in=estados_activos)),

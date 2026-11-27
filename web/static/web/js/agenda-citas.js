@@ -9,7 +9,7 @@ if (grid) {
     const duration = Number(item.dataset.duration);
     if (Number.isFinite(top) && Number.isFinite(duration)) {
       item.style.top = `${Math.max(0, top) * hourSize / 60}px`;
-      item.style.height = `${Math.max(14, duration * hourSize / 60)}px`;
+      item.style.height = `${Math.max(40, duration * hourSize / 60)}px`;
     }
   });
 }

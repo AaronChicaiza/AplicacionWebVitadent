@@ -9,6 +9,9 @@ nlu:
       - buenas noches
       - buenos días
       - buenas tardes, VitaDent
+      - buenas, una consulta
+      - hola, me ayudan porfa
+      - holaa
       - qué tal
   - intent: despedida
     examples: |
@@ -21,6 +24,11 @@ nlu:
       - quiero sacar un turno
       - ayudeme agendando una cita
       - quisiera agendar para mañana
+      - ayúdame con un turno para [limpieza dental](tratamiento)
+      - quiero sacar una cita para [diagnóstico general](tratamiento)
+      - me puedes agendar con [Dra. Odalis Monar](especialista)
+      - quisiera una cita el [27/11/2026 14:00](fecha_hora)
+      - un turno para el [27/11/2026 14:00](fecha_hora), por favor
       - necesito una cita odontologica
       - deseo reservar una consulta dental
       - me da cita por favor
@@ -41,6 +49,9 @@ nlu:
       - hay disponibilidad con la doctora [Odalis Monar](especialista)
       - hay citas para esta semana
       - quiero saber si hay espacio mañana
+      - ¿qué horas libres tienen el [27/11/2026 14:00](fecha_hora)?
+      - revisa disponibilidad para [diagnóstico general](tratamiento)
+      - hay un turno con [Dra. Odalis Monar](especialista) el [27/11/2026 14:00](fecha_hora)
   - intent: cancelar_cita
     examples: |
       - quiero cancelar mi cita
@@ -48,6 +59,8 @@ nlu:
       - por favor anule mi turno
       - anula mi turno
       - ya no puedo asistir a mi reserva
+      - cancela el turno, ya no alcanzo a ir
+      - anula la cita que tengo agendada
   - intent: reprogramar_cita
     examples: |
       - necesito cambiar la fecha de mi cita
@@ -55,6 +68,8 @@ nlu:
       - quiero reprogramar mi cita
       - cambie mi cita para el lunes
       - deseo mover el turno
+      - cambiemos la hora de mi cita
+      - quiero pasar mi turno para otro día
   - intent: consultar_tratamientos
     examples: |
       - qué tratamientos ofrecen
@@ -65,11 +80,18 @@ nlu:
       - qué especialistas trabajan ahí
       - quién atiende ortodoncia
       - quiero conocer a los odontólogos
-  - intent: confirmar_cita
+  - intent: consultar_estado_cita
     examples: |
-      - quiero confirmar mi cita
-      - confirma mi asistencia
+      - quiero saber el estado de mi cita
+      - cómo va mi cita
+      - necesito consultar si mi turno está confirmado
+      - mi cita sigue pendiente
+      - ¿me confirman para qué día quedó la cita?
+      - quisiera revisar mi reserva
       - mi código de cita es [AB12CD34](codigo_cita)
+      - tengo el código [ZX91YU42](codigo_cita), quiero consultar la cita
+      - revisa el estado de la cita [AB12CD34](codigo_cita)
+      - quiero saber cuándo me toca, mi código es [ZX91YU42](codigo_cita)
   - intent: solicitar_asesor_humano
     examples: |
       - quiero hablar con recepción
@@ -104,6 +126,10 @@ nlu:
       - escribí mal mi nombre
       - puse mal la fecha
       - cambiar el tratamiento
+      - corrige mi nombre a [Ana Ejemplo](nombre)
+      - el tratamiento correcto es [Limpieza dental](tratamiento)
+      - cambia la fecha a [27/11/2026 14:00](fecha_hora)
+      - prefiero con [Dra. Odalis Monar](especialista)
   - intent: abandonar_flujo
     examples: |
       - salir de aquí

@@ -1,5 +1,12 @@
 .env
 .venv/
+rasa/.venv/
+rasa/.python/
+.uv-cache/
+.rasa/
+models/
+rasa/.tmp/
+rasa/.rasa-home/
 venv/
 __pycache__/
 *.py[cod]

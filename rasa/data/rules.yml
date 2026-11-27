@@ -52,9 +52,9 @@ rules:
       - active_loop: null
       - action: action_revisar_reprogramacion
 
-  - rule: Iniciar consulta de cita
+  - rule: Iniciar consulta de estado de cita
     steps:
-      - intent: confirmar_cita
+      - intent: consultar_estado_cita
       - action: consulta_cita_form
       - active_loop: consulta_cita_form
 
@@ -95,9 +95,15 @@ rules:
       - active_loop: reserva_form
     steps:
       - intent: corregir_datos
-      - action: action_deactivate_loop
+      - action: utter_correccion_retenida
+      - action: reserva_form
+
+  - rule: Solicitar contexto para corregir datos
+    condition:
       - active_loop: null
-      - action: action_cancelar_solicitud
+    steps:
+      - intent: corregir_datos
+      - action: utter_corregir_iniciar
 
   - rule: Abandonar reserva
     condition:

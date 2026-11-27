@@ -55,17 +55,25 @@
 .admin-modal-error{color:#a43f36;font-size:11px}
 @media(max-width:700px){.admin-table-shell{padding:14px 12px}.admin-table-toolbar{align-items:flex-start;flex-direction:column}.admin-crud-form .form-row{grid-template-columns:1fr}.admin-modal .modal-body{padding:16px}.admin-panel .dt-layout-row{gap:9px}.admin-panel .dt-layout-cell{width:100%}.admin-panel .dt-search{width:100%}.admin-panel .dt-search input{width:min(100%,220px)}}
 
-/* Citas: las acciones se distribuyen dentro de su columna. */
-#tabla-citas { width: 100% !important; table-layout: fixed; }
+/* Citas: conserva el ancho de las columnas y permite desplazamiento horizontal en pantallas estrechas. */
+#tabla-citas { width: 1080px !important; min-width: 1080px; table-layout: fixed; }
+.cita-table-responsive { display: block; width: 100%; overflow-x: auto; }
 #tabla-citas th, #tabla-citas td { min-width: 0; overflow-wrap: anywhere; padding-left: 8px; padding-right: 8px; }
-#tabla-citas th:nth-child(1) { width: 13%; }
-#tabla-citas th:nth-child(2) { width: 11%; }
-#tabla-citas th:nth-child(3) { width: 12%; }
-#tabla-citas th:nth-child(4) { width: 13%; }
-#tabla-citas th:nth-child(5) { width: 15%; }
-#tabla-citas th:nth-child(6) { width: 16%; }
-#tabla-citas th:nth-child(7) { width: 8%; }
-#tabla-citas th:nth-child(8) { width: 12%; }
+#tabla-citas td { white-space: normal; word-break: normal; }
+#tabla-citas td:nth-child(1) strong { display: block; white-space: normal; overflow-wrap: anywhere; word-break: normal; }
+#tabla-citas th:nth-child(1), #tabla-citas td:nth-child(1) { min-width: 190px !important; }
+#tabla-citas .patient-contact { white-space: nowrap !important; overflow-wrap: normal !important; }
+#tabla-citas .patient-appointment-code { white-space: nowrap !important; overflow-wrap: normal !important; font-size: 10px; }
+#tabla-citas .cita-col-paciente { width: 190px; }
+#tabla-citas .cita-col-tratamiento { width: 130px; }
+#tabla-citas .cita-col-fecha { width: 130px; }
+#tabla-citas .cita-col-especialista { width: 155px; }
+#tabla-citas .cita-col-nota { width: 105px; }
+#tabla-citas .cita-col-pago { width: 155px; }
+#tabla-citas .cita-col-estado { width: 90px; }
+#tabla-citas .cita-col-acciones { width: 125px; }
+#tabla-citas .patient-contact, #tabla-citas .patient-appointment-code { display: block; margin-top: 3px; white-space: normal; }
+#tabla-citas .patient-appointment-code { color: #526663; font-weight: 600; }
 #tabla-citas .schedule-specialist-label { white-space: normal; }
 #tabla-citas .cita-actions { display: grid; gap: 8px; justify-content: stretch; white-space: normal; min-width: 0; }
 #tabla-citas .cita-actions-main { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; min-width: 0; }
@@ -78,4 +86,25 @@
 #tabla-citas .cita-action-button:hover { background: #d3eee6; }
 #tabla-citas .cita-action-button:focus-visible { outline: 2px solid #087d83; outline-offset: 2px; }
 #tabla-citas .admin-icon-action { flex-shrink: 0; }
-@media (max-width: 850px) { #tabla-citas th, #tabla-citas td { padding-left: 5px; padding-right: 5px; font-size: 11px; } #tabla-citas .cita-action-button span { display: none; } #tabla-citas .cita-action-button { width: 34px; padding: 5px; } }
+@media (max-width: 900px) { .cita-table-responsive { overflow-x: auto !important; } }
+@media (max-width: 900px) {
+  /* El estilo responsive genérico asigna anchos de tabla de cinco columnas; esta vista tiene ocho. */
+  #tabla-citas th:nth-child(1), #tabla-citas td:nth-child(1) { width: 190px !important; }
+  #tabla-citas th:nth-child(2), #tabla-citas td:nth-child(2) { width: 130px !important; }
+  #tabla-citas th:nth-child(3), #tabla-citas td:nth-child(3) { width: 130px !important; }
+  #tabla-citas th:nth-child(4), #tabla-citas td:nth-child(4) { width: 155px !important; }
+  #tabla-citas th:nth-child(5), #tabla-citas td:nth-child(5) { width: 105px !important; }
+  #tabla-citas th:nth-child(6), #tabla-citas td:nth-child(6) { width: 155px !important; }
+  #tabla-citas th:nth-child(7), #tabla-citas td:nth-child(7) { width: 90px !important; }
+  #tabla-citas th:nth-child(8), #tabla-citas td:nth-child(8) { width: 125px !important; }
+}
+@media (max-width: 650px) {
+  .cita-table-responsive { overflow-x: auto !important; }
+  #tabla-citas { display: table !important; width: 1080px !important; min-width: 1080px !important; white-space: normal; }
+  #tabla-citas thead { display: table-header-group !important; }
+  #tabla-citas tbody { display: table-row-group !important; width: auto; }
+  #tabla-citas tr { display: table-row !important; width: auto; padding: 0; }
+  #tabla-citas th, #tabla-citas td { display: table-cell !important; padding: 10px 8px !important; font-size: 11px; }
+  #tabla-citas .cita-action-button span { display: inline !important; }
+  #tabla-citas .cita-action-button { width: auto; }
+}

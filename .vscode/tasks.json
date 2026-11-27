@@ -1,0 +1,56 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "VitaDent: 1. Iniciar Django (SQLite local)",
+      "type": "process",
+      "command": "${workspaceFolder}\\.venv\\Scripts\\python.exe",
+      "args": ["manage.py", "runserver", "127.0.0.1:8000"],
+      "options": {
+        "cwd": "${workspaceFolder}",
+        "env": {
+          "DJANGO_DATABASE_ENGINE": "sqlite",
+          "SQLITE_NAME": "${workspaceFolder}\\rasa\\vitadent_vscode.sqlite3",
+          "VITADENT_RASA_TOKEN": "token-local-solo-pruebas",
+          "VITADENT_RASA_URL": "http://127.0.0.1:5005"
+        }
+      },
+      "problemMatcher": [],
+      "presentation": {"reveal": "always", "panel": "dedicated", "focus": false}
+    },
+    {
+      "label": "VitaDent: 2. Iniciar acciones del bot",
+      "type": "process",
+      "command": "${workspaceFolder}\\rasa\\.venv\\Scripts\\rasa.exe",
+      "args": ["run", "actions", "--actions", "actions", "--port", "5055"],
+      "options": {
+        "cwd": "${workspaceFolder}\\rasa",
+        "env": {
+          "VITADENT_RASA_TOKEN": "token-local-solo-pruebas",
+          "VITADENT_DJANGO_INTERNAL_URL": "http://127.0.0.1:8000",
+          "DJANGO_DATABASE_ENGINE": "sqlite",
+          "SQLITE_NAME": "${workspaceFolder}\\rasa\\vitadent_vscode.sqlite3"
+        }
+      },
+      "problemMatcher": [],
+      "presentation": {"reveal": "always", "panel": "dedicated", "focus": false}
+    },
+    {
+      "label": "VitaDent: 3. Conversar con el bot",
+      "type": "process",
+      "command": "${workspaceFolder}\\rasa\\.venv\\Scripts\\rasa.exe",
+      "args": ["shell", "--endpoints", "rasa\\endpoints.vscode.yml"],
+      "options": {
+        "cwd": "${workspaceFolder}",
+        "env": {
+          "DJANGO_DATABASE_ENGINE": "sqlite",
+          "SQLITE_NAME": "${workspaceFolder}\\rasa\\vitadent_vscode.sqlite3",
+          "VITADENT_RASA_TOKEN": "token-local-solo-pruebas",
+          "RASA_HOME": "${workspaceFolder}\\rasa\\.rasa-home"
+        }
+      },
+      "problemMatcher": [],
+      "presentation": {"reveal": "always", "panel": "dedicated", "focus": true}
+    }
+  ]
+}

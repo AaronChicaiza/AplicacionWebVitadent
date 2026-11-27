@@ -1,0 +1,4 @@
+# Configuración para probar desde la terminal integrada de VS Code.
+# El shell conserva el diálogo en memoria; Redis solo se usa en Compose.
+action_endpoint:
+  url: "http://127.0.0.1:5055/webhook"

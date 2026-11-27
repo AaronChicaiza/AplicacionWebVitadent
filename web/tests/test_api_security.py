@@ -10,7 +10,7 @@ from django.test import Client, override_settings
 from django.urls import reverse
 from django.utils import timezone
 
-from web.models import Cita, Conversacion, Especialista, MensajeConversacion, Paciente, Tratamiento
+from web.models import Cita, Conversacion, Especialista, HorarioAtencion, MensajeConversacion, Paciente, Tratamiento
 from web.servicios_whatsapp import procesar_evento_whatsapp
 
 
@@ -25,6 +25,43 @@ def test_internal_booking_rejects_missing_token():
         content_type="application/json",
     )
     assert response.status_code == 401
+
+
+@pytest.mark.django_db
+@override_settings(VITADENT_RASA_TOKEN="test-internal-token")
+def test_rasa_catalog_and_availability_endpoints_require_internal_token():
+    specialist = Especialista.objects.create(nombre_completo="Dra. Prueba", especialidad="Odontología")
+    treatment = Tratamiento.objects.create(nombre="Tratamiento de prueba", area="Odontología", duracion_minutos=30)
+    dia = timezone.localdate() + timedelta(days=7)
+    HorarioAtencion.objects.create(especialista=specialist, dia_semana=dia.weekday(), hora_inicio="09:00", hora_fin="10:00")
+    client = Client()
+
+    catalogo_sin_token = client.get(reverse("api_interna_catalogo_rasa", args=["tratamientos"]))
+    catalogo = client.get(reverse("api_interna_catalogo_rasa", args=["tratamientos"]), HTTP_AUTHORIZATION="Bearer test-internal-token")
+    disponibilidad_sin_token = client.get(reverse("api_interna_disponibilidad_rasa"), {"fecha": dia.isoformat(), "especialista": specialist.pk, "tratamiento": treatment.pk})
+    disponibilidad = client.get(
+        reverse("api_interna_disponibilidad_rasa"),
+        {"fecha": dia.isoformat(), "especialista": specialist.pk, "tratamiento": treatment.pk},
+        HTTP_AUTHORIZATION="Bearer test-internal-token",
+    )
+
+    assert catalogo_sin_token.status_code == 401
+    assert catalogo.status_code == 200
+    assert any(item["nombre"] == treatment.nombre for item in catalogo.json()["results"])
+    assert disponibilidad_sin_token.status_code == 401
+    assert disponibilidad.status_code == 200
+    assert disponibilidad.json()["bloques"]
+
+
+@pytest.mark.django_db
+@override_settings(VITADENT_RASA_TOKEN="test-internal-token")
+def test_rasa_availability_rejects_invalid_catalog_ids():
+    response = Client().get(
+        reverse("api_interna_disponibilidad_rasa"),
+        {"fecha": (timezone.localdate() + timedelta(days=1)).isoformat(), "especialista": "0", "tratamiento": "0"},
+        HTTP_AUTHORIZATION="Bearer test-internal-token",
+    )
+    assert response.status_code == 400
 
 
 @pytest.mark.django_db

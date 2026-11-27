@@ -9,7 +9,7 @@ intents:
   - reprogramar_cita
   - consultar_tratamientos
   - consultar_especialistas
-  - confirmar_cita
+  - consultar_estado_cita
   - solicitar_asesor_humano
   - afirmar
   - negar
@@ -35,12 +35,18 @@ slots:
     type: text
     influence_conversation: false
     mappings:
+      - type: from_entity
+        entity: nombre
+        intent: corregir_datos
       - type: from_text
         conditions: [{active_loop: reserva_form, requested_slot: nombre}]
   identificacion:
     type: text
     influence_conversation: false
     mappings:
+      - type: from_entity
+        entity: identificacion
+        intent: corregir_datos
       - type: from_text
         conditions: [{active_loop: reserva_form, requested_slot: identificacion}]
       - type: from_text
@@ -53,6 +59,9 @@ slots:
     type: text
     influence_conversation: false
     mappings:
+      - type: from_entity
+        entity: tratamiento
+        intent: corregir_datos
       - type: from_text
         conditions: [{active_loop: reserva_form, requested_slot: tratamiento}]
       - type: from_text
@@ -61,6 +70,9 @@ slots:
     type: text
     influence_conversation: false
     mappings:
+      - type: from_entity
+        entity: especialista
+        intent: corregir_datos
       - type: from_text
         conditions: [{active_loop: reserva_form, requested_slot: especialista}]
       - type: from_text
@@ -69,6 +81,9 @@ slots:
     type: text
     influence_conversation: false
     mappings:
+      - type: from_entity
+        entity: fecha_hora
+        intent: corregir_datos
       - type: from_text
         conditions: [{active_loop: reserva_form, requested_slot: fecha_hora}]
       - type: from_text
@@ -184,6 +199,10 @@ responses:
     - text: "{resumen_solicitud} Si los datos son correctos, responde sí para enviar la solicitud a recepción; todavía no es una cita confirmada."
   utter_no_enviada:
     - text: "No envié la solicitud. Puedes iniciar otra conversación cuando quieras."
+  utter_correccion_retenida:
+    - text: "Claro, conservaré los demás datos. Indica el campo y el valor correcto, por ejemplo: cambia la fecha a 27/11/2026 14:00."
+  utter_corregir_iniciar:
+    - text: "Puedo corregir los datos durante una solicitud activa. Escribe «reservar cita» para continuar."
 
 actions:
   - action_revisar_reserva
